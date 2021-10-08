@@ -16,6 +16,6 @@ namespace MapEditorMod {
         public override void Unload() { }
 
         public static void Log(LogLevel level, string message)
-            => Logger.Log(level, "Map Maker Mod", message);
+            => Logger.Log(level, "Level Editor Mod", message);
     }
 }
