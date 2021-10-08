@@ -7,8 +7,8 @@
     <ProjectGuid>{30219B67-2EEC-4163-B5B2-0E4EC478DD59}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MapEditorMod</RootNamespace>
-    <AssemblyName>MapEditorMod</AssemblyName>
+    <RootNamespace>LevelEditorMod</RootNamespace>
+    <AssemblyName>LevelEditorMod</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,22 +33,28 @@
   <ItemGroup>
     <Reference Include="Celeste">
       <HintPath>..\..\..\Celeste.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="FNA">
       <HintPath>..\..\..\FNA.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MMHOOK_Celeste">
       <HintPath>..\..\..\MMHOOK_Celeste.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\..\Mono.Cecil.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\..\MonoMod.Utils.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="YamlDotNet">
       <HintPath>..\..\..\YamlDotNet.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

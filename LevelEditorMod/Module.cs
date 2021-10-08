@@ -1,6 +1,6 @@
 ﻿using Celeste.Mod;
 
-namespace MapEditorMod {
+namespace LevelEditorMod {
     public class Module : EverestModule {
         public static Module Instance {
             get;

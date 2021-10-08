@@ -1,7 +1,7 @@
-﻿using MapEditorMod.Editor;
+﻿using LevelEditorMod.Editor;
 using Monocle;
 
-namespace MapEditorMod {
+namespace LevelEditorMod {
     internal class Commands {
         [Command("editor", "opens the level editor")]
         internal static void EditorCommand() => EditorScene.Open();
