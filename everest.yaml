@@ -1,0 +1,6 @@
+- Name: MapEditorMod
+  Version: 1.0.0
+  DLL: MapEditorMod/bin/Debug/MapEditorMod.dll
+  Dependencies:
+    - Name: Everest
+      Version: 1.3070.0
