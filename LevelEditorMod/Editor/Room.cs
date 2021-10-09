@@ -98,7 +98,7 @@ namespace LevelEditorMod.Editor {
 
             // BgDecals
             foreach (Decal decal in bgDecals)
-                decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.scale);
+                decal.Render(offset);
 
             // FgTiles
             for (int x = startX; x < endX; x++)
@@ -108,7 +108,7 @@ namespace LevelEditorMod.Editor {
 
             // FgDecals
             foreach (Decal decal in fgDecals)
-                decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.scale);
+                decal.Render(offset);
         }
     }
 }

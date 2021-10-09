@@ -24,5 +24,9 @@ namespace LevelEditorMod.Editor {
             position = data.Position;
             scale = data.Scale;
         }
+
+        internal void Render(Vector2 offset) {
+            texture.DrawCentered(offset + position, Color.White, scale);
+        }
     }
 }
