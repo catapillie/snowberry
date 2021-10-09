@@ -18,12 +18,12 @@ namespace LevelEditorMod.Editor {
         public Vector2 Position => new Vector2(X, Y);
         public Vector2 Size => new Vector2(Width, Height);
 
-        public VirtualMap<char> FgTileMap { get; private set; }
-        public VirtualMap<char> BgTileMap { get; private set; }
-        public VirtualMap<MTexture> FgTiles, BgTiles;
+        private readonly VirtualMap<char> fgTileMap;
+        private readonly VirtualMap<char> bgTileMap;
+        private VirtualMap<MTexture> fgTiles, bgTiles;
 
-        public readonly List<Decal> FgDecals = new List<Decal>();
-        public readonly List<Decal> BgDecals = new List<Decal>();
+        private readonly List<Decal> fgDecals = new List<Decal>();
+        private readonly List<Decal> bgDecals = new List<Decal>();
 
         public int LoadSeed {
             get {
@@ -36,13 +36,13 @@ namespace LevelEditorMod.Editor {
             }
         }
 
-        private readonly Regex tileSplitter = new Regex("\\r\\n|\\n\\r|\\n|\\r");
+        private static readonly Regex tileSplitter = new Regex("\\r\\n|\\n\\r|\\n|\\r");
 
         public Room(string name, Rectangle bounds) {
             Name = name;
             Bounds = bounds;
-            FgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
-            BgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
+            fgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
+            bgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
         }
 
         public Room(LevelData data)
@@ -51,7 +51,7 @@ namespace LevelEditorMod.Editor {
             string[] array = tileSplitter.Split(data.Bg);
             for (int i = 0; i < array.Length; i++) {
                 for (int j = 0; j < array[i].Length; j++) {
-                    BgTileMap[j, i] = array[i][j];
+                    bgTileMap[j, i] = array[i][j];
                 }
             }
 
@@ -59,7 +59,7 @@ namespace LevelEditorMod.Editor {
             string[] array2 = tileSplitter.Split(data.Solids);
             for (int i = 0; i < array2.Length; i++) {
                 for (int j = 0; j < array2[i].Length; j++) {
-                    FgTileMap[j, i] = array2[i][j];
+                    fgTileMap[j, i] = array2[i][j];
                 }
             }
 
@@ -67,18 +67,18 @@ namespace LevelEditorMod.Editor {
 
             // BgDecals
             foreach (DecalData decal in data.BgDecals) {
-                BgDecals.Add(new Decal(this, decal));
+                bgDecals.Add(new Decal(this, decal));
             }
 
             // FgDecals
             foreach (DecalData decal in data.FgDecals) {
-                FgDecals.Add(new Decal(this, decal));
+                fgDecals.Add(new Decal(this, decal));
             }
         }
 
         private void Autotile() {
-            FgTiles = GFX.FGAutotiler.GenerateMap(FgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
-            BgTiles = GFX.BGAutotiler.GenerateMap(BgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
+            fgTiles = GFX.FGAutotiler.GenerateMap(fgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
+            bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
         public void Render(Rectangle viewRect) {
@@ -93,22 +93,22 @@ namespace LevelEditorMod.Editor {
             // BgTiles
             for (int x = startX; x < endX; x++)
                 for (int y = startY; y < endY; y++)
-                    if (BgTiles[x, y] != null)
-                        BgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
+                    if (bgTiles[x, y] != null)
+                        bgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
             // BgDecals
-            foreach (Decal decal in BgDecals)
-                decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.Scale);
+            foreach (Decal decal in bgDecals)
+                decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.scale);
 
             // FgTiles
             for (int x = startX; x < endX; x++)
                 for (int y = startY; y < endY; y++)
-                    if (FgTiles[x, y] != null)
-                        FgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
+                    if (fgTiles[x, y] != null)
+                        fgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
             // FgDecals
-            foreach (Decal decal in FgDecals)
-                decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.Scale);
+            foreach (Decal decal in fgDecals)
+                decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.scale);
         }
     }
 }

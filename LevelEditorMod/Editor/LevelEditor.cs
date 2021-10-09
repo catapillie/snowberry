@@ -11,7 +11,7 @@ namespace LevelEditorMod.Editor {
 
         private Vector2 mousePos, lastMousePos;
         private Vector2 mouseWorldPos, lastMouseWorldPos;
-        private Camera camera;
+        private readonly Camera camera;
 
         private Map map;
 
