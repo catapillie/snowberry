@@ -40,6 +40,11 @@ namespace LevelEditorMod.Editor {
 
         public EntityPlugin() { }
 
+        internal EntityPlugin SetPosition(Vector2 position) {
+            pos = position - room.Position * 8;
+            return this;
+        }
+
         protected Vector2[] GetNodes() {
             return nodes.Select((Vector2 node) => room.Position * 8 + node).ToArray();
         }
@@ -72,6 +77,21 @@ namespace LevelEditorMod.Editor {
             return this;
         }
 
+        #region Entity Instantiating
+
+        internal static EntityPlugin Create(string name, Room room) {
+            if (Plugins.Entities.TryGetValue(name, out var ctor)) {
+                EntityPlugin entity = ctor();
+
+                entity.Name = name;
+                entity.room = room;
+
+                return entity;
+            }
+
+            return null;
+        }
+
         internal static EntityPlugin Create(Room room, EntityData entityData) {
             if (Plugins.Entities.TryGetValue(entityData.Name, out var ctor)) {
                 EntityPlugin entity = ctor();
@@ -89,5 +109,7 @@ namespace LevelEditorMod.Editor {
             entity = Create(room, entityData);
             return entity != null;
         }
+
+        #endregion
     }
 }

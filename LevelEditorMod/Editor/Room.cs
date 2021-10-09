@@ -83,8 +83,13 @@ namespace LevelEditorMod.Editor {
             foreach (EntityData entity in data.Entities) {
                 if (EntityPlugin.TryCreate(this, entity, out EntityPlugin e))
                     entities.Add(e);
-                //else
-                //    Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
+                else
+                    Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
+            }
+
+            // Player Spawnpoints (excluded from LevelData.Entities)
+            foreach (Vector2 spawn in data.Spawns) {
+                entities.Add(EntityPlugin.Create("player", this).SetPosition(spawn));
             }
 
             // Triggers
@@ -94,8 +99,6 @@ namespace LevelEditorMod.Editor {
                 else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
-
-            // TODO: better unknown entity message maybe
         }
 
         private void Autotile() {
