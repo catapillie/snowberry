@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -80,14 +81,18 @@ namespace LevelEditorMod.Editor {
             BgTiles = GFX.BGAutotiler.GenerateMap(BgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        public void Render() {
+        public void Render(Rectangle viewRect) {
             Vector2 offset = Position * 8;
-
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
 
+            int startX = Math.Max(0, (viewRect.Left - X * 8) / 8);
+            int startY = Math.Max(0, (viewRect.Top - Y * 8) / 8);
+            int endX = Math.Min(Width, Width + (viewRect.Right - (X + Width) * 8) / 8);
+            int endY = Math.Min(Height, Height + (viewRect.Bottom - (Y + Height) * 8) / 8);
+
             // BgTiles
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            for (int x = startX; x < endX; x++)
+                for (int y = startY; y < endY; y++)
                     if (BgTiles[x, y] != null)
                         BgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
@@ -96,8 +101,8 @@ namespace LevelEditorMod.Editor {
                 decal.Texture.DrawCentered(offset + decal.Position, Color.White, decal.Scale);
 
             // FgTiles
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            for (int x = startX; x < endX; x++)
+                for (int y = startY; y < endY; y++)
                     if (FgTiles[x, y] != null)
                         FgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 

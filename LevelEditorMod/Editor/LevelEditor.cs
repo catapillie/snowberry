@@ -62,8 +62,17 @@ namespace LevelEditorMod.Editor {
         public override void Render() {
             Engine.Instance.GraphicsDevice.Clear(bg);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix * Engine.ScreenMatrix);
-            map.Render(camera);
+            
+            int left = (int)camera.Left;
+            int right = (int)camera.Right;
+            int top = (int)camera.Top;
+            int bottom = (int)camera.Bottom;
+            Rectangle viewRect = new Rectangle(left, top, right - left, bottom - top);
+
+            map.Render(viewRect);
+
             Draw.SpriteBatch.End();
+
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null);
             Draw.Text(Draw.DefaultFont, $"Currently editing : {map.Name}...\nCamera : {camera.Position}, Zoom : {camera.Zoom}", Vector2.Zero, Color.White);
