@@ -120,6 +120,10 @@ namespace LevelEditorMod.Editor {
             foreach (Decal decal in bgDecals)
                 decal.Render(offset);
 
+            // Entities
+            foreach (EntityPlugin entity in entities)
+                entity.Render();
+
             // FgTiles
             for (int x = startX; x < endX; x++)
                 for (int y = startY; y < endY; y++)
