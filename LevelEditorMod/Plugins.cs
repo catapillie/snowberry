@@ -11,9 +11,14 @@ namespace LevelEditorMod {
         internal static void Register(Assembly assembly) {
             foreach (Type t in assembly.GetTypes()) {
                 if (t.GetCustomAttribute<EntityPluginAttribute>() is EntityPluginAttribute pl) {
+                    if (pl.Name == null || pl.Name == string.Empty) {
+                        Module.Log(LogLevel.Warn, $"Found entity plugin with null or empty name! skipping... (Type: {t})");
+                        continue;
+                    }
+
                     ConstructorInfo ctor = t.GetConstructor(new Type[] { });
                     if (ctor == null) {
-                        Module.Log(LogLevel.Error, $"'{pl.Name}' does not have a parameterless constructor, skipping...");
+                        Module.Log(LogLevel.Warn, $"'{pl.Name}' does not have a parameterless constructor, skipping...");
                         continue;
                     }
 

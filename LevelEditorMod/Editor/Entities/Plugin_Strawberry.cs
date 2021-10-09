@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 namespace LevelEditorMod.Editor.Entities {
     [EntityPlugin("strawberry")]
     public class Plugin_Strawberry : EntityPlugin {
-        [EntityOption("winged")] public bool Winged;
+        [EntityOption("")] public bool Winged;
         [EntityOption("moon")] public bool Moon;
         [EntityOption("order")] public int Order;
         [EntityOption("checkpointID")] public int CheckpointID;

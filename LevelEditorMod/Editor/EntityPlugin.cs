@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace LevelEditorMod.Editor {
     public abstract class EntityPlugin {
         private Room room;
 
+        protected string Name { get; private set; }
+
         private Vector2 pos;
         protected Vector2 Position => room.Position * 8 + pos;
         protected int Width { get; private set; }
@@ -45,18 +48,24 @@ namespace LevelEditorMod.Editor {
 
         private EntityPlugin Initialize(EntityData entityData) {
             pos = entityData.Position;
+
             Width = entityData.Width;
             Height = entityData.Height;
             Origin = entityData.Origin;
+
             nodes.AddRange(entityData.Nodes);
+
             return Initialize(entityData.Values);
         }
 
         private EntityPlugin Initialize(Dictionary<string, object> data) {
             foreach (FieldInfo f in GetType().GetFields()) {
-                if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option &&
-                    data.TryGetValue((option.Name ?? f.Name).ToString(), out object value)) {
-                    f.SetValue(this, value);
+                if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option) {
+                    if (option.Name == null || option.Name == string.Empty) {
+                        Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{Name}' was ignored because it had a null or empty option name!");
+                        continue;
+                    } else if (data.TryGetValue(option.Name, out object value))
+                        f.SetValue(this, value);
                 }
             }
 
@@ -66,7 +75,10 @@ namespace LevelEditorMod.Editor {
         internal static EntityPlugin Create(Room room, EntityData entityData) {
             if (Plugins.Entities.TryGetValue(entityData.Name, out var ctor)) {
                 EntityPlugin entity = ctor();
+
+                entity.Name = entityData.Name;
                 entity.room = room;
+
                 return entity.Initialize(entityData);
             }
 
