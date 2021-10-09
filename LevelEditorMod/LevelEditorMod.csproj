@@ -65,9 +65,12 @@
     <Compile Include="Editor\LevelEditor.cs" />
     <Compile Include="Editor\Map.cs" />
     <Compile Include="Editor\Room.cs" />
+    <Compile Include="Editor\TriggerPlugin.cs" />
+    <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -91,8 +91,8 @@ namespace LevelEditorMod.Editor {
             foreach (EntityData trigger in data.Triggers) {
                 if (EntityPlugin.TryCreate(this, trigger, out EntityPlugin t))
                     triggers.Add(t);
-                //else
-                //    Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
+                else
+                    Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
 
             // TODO: better unknown entity message maybe
@@ -135,6 +135,10 @@ namespace LevelEditorMod.Editor {
             // FgDecals
             foreach (Decal decal in fgDecals)
                 decal.Render(offset);
+
+            // Triggers
+            foreach (EntityPlugin trigger in triggers)
+                trigger.Render();
         }
     }
 }
