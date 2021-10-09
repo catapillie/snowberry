@@ -27,19 +27,22 @@ namespace LevelEditorMod.Editor {
         private Room room;
 
         private Vector2 pos;
-        private int width;
-        private int height;
-        private Vector2 origin; // unused
+        protected Vector2 Position => room.Position * 8 + pos;
+        protected int Width { get; private set; }
+        protected int Height { get; private set; }
+        protected Vector2 Origin { get; private set; }
 
         private readonly List<Vector2> nodes = new List<Vector2>();
 
         public EntityPlugin() { }
 
+        internal virtual void Render() { }
+
         private EntityPlugin Initialize(EntityData entityData) {
             pos = entityData.Position;
-            width = entityData.Width;
-            height = entityData.Height;
-            origin = entityData.Origin;
+            Width = entityData.Width;
+            Height = entityData.Height;
+            Origin = entityData.Origin;
             nodes.AddRange(entityData.Nodes);
             return Initialize(entityData.Values);
         }
