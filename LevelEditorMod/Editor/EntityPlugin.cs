@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace LevelEditorMod.Editor {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class EntityPluginAttribute : Attribute {
         internal readonly string Name;
 
@@ -14,7 +14,7 @@ namespace LevelEditorMod.Editor {
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class EntityOptionAttribute : Attribute {
         internal readonly string Name;
 

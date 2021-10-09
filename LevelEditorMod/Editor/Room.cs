@@ -83,17 +83,19 @@ namespace LevelEditorMod.Editor {
             foreach (EntityData entity in data.Entities) {
                 if (EntityPlugin.TryCreate(this, entity, out EntityPlugin e))
                     entities.Add(e);
-                else
-                    Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
+                //else
+                //    Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
             }
 
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
                 if (EntityPlugin.TryCreate(this, trigger, out EntityPlugin t))
                     triggers.Add(t);
-                else
-                    Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
+                //else
+                //    Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
+
+            // TODO: better unknown entity message maybe
         }
 
         private void Autotile() {
