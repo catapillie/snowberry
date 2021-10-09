@@ -90,7 +90,7 @@ namespace LevelEditorMod.Editor {
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
                 if (EntityPlugin.TryCreate(this, trigger, out EntityPlugin t))
-                    entities.Add(t);
+                    triggers.Add(t);
                 else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
