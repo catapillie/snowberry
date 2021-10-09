@@ -38,14 +38,14 @@ namespace LevelEditorMod.Editor {
 
         private static readonly Regex tileSplitter = new Regex("\\r\\n|\\n\\r|\\n|\\r");
 
-        public Room(string name, Rectangle bounds) {
+        internal Room(string name, Rectangle bounds) {
             Name = name;
             Bounds = bounds;
             fgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
             bgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
         }
 
-        public Room(LevelData data)
+        internal Room(LevelData data)
             : this(data.Name, data.TileBounds) {
             // BgTiles
             string[] array = tileSplitter.Split(data.Bg);
@@ -81,7 +81,7 @@ namespace LevelEditorMod.Editor {
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        public void Render(Rectangle viewRect) {
+        internal void Render(Rectangle viewRect) {
             Vector2 offset = Position * 8;
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
 

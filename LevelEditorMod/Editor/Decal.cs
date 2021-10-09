@@ -11,12 +11,12 @@ namespace LevelEditorMod.Editor {
         private Vector2 position;
         private Vector2 scale;
 
-        public Decal(Room room, string texture) {
+        internal Decal(Room room, string texture) {
             this.room = room;
             this.texture = GFX.Game[texture];
         }
 
-        public Decal(Room room, DecalData data) {
+        internal Decal(Room room, DecalData data) {
             this.room = room;
 
             // messy, see Celeste.Decal.orig_ctor
