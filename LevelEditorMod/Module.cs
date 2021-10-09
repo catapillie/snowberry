@@ -11,7 +11,9 @@ namespace LevelEditorMod {
             Instance = this;
         }
 
-        public override void Load() { }
+        public override void Load() {
+            Plugins.Register(GetType().Assembly);
+        }
 
         public override void Unload() { }
 

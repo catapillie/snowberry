@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -24,6 +25,9 @@ namespace LevelEditorMod.Editor {
 
         private readonly List<Decal> fgDecals = new List<Decal>();
         private readonly List<Decal> bgDecals = new List<Decal>();
+
+        private readonly List<EntityPlugin> entities = new List<EntityPlugin>();
+        private readonly List<EntityPlugin> triggers = new List<EntityPlugin>();
 
         public int LoadSeed {
             get {
@@ -73,6 +77,22 @@ namespace LevelEditorMod.Editor {
             // FgDecals
             foreach (DecalData decal in data.FgDecals) {
                 fgDecals.Add(new Decal(this, decal));
+            }
+
+            // Entities
+            foreach (EntityData entity in data.Entities) {
+                if (EntityPlugin.TryCreate(this, entity, out EntityPlugin e))
+                    entities.Add(e);
+                else
+                    Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
+            }
+
+            // Triggers
+            foreach (EntityData trigger in data.Triggers) {
+                if (EntityPlugin.TryCreate(this, trigger, out EntityPlugin t))
+                    entities.Add(t);
+                else
+                    Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
         }
 
