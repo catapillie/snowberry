@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace LevelEditorMod.Editor {
@@ -33,9 +34,12 @@ namespace LevelEditorMod.Editor {
         protected Vector2 Origin { get; private set; }
 
         private readonly List<Vector2> nodes = new List<Vector2>();
-        protected Vector2[] Nodes => nodes.ToArray();
 
         public EntityPlugin() { }
+
+        protected Vector2[] GetNodes() {
+            return nodes.Select((Vector2 node) => room.Position * 8 + node).ToArray();
+        }
 
         internal virtual void Render() { }
 
