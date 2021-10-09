@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace LevelEditorMod.Editor {
@@ -18,7 +20,7 @@ namespace LevelEditorMod.Editor {
     public class EntityOptionAttribute : Attribute {
         internal readonly string Name;
 
-        public EntityOptionAttribute([CallerMemberName] string optionName = null) {
+        public EntityOptionAttribute(string optionName = null) {
             Name = optionName;
         }
     }
@@ -48,6 +50,13 @@ namespace LevelEditorMod.Editor {
         }
 
         private EntityPlugin Initialize(Dictionary<string, object> data) {
+            foreach (FieldInfo f in GetType().GetRuntimeFields()) {
+                if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option &&
+                    data.TryGetValue((option.Name ?? f.Name).ToString(), out object value)) {
+                    f.SetValue(this, value);
+                }
+            }
+
             return this;
         }
 
