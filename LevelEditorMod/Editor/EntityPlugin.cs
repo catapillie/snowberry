@@ -19,7 +19,7 @@ namespace LevelEditorMod.Editor {
     public class EntityOptionAttribute : Attribute {
         internal readonly string Name;
 
-        public EntityOptionAttribute(string optionName = null) {
+        public EntityOptionAttribute(string optionName) {
             Name = optionName;
         }
     }
@@ -53,7 +53,7 @@ namespace LevelEditorMod.Editor {
         }
 
         private EntityPlugin Initialize(Dictionary<string, object> data) {
-            foreach (FieldInfo f in GetType().GetRuntimeFields()) {
+            foreach (FieldInfo f in GetType().GetFields()) {
                 if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option &&
                     data.TryGetValue((option.Name ?? f.Name).ToString(), out object value)) {
                     f.SetValue(this, value);
