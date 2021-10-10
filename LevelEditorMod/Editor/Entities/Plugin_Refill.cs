@@ -3,8 +3,8 @@
 namespace LevelEditorMod.Editor.Entities {
     [EntityPlugin("refill")]
     public class Plugin_Refill : EntityPlugin {
-        [EntityOption("twoDash")] public bool TwoDash;
-        [EntityOption("oneUse")] public bool OneUse;
+        [EntityOption("twoDash")] public bool TwoDash = false;
+        [EntityOption("oneUse")] public bool OneUse = false;
 
         internal override void Render() {
             base.Render();

@@ -6,6 +6,7 @@ namespace LevelEditorMod.Editor.Entities {
     public class Plugin_Player : EntityPlugin {
         internal override void Render() {
             base.Render();
+
             GFX.Game["characters/player/sitDown00"].DrawCentered(Position - Vector2.UnitY * 16);
         }
     }
