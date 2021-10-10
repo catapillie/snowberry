@@ -101,6 +101,16 @@ namespace LevelEditorMod.Editor {
             }
         }
 
+        public char GetFgTile(Vector2 at) {
+            Vector2 p = (at - Position * 8) / 8;
+            return fgTileMap[(int)p.X, (int)p.Y];
+        }
+
+        public char GetBgTile(Vector2 at) {
+            Vector2 p = (at - Position * 8) / 8;
+            return bgTileMap[(int)p.X, (int)p.Y];
+        }
+
         private void Autotile() {
             fgTiles = GFX.FGAutotiler.GenerateMap(fgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;

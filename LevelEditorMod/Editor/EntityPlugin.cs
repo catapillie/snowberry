@@ -26,12 +26,12 @@ namespace LevelEditorMod.Editor {
     }
 
     public abstract class EntityPlugin {
-        private Room room;
+        protected Room Room { get; private set; }
 
         protected string Name { get; private set; }
 
         private Vector2 pos;
-        protected Vector2 Position => room.Position * 8 + pos;
+        protected Vector2 Position => Room.Position * 8 + pos;
         protected int Width { get; private set; }
         protected int Height { get; private set; }
         protected Vector2 Origin { get; private set; }
@@ -41,12 +41,12 @@ namespace LevelEditorMod.Editor {
         public EntityPlugin() { }
 
         internal EntityPlugin SetPosition(Vector2 position) {
-            pos = position - room.Position * 8;
+            pos = position - Room.Position * 8;
             return this;
         }
 
         protected Vector2[] GetNodes() {
-            return nodes.Select((Vector2 node) => room.Position * 8 + node).ToArray();
+            return nodes.Select((Vector2 node) => Room.Position * 8 + node).ToArray();
         }
 
         internal virtual void Render() { }
@@ -85,7 +85,7 @@ namespace LevelEditorMod.Editor {
                 EntityPlugin entity = ctor();
 
                 entity.Name = name;
-                entity.room = room;
+                entity.Room = room;
 
                 return entity;
             }
@@ -98,7 +98,7 @@ namespace LevelEditorMod.Editor {
                 EntityPlugin entity = ctor();
 
                 entity.Name = entityData.Name;
-                entity.room = room;
+                entity.Room = room;
 
                 return entity.Initialize(entityData);
             }

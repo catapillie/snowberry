@@ -8,6 +8,7 @@ namespace LevelEditorMod.Editor.Entities {
 
         internal override void Render() {
             base.Render();
+
             GFX.Game[$"objects/{(TwoDash ? "refillTwo" : "refill")}/idle00"].DrawOutlineCentered(Position);
         }
     }
