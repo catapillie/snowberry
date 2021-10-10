@@ -4,7 +4,7 @@ using Monocle;
 namespace LevelEditorMod.Editor.Entities {
     [EntityPlugin("wire")]
     public class Plugin_Wire : EntityPlugin {
-        [EntityOption("above")] public bool Above;
+        [EntityOption("above")] public bool Above = false;
         [EntityOption("color")] public string Hex = "595866";
 
         private Color Color => Calc.HexToColor(Hex);
