@@ -10,7 +10,7 @@ namespace LevelEditorMod {
 
         internal static void Register(Assembly assembly) {
             foreach (Type t in assembly.GetTypes()) {
-                if (t.GetCustomAttribute<EntityPluginAttribute>() is EntityPluginAttribute pl) {
+                foreach (EntityPluginAttribute pl in t.GetCustomAttributes<EntityPluginAttribute>()) {
                     if (pl.Name == null || pl.Name == string.Empty) {
                         Module.Log(LogLevel.Warn, $"Found entity plugin with null or empty name! skipping... (Type: {t})");
                         continue;
