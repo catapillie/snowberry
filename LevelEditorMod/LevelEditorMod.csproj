@@ -62,6 +62,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
     <Compile Include="Editor\Entities\Plugin_Player.cs" />
+    <Compile Include="Editor\Entities\Plugin_Refill.cs" />
     <Compile Include="Editor\EntityPlugin.cs" />
     <Compile Include="Editor\Entities\Plugin_Strawberry.cs" />
     <Compile Include="Editor\LevelEditor.cs" />
