@@ -64,15 +64,16 @@ namespace LevelEditorMod.Editor {
         }
 
         private EntityPlugin Initialize(Dictionary<string, object> data) {
-            foreach (FieldInfo f in GetType().GetFields()) {
-                if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option) {
-                    if (option.Name == null || option.Name == string.Empty) {
-                        Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{Name}' was ignored because it had a null or empty option name!");
-                        continue;
-                    } else if (data.TryGetValue(option.Name, out object value))
-                        f.SetValue(this, value);
+            if (data != null)
+                foreach (FieldInfo f in GetType().GetFields()) {
+                    if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option) {
+                        if (option.Name == null || option.Name == string.Empty) {
+                            Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{Name}' was ignored because it had a null or empty option name!");
+                            continue;
+                        } else if (data.TryGetValue(option.Name, out object value))
+                            f.SetValue(this, value);
+                    }
                 }
-            }
 
             return this;
         }
