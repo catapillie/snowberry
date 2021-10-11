@@ -38,8 +38,6 @@ namespace LevelEditorMod.Editor {
 
         private readonly List<Vector2> nodes = new List<Vector2>();
 
-        public EntityPlugin() { }
-
         internal EntityPlugin SetPosition(Vector2 position) {
             pos = position - Room.Position * 8;
             return this;
@@ -49,9 +47,12 @@ namespace LevelEditorMod.Editor {
             return nodes.Select((Vector2 node) => Room.Position * 8 + node).ToArray();
         }
 
-        internal virtual void Render() { }
+        public virtual void Initialize() { }
+        public virtual void Render() { }
 
-        private EntityPlugin Initialize(EntityData entityData) {
+        #region Entity Instantiating
+
+        private EntityPlugin InitializeData(EntityData entityData) {
             pos = entityData.Position;
 
             Width = entityData.Width;
@@ -60,10 +61,10 @@ namespace LevelEditorMod.Editor {
 
             nodes.AddRange(entityData.Nodes);
 
-            return Initialize(entityData.Values);
+            return InitializeData(entityData.Values);
         }
 
-        private EntityPlugin Initialize(Dictionary<string, object> data) {
+        private EntityPlugin InitializeData(Dictionary<string, object> data) {
             if (data != null)
                 foreach (FieldInfo f in GetType().GetFields()) {
                     if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option) {
@@ -75,10 +76,9 @@ namespace LevelEditorMod.Editor {
                     }
                 }
 
+            Initialize();
             return this;
         }
-
-        #region Entity Instantiating
 
         internal static EntityPlugin Create(string name, Room room) {
             if (Plugins.Entities.TryGetValue(name, out var ctor)) {
@@ -87,6 +87,7 @@ namespace LevelEditorMod.Editor {
                 entity.Name = name;
                 entity.Room = room;
 
+                entity.Initialize();
                 return entity;
             }
 
@@ -100,7 +101,7 @@ namespace LevelEditorMod.Editor {
                 entity.Name = entityData.Name;
                 entity.Room = room;
 
-                return entity.Initialize(entityData);
+                return entity.InitializeData(entityData);
             }
 
             return null;

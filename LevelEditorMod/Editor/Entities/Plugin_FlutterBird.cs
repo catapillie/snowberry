@@ -13,7 +13,7 @@ namespace LevelEditorMod.Editor.Entities {
         };
         // TODO: per-entity randomness
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
             GFX.Game["scenery/flutterbird/idle00"].DrawJustified(Position, new Vector2(0.5f, 1.0f), colors[0]);
         }

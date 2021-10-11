@@ -9,7 +9,7 @@ namespace LevelEditorMod.Editor.Entities {
         [EntityOption("order")] public int Order = -1;
         [EntityOption("checkpointID")] public int CheckpointID = -1;
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
 
             Vector2[] nodes = GetNodes();

@@ -6,7 +6,7 @@ namespace LevelEditorMod.Editor.Entities {
     public class Plugin_Bonfire : EntityPlugin {
         [EntityOption("mode")] public string Mode = "Unlit";
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
 
             GFX.Game[Mode switch {

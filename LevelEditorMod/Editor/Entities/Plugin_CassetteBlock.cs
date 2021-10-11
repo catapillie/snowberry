@@ -15,7 +15,7 @@ namespace LevelEditorMod.Editor.Entities {
             Calc.HexToColor("38e04e"),
         };
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
 
             MTexture block = GFX.Game["objects/cassetteblock/solid"];

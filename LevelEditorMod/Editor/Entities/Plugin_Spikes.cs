@@ -9,7 +9,7 @@ namespace LevelEditorMod.Editor.Entities {
     public class Plugin_Spikes : EntityPlugin {
         [EntityOption("type")] public string Type = "default";
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
             
             switch (Name) {

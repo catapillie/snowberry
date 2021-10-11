@@ -9,7 +9,7 @@ namespace LevelEditorMod.Editor.Entities {
 
         private Color Color => Calc.HexToColor(Hex);
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
 
             Vector2 start = Position;

@@ -8,7 +8,7 @@ namespace LevelEditorMod.Editor.Entities {
         [EntityOption("texture")] public string Texture = "default";
         [EntityOption("surfaceIndex")] public int SurfaceIndex = -1;
 
-        internal override void Render() {
+        public override void Render() {
             base.Render();
 
             string name = Texture == "default" ? "wood" : Texture;
