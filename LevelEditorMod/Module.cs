@@ -17,6 +17,12 @@ namespace LevelEditorMod {
 
         public override void Unload() { }
 
+        public override void LoadContent(bool firstLoad) {
+            base.LoadContent(firstLoad);
+
+            Fonts.Load();
+        }
+
         public static void Log(LogLevel level, string message)
             => Logger.Log(level, "Level Editor Mod", message);
     }

@@ -53,6 +53,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Xml" />
     <Reference Include="YamlDotNet">
       <HintPath>..\..\..\YamlDotNet.dll</HintPath>
       <Private>False</Private>
@@ -77,6 +78,8 @@
     <Compile Include="Editor\Room.cs" />
     <Compile Include="Editor\Triggers\Plugin_Trigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
+    <Compile Include="Graphics\Fonts.cs" />
+    <Compile Include="Graphics\Font.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
