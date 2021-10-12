@@ -45,5 +45,22 @@ namespace LevelEditorMod {
                 }
             }
         }
+
+        public Vector2 Measure(string str) {
+            Vector2 size = Vector2.Zero;
+            foreach (char c in str) {
+                switch (c) {
+                    case '\n':
+                        size.Y += lineHeight;
+                        break;
+
+                    default:
+                        if (glyphs.TryGetValue(c, out Glyph g))
+                            size.X += g.Bounds.Width + 1;
+                        break;
+                }
+            }
+            return size;
+        }
     }
 }

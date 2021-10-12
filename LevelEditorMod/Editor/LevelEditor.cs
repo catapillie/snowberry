@@ -75,7 +75,7 @@ namespace LevelEditorMod.Editor {
 
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null);
-            Fonts.Bold.Draw($"Currently editing : {map.Name}...\nCamera : {camera.Position}, Zoom : {camera.Zoom}", Vector2.Zero, Color.White, Vector2.One * 2f);
+            Text.Bold.Draw($"Currently editing : {map.Name}...\nCamera : {camera.Position}, Zoom : {camera.Zoom}", Vector2.Zero, Color.White, Vector2.One);
             Draw.SpriteBatch.End();
         }
     }

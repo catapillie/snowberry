@@ -20,7 +20,7 @@ namespace LevelEditorMod {
         public override void LoadContent(bool firstLoad) {
             base.LoadContent(firstLoad);
 
-            Fonts.Load();
+            Text.Load();
         }
 
         public static void Log(LogLevel level, string message)
