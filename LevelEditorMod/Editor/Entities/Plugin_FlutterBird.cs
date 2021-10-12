@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("flutterbird")]
-    public class Plugin_FlutterBird : EntityPlugin {
+    [Plugin("flutterbird")]
+    public class Plugin_FlutterBird : Entity {
         private static readonly Color[] colors = new Color[4] {
             Calc.HexToColor("89fbff"),
             Calc.HexToColor("f0fc6c"),

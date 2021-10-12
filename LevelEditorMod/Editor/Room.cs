@@ -26,8 +26,8 @@ namespace LevelEditorMod.Editor {
         private readonly List<Decal> fgDecals = new List<Decal>();
         private readonly List<Decal> bgDecals = new List<Decal>();
 
-        private readonly List<EntityPlugin> entities = new List<EntityPlugin>();
-        private readonly List<EntityPlugin> triggers = new List<EntityPlugin>();
+        private readonly List<Entity> entities = new List<Entity>();
+        private readonly List<Entity> triggers = new List<Entity>();
 
         public int LoadSeed {
             get {
@@ -81,7 +81,7 @@ namespace LevelEditorMod.Editor {
 
             // Entities
             foreach (EntityData entity in data.Entities) {
-                if (EntityPlugin.TryCreate(this, entity, out EntityPlugin e))
+                if (Entity.TryCreate(this, entity, out Entity e))
                     entities.Add(e);
                 else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
@@ -89,12 +89,12 @@ namespace LevelEditorMod.Editor {
 
             // Player Spawnpoints (excluded from LevelData.Entities)
             foreach (Vector2 spawn in data.Spawns) {
-                entities.Add(EntityPlugin.Create("player", this).SetPosition(spawn));
+                entities.Add(Entity.Create("player", this).SetPosition(spawn));
             }
 
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
-                if (EntityPlugin.TryCreate(this, trigger, out EntityPlugin t))
+                if (Entity.TryCreate(this, trigger, out Entity t))
                     triggers.Add(t);
                 else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
@@ -136,7 +136,7 @@ namespace LevelEditorMod.Editor {
                 decal.Render(offset);
 
             // Entities
-            foreach (EntityPlugin entity in entities)
+            foreach (Entity entity in entities)
                 entity.Render();
 
             // FgTiles
@@ -150,7 +150,7 @@ namespace LevelEditorMod.Editor {
                 decal.Render(offset);
 
             // Triggers
-            foreach (EntityPlugin trigger in triggers)
+            foreach (Entity trigger in triggers)
                 trigger.Render();
         }
     }

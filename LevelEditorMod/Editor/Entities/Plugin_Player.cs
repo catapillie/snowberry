@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("player")]
-    public class Plugin_Player : EntityPlugin {
+    [Plugin("player")]
+    public class Plugin_Player : Entity {
         public override void Render() {
             base.Render();
 

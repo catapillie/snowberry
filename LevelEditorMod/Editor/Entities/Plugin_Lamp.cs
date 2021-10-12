@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("lamp")]
-    public class Plugin_Lamp : EntityPlugin {
-        [EntityOption("broken")] public bool Broken = false;
+    [Plugin("lamp")]
+    public class Plugin_Lamp : Entity {
+        [Option("broken")] public bool Broken = false;
 
         public override void Render() {
             base.Render();

@@ -2,10 +2,10 @@
 using Monocle;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("wire")]
-    public class Plugin_Wire : EntityPlugin {
-        [EntityOption("above")] public bool Above = false;
-        [EntityOption("color")] public string Hex = "595866";
+    [Plugin("wire")]
+    public class Plugin_Wire : Entity {
+        [Option("above")] public bool Above = false;
+        [Option("color")] public string Hex = "595866";
 
         private Color Color => Calc.HexToColor(Hex);
 

@@ -6,11 +6,11 @@ using System.Reflection;
 
 namespace LevelEditorMod {
     internal static class Plugins {
-        internal static readonly Dictionary<string, Func<EntityPlugin>> Entities = new Dictionary<string, Func<EntityPlugin>>();
+        internal static readonly Dictionary<string, Func<Entity>> Entities = new Dictionary<string, Func<Entity>>();
 
         internal static void Register(Assembly assembly) {
             foreach (Type t in assembly.GetTypes()) {
-                foreach (EntityPluginAttribute pl in t.GetCustomAttributes<EntityPluginAttribute>()) {
+                foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>()) {
                     if (pl.Name == null || pl.Name == string.Empty) {
                         Module.Log(LogLevel.Warn, $"Found entity plugin with null or empty name! skipping... (Type: {t})");
                         continue;
@@ -22,7 +22,7 @@ namespace LevelEditorMod {
                         continue;
                     }
 
-                    Entities.Add(pl.Name, () => (EntityPlugin)ctor.Invoke(new object[] { }));
+                    Entities.Add(pl.Name, () => (Entity)ctor.Invoke(new object[] { }));
 
                     Module.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' entity plugin");
                 }

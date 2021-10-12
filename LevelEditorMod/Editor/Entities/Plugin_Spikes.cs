@@ -3,12 +3,12 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("spikesUp")]
-    [EntityPlugin("spikesDown")]
-    [EntityPlugin("spikesLeft")]
-    [EntityPlugin("spikesRight")]
-    public class Plugin_Spikes : EntityPlugin {
-        [EntityOption("type")] public string Type = "default";
+    [Plugin("spikesUp")]
+    [Plugin("spikesDown")]
+    [Plugin("spikesLeft")]
+    [Plugin("spikesRight")]
+    public class Plugin_Spikes : Entity {
+        [Option("type")] public string Type = "default";
 
         private Spikes.Directions dir;
 

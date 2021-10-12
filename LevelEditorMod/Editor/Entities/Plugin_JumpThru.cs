@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("jumpThru")]
-    public class Plugin_JumpThru : EntityPlugin {
-        [EntityOption("texture")] public string Texture = "default";
-        [EntityOption("surfaceIndex")] public int SurfaceIndex = -1;
+    [Plugin("jumpThru")]
+    public class Plugin_JumpThru : Entity {
+        [Option("texture")] public string Texture = "default";
+        [Option("surfaceIndex")] public int SurfaceIndex = -1;
 
         public override void Render() {
             base.Render();

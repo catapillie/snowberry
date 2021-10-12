@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("bonfire")]
-    public class Plugin_Bonfire : EntityPlugin {
-        [EntityOption("mode")] public string Mode = "Unlit";
+    [Plugin("bonfire")]
+    public class Plugin_Bonfire : Entity {
+        [Option("mode")] public string Mode = "Unlit";
 
         public override void Render() {
             base.Render();

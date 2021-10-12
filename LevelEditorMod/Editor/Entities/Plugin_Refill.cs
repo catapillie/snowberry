@@ -1,10 +1,10 @@
 ﻿using Celeste;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("refill")]
-    public class Plugin_Refill : EntityPlugin {
-        [EntityOption("twoDash")] public bool TwoDash = false;
-        [EntityOption("oneUse")] public bool OneUse = false;
+    [Plugin("refill")]
+    public class Plugin_Refill : Entity {
+        [Option("twoDash")] public bool TwoDash = false;
+        [Option("oneUse")] public bool OneUse = false;
 
         public override void Render() {
             base.Render();

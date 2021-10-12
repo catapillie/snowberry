@@ -8,24 +8,24 @@ using System.Reflection;
 
 namespace LevelEditorMod.Editor {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class EntityPluginAttribute : Attribute {
+    public class PluginAttribute : Attribute {
         internal readonly string Name;
 
-        public EntityPluginAttribute(string entityName) {
+        public PluginAttribute(string entityName) {
             Name = entityName;
         }
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class EntityOptionAttribute : Attribute {
+    public class OptionAttribute : Attribute {
         internal readonly string Name;
 
-        public EntityOptionAttribute(string optionName) {
+        public OptionAttribute(string optionName) {
             Name = optionName;
         }
     }
 
-    public abstract class EntityPlugin {
+    public abstract class Entity {
         protected Room Room { get; private set; }
 
         protected string Name { get; private set; }
@@ -38,7 +38,7 @@ namespace LevelEditorMod.Editor {
 
         private readonly List<Vector2> nodes = new List<Vector2>();
 
-        internal EntityPlugin SetPosition(Vector2 position) {
+        internal Entity SetPosition(Vector2 position) {
             pos = position - Room.Position * 8;
             return this;
         }
@@ -52,7 +52,7 @@ namespace LevelEditorMod.Editor {
 
         #region Entity Instantiating
 
-        private EntityPlugin InitializeData(EntityData entityData) {
+        private Entity InitializeData(EntityData entityData) {
             pos = entityData.Position;
 
             Width = entityData.Width;
@@ -64,10 +64,10 @@ namespace LevelEditorMod.Editor {
             return InitializeData(entityData.Values);
         }
 
-        private EntityPlugin InitializeData(Dictionary<string, object> data) {
+        private Entity InitializeData(Dictionary<string, object> data) {
             if (data != null)
                 foreach (FieldInfo f in GetType().GetFields()) {
-                    if (f.GetCustomAttribute<EntityOptionAttribute>() is EntityOptionAttribute option) {
+                    if (f.GetCustomAttribute<OptionAttribute>() is OptionAttribute option) {
                         if (option.Name == null || option.Name == string.Empty) {
                             Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{Name}' was ignored because it had a null or empty option name!");
                             continue;
@@ -80,9 +80,9 @@ namespace LevelEditorMod.Editor {
             return this;
         }
 
-        internal static EntityPlugin Create(string name, Room room) {
+        internal static Entity Create(string name, Room room) {
             if (Plugins.Entities.TryGetValue(name, out var ctor)) {
-                EntityPlugin entity = ctor();
+                Entity entity = ctor();
 
                 entity.Name = name;
                 entity.Room = room;
@@ -94,9 +94,9 @@ namespace LevelEditorMod.Editor {
             return null;
         }
 
-        internal static EntityPlugin Create(Room room, EntityData entityData) {
+        internal static Entity Create(Room room, EntityData entityData) {
             if (Plugins.Entities.TryGetValue(entityData.Name, out var ctor)) {
-                EntityPlugin entity = ctor();
+                Entity entity = ctor();
 
                 entity.Name = entityData.Name;
                 entity.Room = room;
@@ -107,7 +107,7 @@ namespace LevelEditorMod.Editor {
             return null;
         }
 
-        internal static bool TryCreate(Room room, EntityData entityData, out EntityPlugin entity) {
+        internal static bool TryCreate(Room room, EntityData entityData, out Entity entity) {
             entity = Create(room, entityData);
             return entity != null;
         }

@@ -2,12 +2,12 @@
 using Microsoft.Xna.Framework;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("strawberry")]
-    public class Plugin_Strawberry : EntityPlugin {
-        [EntityOption("winged")] public bool Winged = false;
-        [EntityOption("moon")] public bool Moon = false;
-        [EntityOption("order")] public int Order = -1;
-        [EntityOption("checkpointID")] public int CheckpointID = -1;
+    [Plugin("strawberry")]
+    public class Plugin_Strawberry : Entity {
+        [Option("winged")] public bool Winged = false;
+        [Option("moon")] public bool Moon = false;
+        [Option("order")] public int Order = -1;
+        [Option("checkpointID")] public int CheckpointID = -1;
 
         public override void Render() {
             base.Render();

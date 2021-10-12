@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace LevelEditorMod.Editor.Entities {
-    [EntityPlugin("cassetteBlock")]
-    public class Plugin_CassetteBlock : EntityPlugin {
-        [EntityOption("index")] public int Index = 0;
-        [EntityOption("tempo")] public float Tempo = 1.0f;
+    [Plugin("cassetteBlock")]
+    public class Plugin_CassetteBlock : Entity {
+        [Option("index")] public int Index = 0;
+        [Option("tempo")] public float Tempo = 1.0f;
 
         private static readonly Color[] colors = new Color[4] {
             Calc.HexToColor("49aaf0"),
