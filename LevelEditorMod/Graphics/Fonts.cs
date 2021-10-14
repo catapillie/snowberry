@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Xml;
 
 namespace LevelEditorMod {
-    public static class Text {
+    internal static class Fonts {
         public static Font Regular { get; private set; }
         public static Font Bold { get; private set; }
 
@@ -46,7 +46,5 @@ namespace LevelEditorMod {
 
             return new Font(texture, characters, bounds, offsets, lineHeight);
         }
-
-
     }
 }

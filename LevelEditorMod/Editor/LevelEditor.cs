@@ -15,6 +15,8 @@ namespace LevelEditorMod.Editor {
 
         private Map map;
 
+        private readonly static FormattedText infoText = FormattedText.Parse("{#e6e6e6}Currently editing : {#00dce8}{map}{#e6e6e6}...\nCamera : [{camx}, {camy}] ×{zoom}");
+
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
             camera = new Camera();
@@ -75,7 +77,8 @@ namespace LevelEditorMod.Editor {
 
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null);
-            Text.Bold.Draw($"Currently editing : {map.Name}...\nCamera : {camera.Position}, Zoom : {camera.Zoom}", Vector2.Zero, Color.White, Vector2.One);
+            Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One * 2f,
+                map.Name, (int)camera.X, (int)camera.Y, camera.Zoom);
             Draw.SpriteBatch.End();
         }
     }

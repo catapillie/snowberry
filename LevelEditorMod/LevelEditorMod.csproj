@@ -78,8 +78,9 @@
     <Compile Include="Editor\Room.cs" />
     <Compile Include="Editor\Triggers\Plugin_Trigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
-    <Compile Include="Graphics\Text.cs" />
+    <Compile Include="Graphics\Fonts.cs" />
     <Compile Include="Graphics\Font.cs" />
+    <Compile Include="Graphics\FormattedText.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
