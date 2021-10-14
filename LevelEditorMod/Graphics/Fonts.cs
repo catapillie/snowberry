@@ -6,13 +6,15 @@ using System.Collections.Generic;
 using System.Xml;
 
 namespace LevelEditorMod {
-    internal static class Fonts {
+    public static class Fonts {
         public static Font Regular { get; private set; }
         public static Font Bold { get; private set; }
+        public static Font Pico8 { get; private set; }
 
         internal static void Load() {
             Regular = LoadFont("regular");
             Bold = LoadFont("bold");
+            Pico8 = LoadFont("pico8");
         }
 
         private static Font LoadFont(string name) {
