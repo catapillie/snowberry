@@ -15,7 +15,7 @@ namespace LevelEditorMod.Editor {
 
         private Map map;
 
-        private readonly static FormattedText infoText = FormattedText.Parse("{#e6e6e6}Currently editing : {#00dce8}{map}{#e6e6e6}...\nCamera : [{camx}, {camy}] ×{zoom}");
+        private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -28,7 +28,7 @@ namespace LevelEditorMod.Editor {
         internal static void Open(MapData data) {
             Map map = new Map(data);
 
-            Module.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}/{data.Filename}");
+            Module.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
 
             Audio.Stop(Audio.CurrentAmbienceEventInstance);
             Audio.Stop(Audio.CurrentMusicEventInstance);

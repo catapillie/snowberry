@@ -9,11 +9,12 @@ namespace LevelEditorMod {
     public class FormattedText {
         private static readonly Regex commandMatch = new Regex(@"^{((?:[^{}\n])*)}");
         private static readonly Regex colorCmd = new Regex(@"^\s*#?[a-fA-F0-9]{6}\s*");
+        private static readonly Regex colorPopCmd = new Regex(@"^\s*#<<\s*");
 
         private readonly Tuple<char?, Color>[] characters;
 
         private FormattedText(string expr) {
-            Color color = Color.White;
+            Stack<Color> colors = new Stack<Color>();
             List<Tuple<char?, Color>> characters = new List<Tuple<char?, Color>>();
 
             bool esc = false;
@@ -29,10 +30,12 @@ namespace LevelEditorMod {
                     if (cmdMatch.Success) {
                         string cmd = cmdMatch.Groups[1].Value;
 
-                        if (colorCmd.IsMatch(cmd))
-                            color = Calc.HexToColor(cmd.Trim());
-                        else
-                            characters.Add(Tuple.Create<char?, Color>(null, color));
+                        if (colorCmd.IsMatch(cmd)) {
+                            colors.Push(Calc.HexToColor(cmd.Trim()));
+                        } else if (colorPopCmd.IsMatch(cmd)) {
+                            if (colors.Count != 0) colors.Pop();
+                        } else
+                            characters.Add(Tuple.Create<char?, Color>(null, colors.Count == 0 ? Color.White : colors.Peek()));
 
                         i += cmdMatch.Length - 1;
                         continue;
@@ -40,7 +43,7 @@ namespace LevelEditorMod {
                 }
                 esc = false;
 
-                characters.Add(Tuple.Create<char?, Color>(c, color));
+                characters.Add(Tuple.Create<char?, Color>(c, colors.Count == 0 ? Color.White : colors.Peek()));
             }
             this.characters = characters.ToArray();
         }
@@ -48,8 +51,15 @@ namespace LevelEditorMod {
         public string Format(out Color[] colors, params object[] values) {
             string formatted = "";
             List<Color> colorList = new List<Color>();
+            int v = 0;
             foreach (var pair in characters) {
                 if (pair.Item1 == null) {
+                    if (v < values.Length) {
+                        string insert = values[v]?.ToString() ?? "null";
+                        formatted += insert;
+                        colorList.AddRange(Enumerable.Repeat(pair.Item2, insert.Length));
+                        v++;
+                    }
                 } else {
                     formatted += pair.Item1;
                     colorList.Add(pair.Item2);
