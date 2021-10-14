@@ -66,6 +66,7 @@
     <Compile Include="Editor\Entities\Plugin_CassetteBlock.cs" />
     <Compile Include="Editor\Entities\Plugin_FlutterBird.cs" />
     <Compile Include="Editor\Entities\Plugin_JumpThru.cs" />
+    <Compile Include="Editor\Entities\Plugin_Key.cs" />
     <Compile Include="Editor\Entities\Plugin_Lamp.cs" />
     <Compile Include="Editor\Entities\Plugin_Player.cs" />
     <Compile Include="Editor\Entities\Plugin_Refill.cs" />
