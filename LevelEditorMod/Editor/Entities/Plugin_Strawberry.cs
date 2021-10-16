@@ -12,9 +12,7 @@ namespace LevelEditorMod.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            Vector2[] nodes = GetNodes();
-
-            bool seeded = nodes.Length != 0;
+            bool seeded = Nodes.Length != 0;
             if (Moon) {
                 string anim = seeded || Winged ? "ghost" : "normal";
                 GFX.Game[$"collectables/moonBerry/{anim}00"].DrawCentered(Position);
@@ -25,7 +23,7 @@ namespace LevelEditorMod.Editor.Entities {
             }
 
             if (seeded)
-                foreach (Vector2 node in nodes)
+                foreach (Vector2 node in Nodes)
                     GFX.Game["collectables/strawberry/seed00"].DrawCentered(node);
         }
     }

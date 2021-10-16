@@ -30,21 +30,27 @@ namespace LevelEditorMod.Editor {
 
         protected string Name { get; private set; }
 
-        private Vector2 pos;
-        protected Vector2 Position => Room.Position * 8 + pos;
+        protected Vector2 Position { get; private set; }
         protected int Width { get; private set; }
         protected int Height { get; private set; }
         protected Vector2 Origin { get; private set; }
 
+        private bool nodesChanged;
         private readonly List<Vector2> nodes = new List<Vector2>();
-
-        internal Entity SetPosition(Vector2 position) {
-            pos = position - Room.Position * 8;
-            return this;
+        private Vector2[] nodeArray;
+        protected Vector2[] Nodes {
+            get {
+                if (nodeArray == null || nodesChanged) {
+                    nodeArray = nodes.ToArray();
+                    nodesChanged = false;
+                }
+                return nodeArray;
+            }
         }
 
-        protected Vector2[] GetNodes() {
-            return nodes.Select((Vector2 node) => Room.Position * 8 + node).ToArray();
+        internal Entity SetPosition(Vector2 position) {
+            Position = position;
+            return this;
         }
 
         public virtual void Initialize() { }
@@ -53,13 +59,15 @@ namespace LevelEditorMod.Editor {
         #region Entity Instantiating
 
         private Entity InitializeData(EntityData entityData) {
-            pos = entityData.Position;
+            Vector2 offset = Room.Position * 8;
 
+            Position = entityData.Position + offset;
             Width = entityData.Width;
             Height = entityData.Height;
             Origin = entityData.Origin;
 
-            nodes.AddRange(entityData.Nodes);
+            foreach (Vector2 node in entityData.Nodes)
+                nodes.Add(node + offset);
 
             return InitializeData(entityData.Values);
         }
