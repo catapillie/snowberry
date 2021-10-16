@@ -22,15 +22,15 @@ namespace LevelEditorMod.Editor {
                 fillers.Add(filler);
         }
 
-        internal void Render() {
-			//Draw.Line(new Vector2(0, viewRect.Top), new Vector2(0, viewRect.Bottom), Color.White * 0.01f, 2);
-			//Draw.Line(new Vector2(viewRect.Left, 0), new Vector2(viewRect.Right, 0), Color.White * 0.01f, 2);
+        internal void Render(Rectangle viewRect) {
+			Draw.Line(new Vector2(0, viewRect.Top), new Vector2(0, viewRect.Bottom), Color.White * 0.01f, 2);
+			Draw.Line(new Vector2(viewRect.Left, 0), new Vector2(viewRect.Right, 0), Color.White * 0.01f, 2);
 
 			foreach (Room room in rooms) {
-				//Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
-				//if (!viewRect.Intersects(rect))
-				//	continue;
-				room.Render();
+				Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
+				if (!viewRect.Intersects(rect))
+					continue;
+				room.Render(viewRect);
 			}
 
 			foreach (Rectangle filler in fillers) {

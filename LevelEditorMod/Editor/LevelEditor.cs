@@ -9,6 +9,7 @@ namespace LevelEditorMod.Editor {
     public class LevelEditor : Scene {
         private class Camera {
             private bool changedView;
+
             private Vector2 pos;
             public Vector2 Position {
                 get => pos;
@@ -17,6 +18,9 @@ namespace LevelEditorMod.Editor {
                     changedView = true;
                 }
             }
+            public int X => (int)Position.X;
+            public int Y => (int)Position.Y;
+
             private float scale = 1f;
             public float Zoom {
                 get => scale;
@@ -48,16 +52,23 @@ namespace LevelEditorMod.Editor {
                 }
             }
 
+            public Rectangle ViewRect { get; private set; }
+
             public RenderTarget2D Buffer { get; private set; }
 
             private void UpdateMatrices() {
                 Matrix m = Matrix.CreateTranslation((int)-Position.X, (int)-Position.Y, 0f) * Matrix.CreateScale(Math.Min(1f, Zoom));
-                if (Buffer != null)
+                if (Buffer != null) {
                     m *= Matrix.CreateTranslation(Buffer.Width / 2, Buffer.Height / 2, 0f);
-                else
+                    ViewRect = new Rectangle((int)Position.X - Buffer.Width / 2, (int)Position.Y - Buffer.Height / 2, Buffer.Width, Buffer.Height);
+                } else {
                     m *= Engine.ScreenMatrix * Matrix.CreateTranslation(Engine.ViewWidth / 2, Engine.ViewHeight / 2, 0f);
-                matrix = m;
-                inverse = Matrix.Invert(m);
+                    int w = (int)(Engine.Width / Zoom);
+                    int h = (int)(Engine.Height / Zoom);
+                    ViewRect = new Rectangle((int)Position.X - w / 2, (int)Position.Y - h / 2, w, h);
+                }
+                inverse = Matrix.Invert(matrix = m);
+
                 changedView = false;
             }
 
@@ -74,7 +85,7 @@ namespace LevelEditorMod.Editor {
 
         private Map map;
 
-        private readonly static FormattedText infoText = FormattedText.Parse("branch: {#ef0810}[pixel-perfect-rendering]");
+        private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -138,18 +149,10 @@ namespace LevelEditorMod.Editor {
             Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
             Engine.Instance.GraphicsDevice.Clear(bg);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-            
-            //int left = (int)camera.Left;
-            //int right = (int)camera.Right;
-            //int top = (int)camera.Top;
-            //int bottom = (int)camera.Bottom;
-            //Rectangle viewRect = new Rectangle(left, top, right - left, bottom - top);
-
-            map.Render();
+            map.Render(camera.ViewRect);
             Draw.SpriteBatch.End();
+
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
-
-
             if (camera.Buffer != null) {
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
                 Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
@@ -157,7 +160,7 @@ namespace LevelEditorMod.Editor {
             }
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null);
-            Fonts.Regular.Draw(infoText, new Vector2(Engine.ViewWidth, Engine.ViewHeight), Vector2.One * 2f, Vector2.One);
+            Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One * 2f, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
             Draw.SpriteBatch.End();
         }
     }
