@@ -31,8 +31,11 @@ namespace LevelEditorMod.Editor {
         protected string Name { get; private set; }
 
         protected Vector2 Position { get; private set; }
+        protected int X => (int)Position.X;
+        protected int Y => (int)Position.Y;
         protected int Width { get; private set; }
         protected int Height { get; private set; }
+        protected Vector2 Center => Position + new Vector2(Width, Height) / 2f;
         protected Vector2 Origin { get; private set; }
 
         private bool nodesChanged;
