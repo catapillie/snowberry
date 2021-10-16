@@ -16,7 +16,7 @@ namespace LevelEditorMod.Editor.Triggers {
 
         public override void Initialize() {
             base.Initialize();
-            Text = string.Join(" ", Regex.Split(char.ToUpper(Name[0]) + Name.Substring(1), @"(?=[A-Z])"));
+            Text = string.Join(" ", Regex.Split(char.ToUpper(Name[0]) + Name.Substring(1), @"(?=[A-Z])")).Trim();
         }
 
         public override void Render() {
@@ -26,7 +26,7 @@ namespace LevelEditorMod.Editor.Triggers {
             Draw.Rect(rect, Color * 0.3f);
             Draw.HollowRect(rect, Color);
 
-            Fonts.Pico8.Draw(Text, new Vector2(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f), Vector2.One, Vector2.One * 0.5f, Color.Black); ;
+            Fonts.Pico8.Draw(Text, new Vector2(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f), Vector2.One, Vector2.One * 0.5f, Color.Black);
         }
     }
 }

@@ -7,20 +7,77 @@ using System;
 
 namespace LevelEditorMod.Editor {
     public class LevelEditor : Scene {
+        private class Camera {
+            private bool changedView;
+            private Vector2 pos;
+            public Vector2 Position {
+                get => pos;
+                set {
+                    pos = value;
+                    changedView = true;
+                }
+            }
+            private float scale = 1f;
+            public float Zoom {
+                get => scale;
+                set {
+                    scale = value;
+                    if (scale < 1f)
+                        Buffer = null;
+                    else {
+                        Vector2 size = new Vector2(Engine.Width, Engine.Height) / scale;
+                        Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, (int)size.X + (Engine.Width % scale == 0 ? 0 : 1), (int)size.Y + (Engine.Height % scale == 0 ? 0 : 1));
+                    }
+                    changedView = true;
+                }
+            }
+
+            private Matrix matrix, inverse;
+            public Matrix Matrix {
+                get {
+                    if (changedView)
+                        UpdateMatrices();
+                    return matrix;
+                }
+            }
+            public Matrix Inverse {
+                get {
+                    if (changedView)
+                        UpdateMatrices();
+                    return inverse;
+                }
+            }
+
+            public RenderTarget2D Buffer { get; private set; }
+
+            private void UpdateMatrices() {
+                Matrix m = Matrix.CreateTranslation((int)-Position.X, (int)-Position.Y, 0f) * Matrix.CreateScale(Math.Min(1f, Zoom));
+                if (Buffer != null)
+                    m *= Matrix.CreateTranslation(Buffer.Width / 2, Buffer.Height / 2, 0f);
+                else
+                    m *= Engine.ScreenMatrix * Matrix.CreateTranslation(Engine.ViewWidth / 2, Engine.ViewHeight / 2, 0f);
+                matrix = m;
+                inverse = Matrix.Invert(m);
+                changedView = false;
+            }
+
+            public Camera() {
+                Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width, Engine.Height);
+            }
+        }
+
         private static readonly Color bg = Calc.HexToColor("121212");
 
+        private Camera camera;
         private Vector2 mousePos, lastMousePos;
         private Vector2 mouseWorldPos, lastMouseWorldPos;
-        private readonly Camera camera;
 
         private Map map;
 
-        private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
+        private readonly static FormattedText infoText = FormattedText.Parse("branch: {#ef0810}[pixel-perfect-rendering]");
 
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
-            camera = new Camera();
-            camera.CenterOrigin();
 
             this.map = map;
         }
@@ -38,47 +95,69 @@ namespace LevelEditorMod.Editor {
 
         public override void Update() {
             base.Update();
-            mousePos = MInput.Mouse.Position;
 
+            lastMouseWorldPos = mouseWorldPos;
+            lastMousePos = mousePos;
+            mousePos = MInput.Mouse.Position;
+            
             // zooming
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
-            if (wheel != 0) {
-                if ((wheel > 0 && camera.Zoom >= 1f) || camera.Zoom > 1f) {
-                    camera.Zoom += wheel;
-                } else {
-                    camera.Zoom += wheel * 0.1f;
-                }
-                camera.Zoom = Math.Max(0.1f, Math.Min(24f, camera.Zoom));
-            }
+            float s = camera.Zoom;
+            if (wheel > 0)
+                s = s >= 1 ? s + 1 : s * 2f;
+            else if (wheel < 0)
+                s = s > 1 ? s - 1 : s / 2f;
+            s = Calc.Clamp(s, 0.0625f, 24f);
+            if (s != camera.Zoom)
+                camera.Zoom = s;
+
+            if (camera.Buffer != null)
+                mousePos /= camera.Zoom;
 
             // panning
-            if (MInput.Mouse.CheckRightButton)
-                camera.Position += (lastMousePos - mousePos) / camera.Zoom;
+            if (MInput.Mouse.CheckRightButton) {
+                Vector2 move = lastMousePos - mousePos;
+                if (move != Vector2.Zero)
+                    camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
+            }
 
             mouseWorldPos = Vector2.Transform(mousePos, camera.Inverse);
+        }
 
-            lastMousePos = mousePos;
-            lastMouseWorldPos = mouseWorldPos;
+        public override void Begin() {
+            base.Begin();
+            camera = new Camera();
+        }
+
+        public override void End() {
+            base.End();
+            camera.Buffer?.Dispose();
         }
 
         public override void Render() {
+            Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
             Engine.Instance.GraphicsDevice.Clear(bg);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix * Engine.ScreenMatrix);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
             
-            int left = (int)camera.Left;
-            int right = (int)camera.Right;
-            int top = (int)camera.Top;
-            int bottom = (int)camera.Bottom;
-            Rectangle viewRect = new Rectangle(left, top, right - left, bottom - top);
+            //int left = (int)camera.Left;
+            //int right = (int)camera.Right;
+            //int top = (int)camera.Top;
+            //int bottom = (int)camera.Bottom;
+            //Rectangle viewRect = new Rectangle(left, top, right - left, bottom - top);
 
-            map.Render(viewRect);
-
+            map.Render();
             Draw.SpriteBatch.End();
+            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null);
-            Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One * 2f,
-                map.Name, (int)camera.X, (int)camera.Y, camera.Zoom);
+            if (camera.Buffer != null) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
+                Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
+                Draw.SpriteBatch.End();
+            }
+
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null);
+            Fonts.Regular.Draw(infoText, new Vector2(Engine.ViewWidth, Engine.ViewHeight), Vector2.One * 2f, Vector2.One);
             Draw.SpriteBatch.End();
         }
     }

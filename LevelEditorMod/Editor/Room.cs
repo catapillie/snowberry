@@ -116,18 +116,18 @@ namespace LevelEditorMod.Editor {
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        internal void Render(Rectangle viewRect) {
+        internal void Render() {
             Vector2 offset = Position * 8;
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
 
-            int startX = Math.Max(0, (viewRect.Left - X * 8) / 8);
-            int startY = Math.Max(0, (viewRect.Top - Y * 8) / 8);
-            int endX = Math.Min(Width, Width + (viewRect.Right - (X + Width) * 8) / 8);
-            int endY = Math.Min(Height, Height + (viewRect.Bottom - (Y + Height) * 8) / 8);
+            //int startX = Math.Max(0, (viewRect.Left - X * 8) / 8);
+            //int startY = Math.Max(0, (viewRect.Top - Y * 8) / 8);
+            //int endX = Math.Min(Width, Width + (viewRect.Right - (X + Width) * 8) / 8);
+            //int endY = Math.Min(Height, Height + (viewRect.Bottom - (Y + Height) * 8) / 8);
 
             // BgTiles
-            for (int x = startX; x < endX; x++)
-                for (int y = startY; y < endY; y++)
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
                     if (bgTiles[x, y] != null)
                         bgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
@@ -140,8 +140,8 @@ namespace LevelEditorMod.Editor {
                 entity.Render();
 
             // FgTiles
-            for (int x = startX; x < endX; x++)
-                for (int y = startY; y < endY; y++)
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
                     if (fgTiles[x, y] != null)
                         fgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 

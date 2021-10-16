@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monocle;
 using System;
 using System.Collections.Generic;
 
@@ -34,6 +35,7 @@ namespace LevelEditorMod {
             if (justify != Vector2.Zero)
                 position -= Measure(str) * scale * justify;
 
+            position = Calc.Round(position);
             float startX = position.X;
 
             for (int i = 0; i < str.Length; i++) {
@@ -58,6 +60,7 @@ namespace LevelEditorMod {
             if (justify != Vector2.Zero)
               position -= Measure(str) * scale * justify;
 
+            position = Calc.Round(position);
             float startX = position.X;
 
             for (int i = 0; i < str.Length; i++) {
@@ -102,7 +105,7 @@ namespace LevelEditorMod {
                         break;
                 }
             }
-            return size;
+            return size - Vector2.UnitX;
         }
     }
 }
