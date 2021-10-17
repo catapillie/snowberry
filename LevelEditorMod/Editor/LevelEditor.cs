@@ -7,7 +7,7 @@ using System;
 
 namespace LevelEditorMod.Editor {
     public class LevelEditor : Scene {
-        private class Camera {
+        internal class Camera {
             private bool changedView;
 
             private Vector2 pos;
@@ -147,10 +147,7 @@ namespace LevelEditorMod.Editor {
 
         public override void Render() {
             Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
-            Engine.Instance.GraphicsDevice.Clear(bg);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-            map.Render(camera.ViewRect);
-            Draw.SpriteBatch.End();
+            map.Render(camera);
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
             if (camera.Buffer != null) {

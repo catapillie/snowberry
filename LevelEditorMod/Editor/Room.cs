@@ -116,8 +116,16 @@ namespace LevelEditorMod.Editor {
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        internal void Render(Rectangle viewRect) {
+        internal void Render(Rectangle viewRect, LevelEditor.Camera camera) {
             Vector2 offset = Position * 8;
+
+            Vector2 zero = Vector2.Transform(offset, camera.Matrix);
+            float s = camera.Zoom < 1f ? camera.Zoom : 1f;
+            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
+                (int)Math.Round(zero.X), (int)Math.Round(zero.Y),
+                (int)Math.Round(Width * 8 * s),
+                (int)Math.Round(Height * 8 * s));
+
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
 
             int startX = Math.Max(0, (viewRect.Left - X * 8) / 8);
