@@ -17,7 +17,7 @@ namespace LevelEditorMod.Editor.Entities {
             Vector2 control = (start + end) / 2f + Vector2.UnitY * 24f;
 
             SimpleCurve curve = new SimpleCurve(start, end, control);
-            curve.Render(Color, 16);
+            curve.Render(Color, 20);
         }
     }
 }

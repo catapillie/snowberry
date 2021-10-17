@@ -14,7 +14,7 @@ namespace LevelEditorMod.Editor.Entities {
             Draw.Rect(Position, Width, Height, Color.Black * 0.25f);
             Draw.HollowRect(Position, Width, Height, Color.White);
             if (Nodes.Length != 0)
-                Draw.Line(Center, Nodes[0] + new Vector2(Width, Height) / 2f, Color.White);
+                DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2f, Color.White, 4, 2);
         }
     }
 }
