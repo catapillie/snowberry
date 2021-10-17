@@ -25,11 +25,10 @@ namespace LevelEditorMod.Editor {
 
         internal void Render(LevelEditor.Camera camera) {
             Rectangle viewRect = camera.ViewRect;
-            //Draw.Line(new Vector2(0, viewRect.Top), new Vector2(0, viewRect.Bottom), Color.White * 0.01f, 2);
-            //Draw.Line(new Vector2(viewRect.Left, 0), new Vector2(viewRect.Right, 0), Color.White * 0.01f, 2);
 
             Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+
             foreach (Room room in rooms) {
 				Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
 				if (!viewRect.Intersects(rect))
@@ -39,14 +38,17 @@ namespace LevelEditorMod.Editor {
                 room.Render(viewRect, camera);
                 Draw.SpriteBatch.End();
             }
+
             Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
-
-            //foreach (Rectangle filler in fillers) {
-            //	Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
-            //	Draw.Rect(rect, Color.White * 0.08f);
-            //	Draw.HollowRect(rect, Color.OrangeRed);
-            //}
+            
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+            foreach (Rectangle filler in fillers) {
+            	Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
+            	Draw.Rect(rect, Color.White * 0.08f);
+            	Draw.HollowRect(rect, Color.OrangeRed);
+            }
+            Draw.SpriteBatch.End();
         }
     }
 }
