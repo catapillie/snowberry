@@ -79,6 +79,7 @@
     <Compile Include="Editor\Entities\Plugin_Refill.cs" />
     <Compile Include="Editor\Entities\Plugin_Spikes.cs" />
     <Compile Include="Editor\Entities\Plugin_Spinner.cs" />
+    <Compile Include="Editor\Entities\Plugin_SummitGem.cs" />
     <Compile Include="Editor\Entities\Plugin_Wire.cs" />
     <Compile Include="Editor\Entities\Plugin_ZipMover.cs" />
     <Compile Include="Editor\Entity.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Editor\LevelEditor.cs" />
     <Compile Include="Editor\Map.cs" />
     <Compile Include="Editor\Room.cs" />
+    <Compile Include="Editor\Triggers\Plugin_CameraOffsetTrigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_Trigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
     <Compile Include="Graphics\DrawUtil.cs" />
