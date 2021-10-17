@@ -77,7 +77,7 @@ namespace LevelEditorMod.Editor {
             }
         }
 
-        private static readonly Color bg = Calc.HexToColor("121212");
+        private static readonly Color bg = Calc.HexToColor("060607");
 
         private Camera camera;
         private Vector2 mousePos, lastMousePos;
@@ -147,6 +147,7 @@ namespace LevelEditorMod.Editor {
 
         public override void Render() {
             Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
+            Engine.Instance.GraphicsDevice.Clear(bg);
             map.Render(camera);
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(null);
