@@ -144,8 +144,11 @@ namespace LevelEditorMod.Editor {
                 decal.Render(offset);
 
             // Entities
-            foreach (Entity entity in entities)
+            foreach (Entity entity in entities) {
+                Calc.PushRandom(entity.GetHashCode());
                 entity.Render();
+                Calc.PopRandom();
+            }
 
             // FgTiles
             for (int x = startX; x < endX; x++)
