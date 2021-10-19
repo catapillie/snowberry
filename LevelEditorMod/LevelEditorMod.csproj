@@ -66,6 +66,7 @@
     <Compile Include="Editor\Entities\Plugin_Booster.cs" />
     <Compile Include="Editor\Entities\Plugin_CassetteBlock.cs" />
     <Compile Include="Editor\Entities\Plugin_ClutterBlock.cs" />
+    <Compile Include="Editor\Entities\Plugin_DarkChaser.cs" />
     <Compile Include="Editor\Entities\Plugin_DreamBlock.cs" />
     <Compile Include="Editor\Entities\Plugin_FlutterBird.cs" />
     <Compile Include="Editor\Entities\Plugin_GoldenBerry.cs" />

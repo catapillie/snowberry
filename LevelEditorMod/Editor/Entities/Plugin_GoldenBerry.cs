@@ -3,15 +3,23 @@ using Microsoft.Xna.Framework;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("goldenBerry")]
+    [Plugin("memorialTextController")]
     public class Plugin_GoldenBerry : Entity {
         [Option("winged")] public bool Winged = false;
+
+        private bool noDash;
+
+        public override void Initialize() {
+            base.Initialize();
+            noDash = Name == "memorialTextController";
+        }
 
         public override void Render() {
             base.Render();
 
             bool seeded = Nodes.Length != 0;
-            string dir = seeded ? "ghostgoldberry" : "goldberry";
-            string anim = Winged ? "wings01" : "idle00";
+            string dir = seeded && !noDash ? "ghostgoldberry" : "goldberry";
+            string anim = Winged || noDash ? "wings01" : "idle00";
             GFX.Game[$"collectables/{dir}/{anim}"].DrawCentered(Position);
 
             if (seeded)
