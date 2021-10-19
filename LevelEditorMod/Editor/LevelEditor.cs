@@ -87,6 +87,7 @@ namespace LevelEditorMod.Editor {
         private Map map;
 
         private readonly UIElement ui = new UIElement();
+        private RenderTarget2D rendertarget;
 
         private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
@@ -136,34 +137,60 @@ namespace LevelEditorMod.Editor {
             }
 
             mouseWorldPos = Vector2.Transform(mousePos, camera.Inverse);
+
+            ui.Update();
         }
 
         public override void Begin() {
             base.Begin();
             camera = new Camera();
+            rendertarget = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width / 2, Engine.Height / 2);
         }
 
         public override void End() {
             base.End();
             camera.Buffer?.Dispose();
+            rendertarget.Dispose();
         }
 
         public override void Render() {
-            Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
+            #region UI Rendering
+
+            Engine.Instance.GraphicsDevice.SetRenderTarget(rendertarget);
+            Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+            ui.Render();
+            Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
+            Draw.SpriteBatch.End();
+
+            #endregion
+
+            #region Map Rendering
+
+            if (camera.Buffer != null)
+                Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
+            else
+                Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+
             Engine.Instance.GraphicsDevice.Clear(bg);
             map.Render(camera);
 
-            Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+            #endregion
+
+            #region Displaying on Backbuffer
+
             if (camera.Buffer != null) {
+                Engine.Instance.GraphicsDevice.SetRenderTarget(null);
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
                 Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
                 Draw.SpriteBatch.End();
             }
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null);
-            ui.Render(Vector2.Zero);
-            Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One * 2f, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+            Draw.SpriteBatch.Draw(rendertarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Vector2.One * 2, SpriteEffects.None, 0f);
             Draw.SpriteBatch.End();
+
+            #endregion
         }
     }
 }
