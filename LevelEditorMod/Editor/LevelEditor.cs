@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using LevelEditorMod.Editor.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
@@ -85,6 +86,8 @@ namespace LevelEditorMod.Editor {
 
         private Map map;
 
+        private readonly UIElement ui = new UIElement();
+
         private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
         private LevelEditor(Map map) {
@@ -158,6 +161,7 @@ namespace LevelEditorMod.Editor {
             }
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null);
+            ui.Render(Vector2.Zero);
             Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One * 2f, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
             Draw.SpriteBatch.End();
         }
