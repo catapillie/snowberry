@@ -100,6 +100,7 @@ namespace LevelEditorMod.Editor {
                 BG = Calc.HexToColor("db2323"),
                 PressedBG = Calc.HexToColor("f0f0f0"),
                 PressedFG = Calc.HexToColor("db2323"),
+                HoveredBG = Calc.HexToColor("b02020"),
                 OnPress = () => Engine.Scene = new LevelLoader(new Session(leave)),
             });
 
