@@ -87,12 +87,19 @@ namespace LevelEditorMod.Editor {
         private Map map;
 
         private readonly UIElement ui = new UIElement();
-        private RenderTarget2D rendertarget;
+        private RenderTarget2D uiBuffer;
 
-        private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
+        //private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
+
+            ui.Add(new UIButton("◀- back to map", Fonts.Regular) {
+                FG = Calc.HexToColor("f0f0f0"),
+                BG = Calc.HexToColor("db2323"),
+                PressedBG = Calc.HexToColor("f0f0f0"),
+                PressedFG = Calc.HexToColor("db2323"),
+            });
 
             this.map = map;
         }
@@ -144,23 +151,23 @@ namespace LevelEditorMod.Editor {
         public override void Begin() {
             base.Begin();
             camera = new Camera();
-            rendertarget = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width / 2, Engine.Height / 2);
+            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width / 2, Engine.Height / 2);
         }
 
         public override void End() {
             base.End();
             camera.Buffer?.Dispose();
-            rendertarget.Dispose();
+            uiBuffer.Dispose();
         }
 
         public override void Render() {
             #region UI Rendering
 
-            Engine.Instance.GraphicsDevice.SetRenderTarget(rendertarget);
+            Engine.Instance.GraphicsDevice.SetRenderTarget(uiBuffer);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
             ui.Render();
-            Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
+            //Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
             Draw.SpriteBatch.End();
 
             #endregion
@@ -187,7 +194,7 @@ namespace LevelEditorMod.Editor {
             }
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-            Draw.SpriteBatch.Draw(rendertarget, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Vector2.One * 2, SpriteEffects.None, 0f);
+            Draw.SpriteBatch.Draw(uiBuffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Vector2.One * 2, SpriteEffects.None, 0f);
             Draw.SpriteBatch.End();
 
             #endregion

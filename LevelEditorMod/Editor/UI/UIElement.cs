@@ -13,10 +13,9 @@ namespace LevelEditorMod.Editor.UI {
                 element.Update();
         }
 
-        public virtual void Render(Vector2? position = null) {
-            Vector2 offset = position ?? Vector2.Zero;
+        public virtual void Render(Vector2 position = default) {
             foreach (UIElement element in children)
-                element.Render(offset + element.Position);
+                element.Render(position + element.Position);
         }
 
         public void Add(UIElement element)
