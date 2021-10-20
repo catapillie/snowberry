@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace LevelEditorMod.Editor.UI {
     public class UIElement {
         private readonly List<UIElement> children = new List<UIElement>();
+        protected UIElement Parent;
 
         public Vector2 Position;
         public int Width, Height;
@@ -11,6 +12,7 @@ namespace LevelEditorMod.Editor.UI {
         public virtual void Update(Vector2 position = default) {
             foreach (UIElement element in children)
                 element.Update(position + element.Position);
+            children.RemoveAll(e => e == null);
         }
 
         public virtual void Render(Vector2 position = default) {
@@ -18,7 +20,19 @@ namespace LevelEditorMod.Editor.UI {
                 element.Render(position + element.Position);
         }
 
-        public void Add(UIElement element)
-            => children.Add(element);
+        protected virtual void OnDestroy() { }
+
+        public void Destroy() {
+            foreach (UIElement element in children)
+                element?.Destroy();
+            OnDestroy();
+        }
+
+        public void Add(UIElement element) {
+            if (element.Parent == null) {
+                children.Add(element);
+                element.Parent = this;
+            }
+        }
     }
 }

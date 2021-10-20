@@ -18,14 +18,14 @@ namespace LevelEditorMod {
 
         private readonly Texture2D texture;
         private readonly Dictionary<char, Glyph> glyphs = new Dictionary<char, Glyph>();
-        private readonly int lineHeight;
+        public readonly int LineHeight;
 
         public Font(Texture2D texture, List<char> characters, List<Rectangle> bounds, List<Vector2> offsets, int lineHeight) {
             this.texture = texture;
             for (int i = 0; i < characters.Count; i++) {
                 glyphs.Add(characters[i], new Glyph(bounds[i], offsets[i]));
             }
-            this.lineHeight = lineHeight;
+            LineHeight = lineHeight;
         }
 
         public void Draw(string str, Vector2 position, Vector2 scale, Color color)
@@ -43,7 +43,7 @@ namespace LevelEditorMod {
                 switch (c) {
                     case '\n':
                         position.X = startX;
-                        position.Y += lineHeight * scale.Y;
+                        position.Y += LineHeight * scale.Y;
                         break;
 
                     default:
@@ -68,7 +68,7 @@ namespace LevelEditorMod {
                 switch (c) {
                     case '\n':
                         position.X = startX;
-                        position.Y += lineHeight * scale.Y;
+                        position.Y += LineHeight * scale.Y;
                         break;
 
                     default:
@@ -87,6 +87,12 @@ namespace LevelEditorMod {
         public void Draw(FormattedText text, Vector2 position, Vector2 scale, Vector2 justify, params object[] values)
             => Draw(text.Format(out Color[] colors, values), position, scale, justify, colors);
 
+        public Vector2 Measure(char c) {
+            if (glyphs.TryGetValue(c, out Glyph g))
+                return new Vector2(g.Bounds.Width, g.Bounds.Height);
+            return Vector2.Zero;
+        }
+
         public Vector2 Measure(string str) {
             Vector2 size = Vector2.Zero;
             int currentWidth = 0;
@@ -96,7 +102,7 @@ namespace LevelEditorMod {
                         if (currentWidth > size.X)
                             size.X = currentWidth;
                         currentWidth = 0;
-                        size.Y += lineHeight;
+                        size.Y += LineHeight;
                         break;
 
                     default:

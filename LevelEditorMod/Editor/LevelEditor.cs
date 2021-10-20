@@ -95,13 +95,21 @@ namespace LevelEditorMod.Editor {
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
 
-            ui.Add(new UIButton("return to level", Fonts.Regular, 2, 4) {
+            UIButton button;
+            ui.Add(button = new UIButton("return to level", Fonts.Regular, 2, 4) {
                 FG = Calc.HexToColor("f0f0f0"),
                 BG = Calc.HexToColor("db2323"),
                 PressedBG = Calc.HexToColor("f0f0f0"),
                 PressedFG = Calc.HexToColor("db2323"),
                 HoveredBG = Calc.HexToColor("b02020"),
                 OnPress = () => Engine.Scene = new LevelLoader(new Session(leave)),
+            });
+            ui.Add(new UIButton("<reload>", Fonts.Bold, 4, 8) {
+                Position = Vector2.UnitX * button.Width,
+                OnPress = () => Engine.Scene = new LevelEditor(map),
+            });
+            ui.Add(new UITextField(Fonts.Regular, 128, map.Name) {
+                Position = Vector2.UnitY * button.Height,
             });
 
             this.map = map;
@@ -167,6 +175,7 @@ namespace LevelEditorMod.Editor {
             base.End();
             camera.Buffer?.Dispose();
             uiBuffer.Dispose();
+            ui.Destroy();
         }
 
         public override void Render() {
