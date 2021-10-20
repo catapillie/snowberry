@@ -3,6 +3,7 @@ using Celeste.Mod;
 using LevelEditorMod.Editor.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 
@@ -82,9 +83,9 @@ namespace LevelEditorMod.Editor {
 
         private Camera camera;
         private Vector2 mousePos, lastMousePos;
-        private Vector2 mouseWorldPos, lastMouseWorldPos;
 
         private Map map;
+        private AreaKey leave;
 
         private readonly UIElement ui = new UIElement();
         private RenderTarget2D uiBuffer;
@@ -94,11 +95,12 @@ namespace LevelEditorMod.Editor {
         private LevelEditor(Map map) {
             Engine.Instance.IsMouseVisible = true;
 
-            ui.Add(new UIButton("◀- back to map", Fonts.Regular) {
+            ui.Add(new UIButton("return to level", Fonts.Regular, 2, 4) {
                 FG = Calc.HexToColor("f0f0f0"),
                 BG = Calc.HexToColor("db2323"),
                 PressedBG = Calc.HexToColor("f0f0f0"),
                 PressedFG = Calc.HexToColor("db2323"),
+                OnPress = () => Engine.Scene = new LevelLoader(new Session(leave)),
             });
 
             this.map = map;
@@ -112,13 +114,17 @@ namespace LevelEditorMod.Editor {
             Audio.Stop(Audio.CurrentAmbienceEventInstance);
             Audio.Stop(Audio.CurrentMusicEventInstance);
 
-            Engine.Scene = new LevelEditor(map);
+            Engine.Scene = new LevelEditor(map) {
+                leave = data.Area
+            };
         }
 
         public override void Update() {
             base.Update();
 
-            lastMouseWorldPos = mouseWorldPos;
+            EditorInput.Mouse.WorldLast = EditorInput.Mouse.World;
+            EditorInput.Mouse.ScreenLast = EditorInput.Mouse.Screen;
+
             lastMousePos = mousePos;
             mousePos = MInput.Mouse.Position;
             
@@ -143,7 +149,9 @@ namespace LevelEditorMod.Editor {
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
             }
 
-            mouseWorldPos = Vector2.Transform(mousePos, camera.Inverse);
+            EditorInput.Mouse.World = Vector2.Transform(mousePos, camera.Inverse);
+            MouseState m = Mouse.GetState();
+            EditorInput.Mouse.Screen = new Vector2(m.X, m.Y) / 2;
 
             ui.Update();
         }
@@ -151,7 +159,7 @@ namespace LevelEditorMod.Editor {
         public override void Begin() {
             base.Begin();
             camera = new Camera();
-            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width / 2, Engine.Height / 2);
+            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
         }
 
         public override void End() {

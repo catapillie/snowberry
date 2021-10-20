@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
+    <Compile Include="Editor\EditorInput.cs" />
     <Compile Include="Editor\Entities\Plugin_Bonfire.cs" />
     <Compile Include="Editor\Entities\Plugin_Booster.cs" />
     <Compile Include="Editor\Entities\Plugin_CassetteBlock.cs" />

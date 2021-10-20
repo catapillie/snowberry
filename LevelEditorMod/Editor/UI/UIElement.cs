@@ -8,9 +8,9 @@ namespace LevelEditorMod.Editor.UI {
         public Vector2 Position;
         public int Width, Height;
 
-        public virtual void Update() {
+        public virtual void Update(Vector2 position = default) {
             foreach (UIElement element in children)
-                element.Update();
+                element.Update(position + element.Position);
         }
 
         public virtual void Render(Vector2 position = default) {

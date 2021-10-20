@@ -22,6 +22,8 @@ namespace LevelEditorMod.Editor.UI {
             topFill, bottomFill,
             mid;
 
+        public Action OnPress;
+
         private UIButton() {
             MTexture full = GFX.Gui["editor/button"];
             top = full.GetSubtexture(0, 0, 3, 4);
@@ -31,7 +33,7 @@ namespace LevelEditorMod.Editor.UI {
             mid = full.GetSubtexture(0, 4, 2, 1);
         }
 
-        public UIButton(int width, int height) 
+        public UIButton(int width, int height)
             : this() {
             Width = Math.Max(6, width);
             Height = Math.Max(8, height);
@@ -49,10 +51,22 @@ namespace LevelEditorMod.Editor.UI {
             textOffset = new Vector2(spaceX, spaceY);
         }
 
-        public override void Update() {
+        public override void Update(Vector2 position = default) {
             base.Update();
 
-            lerp = Calc.Approach(lerp, (pressed = MInput.Mouse.CheckLeftButton) ? 1f : 0f, Engine.DeltaTime * 25f);
+            int mouseX = (int)EditorInput.Mouse.Screen.X;
+            int mouseY = (int)EditorInput.Mouse.Screen.Y;
+            bool inside = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
+
+            if (MInput.Mouse.PressedLeftButton && inside)
+                pressed = true;
+            else if (MInput.Mouse.ReleasedLeftButton) {
+                if (inside && pressed)
+                    OnPress?.Invoke();
+                pressed = false;
+            }
+
+            lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
         }
 
         public override void Render(Vector2 position = default) {
