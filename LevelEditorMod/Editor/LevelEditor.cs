@@ -108,7 +108,7 @@ namespace LevelEditorMod.Editor {
                 Position = Vector2.UnitX * button.Width,
                 OnPress = () => Engine.Scene = new LevelEditor(map),
             });
-            ui.Add(new UITextField(Fonts.Regular, 128, map.Name) {
+            ui.Add(new UITextField(Fonts.Regular, 256, map.Name) {
                 Position = Vector2.UnitY * button.Height,
             });
 

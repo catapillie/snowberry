@@ -6,17 +6,18 @@ using System;
 
 namespace LevelEditorMod.Editor.UI {
     public class UITextField : UIElement {
-        private readonly Font font;
-
-        private bool selected;
-
+        private bool selected, canDragIndex = true;
         private int charIndex, selection;
+
         private string input;
         private int[] widthAtIndex;
+        private readonly Font font;
 
         private float lerp;
         public Color Line = Color.Teal;
         public Color LineSelected = Color.LimeGreen;
+
+        private float timeOffset;
 
         public UITextField(Font font, int width, string input = "") {
             this.font = font;
@@ -30,7 +31,7 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         private void OnInput(char c) {
-            if (Engine.Commands.Open || !selected) 
+            if (Engine.Commands.Open || !selected)
                 return;
 
             int from = charIndex;
@@ -48,9 +49,11 @@ namespace LevelEditorMod.Editor.UI {
                 int newCharIndex = a == b ? a - 1 : a;
                 UpdateInput(input.Substring(0, newCharIndex) + input.Substring(b));
                 selection = charIndex = newCharIndex;
+                timeOffset = Engine.Scene.TimeActive;
             } else if (!char.IsControl(c)) {
                 UpdateInput(input.Substring(0, a) + c + input.Substring(b));
                 selection = charIndex = a + 1;
+                timeOffset = Engine.Scene.TimeActive;
             }
         }
 
@@ -65,58 +68,85 @@ namespace LevelEditorMod.Editor.UI {
             widthAtIndex[widthAtIndex.Length - 1] = w;
         }
 
+        private static bool MustSeparate(char at, char previous, bool ignoreWhiteSpace = true) {
+            if (ignoreWhiteSpace)
+                return !char.IsWhiteSpace(at) && char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
+            else
+                return char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
+
+        }
+
+        private int MoveIndex(int step, bool stepByWord, bool ignoreWhiteSpace = true) {
+            int next = charIndex;
+
+            if (stepByWord) {
+                next += step;
+                while (next > 0 && next < input.Length && !MustSeparate(input[next], input[next - 1], ignoreWhiteSpace))
+                    next += step;
+            } else
+                next += step;
+
+            return Calc.Clamp(next, 0, input.Length); ;
+        }
+
         public override void Update(Vector2 position = default) {
             base.Update(position);
 
-            int mouseX = (int)EditorInput.Mouse.Screen.X;
-            int mouseY = (int)EditorInput.Mouse.Screen.Y;
-            bool inside = new Rectangle((int)position.X - 1, (int)position.Y - 1, Width + 2, Height + 2).Contains(mouseX, mouseY);
-
-            if (MInput.Mouse.PressedLeftButton) {
-                selected = inside;
-                if (inside) {
-                    int d = mouseX - (int)position.X + 1;
-                    int i;
-                    for (i = 0; i < widthAtIndex.Length - 1; i++)
-                        if (widthAtIndex[i + 1] >= d)
-                            break;
-                    charIndex = selection = i;
-                }
-            }
-
             if (MInput.Mouse.CheckLeftButton) {
-                if (selected) {
-                    int d = mouseX - (int)position.X + 1;
-                    int i;
+                int mouseX = (int)EditorInput.Mouse.Screen.X;
+                int mouseY = (int)EditorInput.Mouse.Screen.Y;
+                bool inside = new Rectangle((int)position.X - 1, (int)position.Y - 1, Width + 2, Height + 2).Contains(mouseX, mouseY);
+
+                bool click = MInput.Mouse.PressedLeftButton, reclick = selected && click;
+
+                if (click)
+                    canDragIndex = selected = inside;
+
+                if (canDragIndex && selected) {
+                    int i, d = mouseX - (int)position.X + 1;
+
                     for (i = 0; i < widthAtIndex.Length - 1; i++)
                         if (widthAtIndex[i + 1] >= d)
                             break;
-                    charIndex = i;
+
+                    if (i != charIndex) {
+                        charIndex = i;
+                        if (click)
+                            selection = i;
+                        timeOffset = Engine.Scene.TimeActive;
+                    } else if (reclick) {
+                        if (!MustSeparate(input[Math.Min(input.Length - 1, charIndex)], input[Math.Max(0, charIndex - 1)], false))
+                            charIndex = MoveIndex(-1, true, false);
+                        selection = MoveIndex(1, true, false);
+                        canDragIndex = false;
+                    }
                 }
             }
 
-            bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
-            bool ctrl = MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down;
+            if (MInput.Mouse.ReleasedLeftButton)
+                canDragIndex = false;
 
             if (selected) {
+                bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
+                bool ctrl = MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down;
+
                 if (MInput.Keyboard.Pressed(Keys.Escape)) {
                     selected = false;
-                }
-                if (MInput.Keyboard.Pressed(Keys.Left)) {
-                    if (shift) {
-                        charIndex = Calc.Clamp(charIndex - 1, 0, input.Length);
-                    } else 
-                        charIndex = selection = charIndex == selection ? charIndex - 1 : Math.Min(charIndex, selection);
-                }
-                if (MInput.Keyboard.Pressed(Keys.Right)) {
-                    if (shift) {
-                        charIndex = Calc.Clamp(charIndex + 1, 0, input.Length);
-                    } else
-                        charIndex = selection = charIndex == selection ? charIndex + 1 : Math.Max(charIndex, selection);
+                } else {
+                    bool moved = false;
+                    if (moved |= MInput.Keyboard.Pressed(Keys.Left))
+                        charIndex = MoveIndex(-1, ctrl);
+                    else if (moved |= MInput.Keyboard.Pressed(Keys.Right))
+                        charIndex = MoveIndex(1, ctrl);
+                    if (moved) {
+                        timeOffset = Engine.Scene.TimeActive;
+                        if (!shift)
+                            selection = charIndex;
+                    }
                 }
             }
 
-            lerp = Calc.Approach(lerp, selected ? 1f : 0f, Engine.DeltaTime * 5f);
+            lerp = Calc.Approach(lerp, selected ? 1f : 0f, Engine.DeltaTime * 4f);
         }
 
         public override void Render(Vector2 position = default) {
@@ -132,7 +162,7 @@ namespace LevelEditorMod.Editor.UI {
             }
 
             if (selected) {
-                if (Engine.Scene.TimeActive % 1f < 0.5f) {
+                if ((Engine.Scene.TimeActive - timeOffset) % 1f < 0.5f) {
                     Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, font.LineHeight, Color.White);
                 }
                 if (selection != charIndex) {
