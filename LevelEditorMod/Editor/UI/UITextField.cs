@@ -6,7 +6,7 @@ using System;
 
 namespace LevelEditorMod.Editor.UI {
     public class UITextField : UIElement {
-        private bool selected;
+        private bool selected, hovering;
         private int charIndex, selection;
 
         private string input;
@@ -66,7 +66,10 @@ namespace LevelEditorMod.Editor.UI {
                 w += (int)font.Measure(input[i]).X + 1;
             }
             widthAtIndex[widthAtIndex.Length - 1] = w;
+            OnInputUpdate(input);
         }
+
+        protected virtual void OnInputUpdate(string input) { }
 
         private void GetSelection(out int a, out int b) {
             if (charIndex < selection) {
@@ -97,11 +100,11 @@ namespace LevelEditorMod.Editor.UI {
         public override void Update(Vector2 position = default) {
             base.Update(position);
 
-            if (MInput.Mouse.CheckLeftButton) {
-                int mouseX = (int)EditorInput.Mouse.Screen.X;
-                int mouseY = (int)EditorInput.Mouse.Screen.Y;
-                bool inside = new Rectangle((int)position.X - 1, (int)position.Y - 1, Width + 2, Height + 2).Contains(mouseX, mouseY);
+            int mouseX = (int)EditorInput.Mouse.Screen.X;
+            int mouseY = (int)EditorInput.Mouse.Screen.Y;
+            bool inside = new Rectangle((int)position.X - 1, (int)position.Y - 1, Width + 2, Height + 2).Contains(mouseX, mouseY);
 
+            if (MInput.Mouse.CheckLeftButton) {
                 bool click = MInput.Mouse.PressedLeftButton;
 
                 if (click)
@@ -167,12 +170,13 @@ namespace LevelEditorMod.Editor.UI {
             }
 
             lerp = Calc.Approach(lerp, selected ? 1f : 0f, Engine.DeltaTime * 4f);
+            hovering = inside;
         }
 
         public override void Render(Vector2 position = default) {
             base.Render(position);
 
-            Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, lerp));
+            Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, hovering && !selected ? 0.25f : lerp));
             font.Draw(input, position, Vector2.One, FG);
 
             Draw.Rect(position + Vector2.UnitY * Height, Width, 1, Line);

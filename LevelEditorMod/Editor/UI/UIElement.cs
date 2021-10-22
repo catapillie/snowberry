@@ -20,6 +20,8 @@ namespace LevelEditorMod.Editor.UI {
                 element.Render(position + element.Position);
         }
 
+        protected virtual void Initialize() { }
+
         protected virtual void OnDestroy() { }
 
         public void Destroy() {
@@ -32,6 +34,7 @@ namespace LevelEditorMod.Editor.UI {
             if (element.Parent == null) {
                 children.Add(element);
                 element.Parent = this;
+                element.Initialize();
             }
         }
     }

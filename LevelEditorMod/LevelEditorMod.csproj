@@ -94,6 +94,7 @@
     <Compile Include="Editor\Triggers\Plugin_Trigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
     <Compile Include="Editor\UI\UIButton.cs" />
+    <Compile Include="Editor\UI\UIValueTextField.cs" />
     <Compile Include="Editor\UI\UIElement.cs" />
     <Compile Include="Editor\UI\UITextField.cs" />
     <Compile Include="Graphics\DrawUtil.cs" />
