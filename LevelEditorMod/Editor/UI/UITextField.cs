@@ -14,8 +14,12 @@ namespace LevelEditorMod.Editor.UI {
         private readonly Font font;
 
         private float lerp;
+
         public Color Line = Color.Teal;
         public Color LineSelected = Color.LimeGreen;
+        public Color BG = Color.Black * 0.25f;
+        public Color BGSelected = Color.Black * 0.5f;
+        public Color FG = Calc.HexToColor("f0f0f0");
 
         private float timeOffset;
 
@@ -74,20 +78,15 @@ namespace LevelEditorMod.Editor.UI {
             }
         }
 
-        private static bool MustSeparate(char at, char previous, bool ignoreWhiteSpace = true) {
-            if (ignoreWhiteSpace)
-                return !char.IsWhiteSpace(at) && char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
-            else
-                return char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
+        private static bool MustSeparate(char at, char previous)
+            => char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
 
-        }
-
-        private int MoveIndex(int step, bool stepByWord, bool ignoreWhiteSpace = true) {
+        private int MoveIndex(int step, bool stepByWord) {
             int next = charIndex;
 
             if (stepByWord) {
                 next += step;
-                while (next > 0 && next < input.Length && !MustSeparate(input[next], input[next - 1], ignoreWhiteSpace))
+                while (next > 0 && next < input.Length && !MustSeparate(input[next], input[next - 1]))
                     next += step;
             } else
                 next += step;
@@ -173,7 +172,8 @@ namespace LevelEditorMod.Editor.UI {
         public override void Render(Vector2 position = default) {
             base.Render(position);
 
-            font.Draw(input, position, Vector2.One, Color.White);
+            Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, lerp));
+            font.Draw(input, position, Vector2.One, FG);
 
             Draw.Rect(position + Vector2.UnitY * Height, Width, 1, Line);
             if (lerp != 0f) {
@@ -184,7 +184,7 @@ namespace LevelEditorMod.Editor.UI {
 
             if (selected) {
                 if ((Engine.Scene.TimeActive - timeOffset) % 1f < 0.5f) {
-                    Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, font.LineHeight, Color.White);
+                    Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, font.LineHeight, FG);
                 }
                 if (selection != charIndex) {
                     int a = widthAtIndex[charIndex], b = widthAtIndex[selection];
