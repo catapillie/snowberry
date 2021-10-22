@@ -6,7 +6,7 @@ using System;
 
 namespace LevelEditorMod.Editor.UI {
     public class UITextField : UIElement {
-        private bool selected, canDragIndex = true;
+        private bool selected;
         private int charIndex, selection;
 
         private string input;
@@ -18,6 +18,8 @@ namespace LevelEditorMod.Editor.UI {
         public Color LineSelected = Color.LimeGreen;
 
         private float timeOffset;
+
+        private static string clipboard;
 
         public UITextField(Font font, int width, string input = "") {
             this.font = font;
@@ -34,21 +36,12 @@ namespace LevelEditorMod.Editor.UI {
             if (Engine.Commands.Open || !selected)
                 return;
 
-            int from = charIndex;
-            int to = selection;
-            int a, b;
-            if (from < to) {
-                a = from; b = to;
-            } else if (to < from) {
-                a = to; b = from;
-            } else {
-                a = b = from;
-            }
+            GetSelection(out int a, out int b);
 
             if (c == '\b' && input.Length != 0 && !(a == 0 && b == 0)) {
-                int newCharIndex = a == b ? a - 1 : a;
-                UpdateInput(input.Substring(0, newCharIndex) + input.Substring(b));
-                selection = charIndex = newCharIndex;
+                int nextCharIndex = a == b ? a - 1 : a;
+                InsertString(nextCharIndex, b);
+                selection = charIndex = nextCharIndex;
                 timeOffset = Engine.Scene.TimeActive;
             } else if (!char.IsControl(c)) {
                 UpdateInput(input.Substring(0, a) + c + input.Substring(b));
@@ -56,6 +49,9 @@ namespace LevelEditorMod.Editor.UI {
                 timeOffset = Engine.Scene.TimeActive;
             }
         }
+
+        private void InsertString(int from, int to, string str = null)
+            => UpdateInput(input.Substring(0, from) + str + input.Substring(to));
 
         private void UpdateInput(string str) {
             input = str;
@@ -66,6 +62,16 @@ namespace LevelEditorMod.Editor.UI {
                 w += (int)font.Measure(input[i]).X + 1;
             }
             widthAtIndex[widthAtIndex.Length - 1] = w;
+        }
+
+        private void GetSelection(out int a, out int b) {
+            if (charIndex < selection) {
+                a = charIndex; b = selection;
+            } else if (selection < charIndex) {
+                a = selection; b = charIndex;
+            } else {
+                a = b = charIndex;
+            }
         }
 
         private static bool MustSeparate(char at, char previous, bool ignoreWhiteSpace = true) {
@@ -97,12 +103,12 @@ namespace LevelEditorMod.Editor.UI {
                 int mouseY = (int)EditorInput.Mouse.Screen.Y;
                 bool inside = new Rectangle((int)position.X - 1, (int)position.Y - 1, Width + 2, Height + 2).Contains(mouseX, mouseY);
 
-                bool click = MInput.Mouse.PressedLeftButton, reclick = selected && click;
+                bool click = MInput.Mouse.PressedLeftButton;
 
                 if (click)
-                    canDragIndex = selected = inside;
+                    selected = inside;
 
-                if (canDragIndex && selected) {
+                if (selected) {
                     int i, d = mouseX - (int)position.X + 1;
 
                     for (i = 0; i < widthAtIndex.Length - 1; i++)
@@ -114,22 +120,14 @@ namespace LevelEditorMod.Editor.UI {
                         if (click)
                             selection = i;
                         timeOffset = Engine.Scene.TimeActive;
-                    } else if (reclick) {
-                        if (!MustSeparate(input[Math.Min(input.Length - 1, charIndex)], input[Math.Max(0, charIndex - 1)], false))
-                            charIndex = MoveIndex(-1, true, false);
-                        selection = MoveIndex(1, true, false);
-                        canDragIndex = false;
                     }
                 }
             }
 
-            if (MInput.Mouse.ReleasedLeftButton)
-                canDragIndex = false;
-
             if (selected) {
                 bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
                 bool ctrl = MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down;
-
+                
                 if (MInput.Keyboard.Pressed(Keys.Escape)) {
                     selected = false;
                 } else {
@@ -142,6 +140,29 @@ namespace LevelEditorMod.Editor.UI {
                         timeOffset = Engine.Scene.TimeActive;
                         if (!shift)
                             selection = charIndex;
+                    }
+                }
+
+                if (ctrl) {
+                    bool copy = MInput.Keyboard.Pressed(Keys.C), cut = MInput.Keyboard.Pressed(Keys.X);
+
+                    if (MInput.Keyboard.Pressed(Keys.A)) {
+                        charIndex = input.Length;
+                        selection = 0;
+                    }
+                    
+                    if (selection != charIndex && (copy || cut)) {
+                        GetSelection(out int a, out int b);
+                        clipboard = input.Substring(a, b - a);
+                        if (cut) {
+                            InsertString(a, b);
+                            selection = charIndex = a;
+                        }
+                    } else if (MInput.Keyboard.Pressed(Keys.V) && clipboard != null) {
+                        GetSelection(out int a, out int b);
+                        InsertString(a, b, clipboard);
+                        selection = charIndex = a + clipboard.Length;
+                        timeOffset = Engine.Scene.TimeActive;
                     }
                 }
             }

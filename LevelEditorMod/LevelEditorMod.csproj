@@ -53,6 +53,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="YamlDotNet">
       <HintPath>..\..\..\YamlDotNet.dll</HintPath>
