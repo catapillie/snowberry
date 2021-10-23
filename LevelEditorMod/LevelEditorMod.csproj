@@ -81,6 +81,7 @@
     <Compile Include="Editor\Entities\Plugin_Spikes.cs" />
     <Compile Include="Editor\Entities\Plugin_Spinner.cs" />
     <Compile Include="Editor\Entities\Plugin_SummitGem.cs" />
+    <Compile Include="Editor\Entities\Plugin_TileEntities.cs" />
     <Compile Include="Editor\Entities\Plugin_Wire.cs" />
     <Compile Include="Editor\Entities\Plugin_ZipMover.cs" />
     <Compile Include="Editor\Entity.cs" />

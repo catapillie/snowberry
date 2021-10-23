@@ -3,7 +3,6 @@ using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace LevelEditorMod.Editor {
@@ -56,7 +55,8 @@ namespace LevelEditorMod.Editor {
             return this;
         }
 
-        public virtual void Initialize() { }
+        public virtual void ChangeDefault() { }
+        public virtual void Initialize() => ChangeDefault();
         public virtual void Render() { }
 
         #region Entity Instantiating
