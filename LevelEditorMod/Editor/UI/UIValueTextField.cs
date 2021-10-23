@@ -23,11 +23,11 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         public override void Update(Vector2 position = default) {
-            base.Update(position);
-
             errLerp = Calc.Approach(errLerp, err ? 1f : 0f, Engine.DeltaTime * 7f);
             base.Line = Color.Lerp(Line, ErrLine, errLerp);
             base.LineSelected = Color.Lerp(LineSelected, ErrLineSelected, errLerp);
+
+            base.Update(position);
         }
 
         protected override void OnInputUpdate(string input) {
