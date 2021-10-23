@@ -8,7 +8,7 @@ using System;
 namespace LevelEditorMod.Editor {
     public class LevelEditor : Scene {
         internal class Camera {
-            private bool changedView;
+            private bool changedView = true;
 
             private Vector2 pos;
             public Vector2 Position {
