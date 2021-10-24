@@ -108,8 +108,8 @@ namespace LevelEditorMod.Editor {
                 Position = Vector2.UnitX * button.Width,
                 OnPress = () => Engine.Scene = new LevelEditor(map),
             });
-            ui.Add(new UICheckBox(2) {
-                Position = Vector2.UnitY * button.Height,
+            ui.Add(new UIValueTextField<float>(Fonts.Regular, 256) {
+                Position = Vector2.UnitY * (button.Height + 16),
             });
 
             this.map = map;

@@ -12,10 +12,20 @@ namespace LevelEditorMod.Editor.UI {
         private bool err;
         private float errLerp;
 
-        public T Value { get; private set; }
+        new public T Value { get; private set; }
+
+        private static readonly char[] integerChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' };
+        private static readonly char[] floatChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '.', ',', 'e' };
 
         public UIValueTextField(Font font, int width, string input = "")
-            : base(font, width, input) { }
+            : base(font, width, input) {
+            Console.WriteLine(Type.GetTypeCode(typeof(T)));
+            AllowedCharacters = Type.GetTypeCode(typeof(T)) switch {
+                TypeCode.Int32 => integerChars,
+                TypeCode.Single => floatChars,
+                _ => null
+            };
+        }
 
         protected override void Initialize() {
             base.Initialize();

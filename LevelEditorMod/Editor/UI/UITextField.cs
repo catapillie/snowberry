@@ -3,13 +3,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
+using System.Linq;
 
 namespace LevelEditorMod.Editor.UI {
     public class UITextField : UIElement {
         private bool selected, hovering;
         private int charIndex, selection;
 
-        private string input;
+        public string Value { get; private set; }
         private int[] widthAtIndex;
         private readonly Font font;
 
@@ -25,10 +26,12 @@ namespace LevelEditorMod.Editor.UI {
 
         private static string clipboard;
 
+        protected char[] AllowedCharacters;
+
         public UITextField(Font font, int width, string input = "") {
             this.font = font;
             UpdateInput(input ?? "null");
-            charIndex = selection = this.input.Length;
+            charIndex = selection = this.Value.Length;
 
             Width = Math.Max(1, width);
             Height = font.LineHeight;
@@ -42,31 +45,31 @@ namespace LevelEditorMod.Editor.UI {
 
             GetSelection(out int a, out int b);
 
-            if (c == '\b' && input.Length != 0 && !(a == 0 && b == 0)) {
+            if (c == '\b' && Value.Length != 0 && !(a == 0 && b == 0)) {
                 int nextCharIndex = a == b ? a - 1 : a;
                 InsertString(nextCharIndex, b);
                 selection = charIndex = nextCharIndex;
                 timeOffset = Engine.Scene.TimeActive;
-            } else if (!char.IsControl(c)) {
-                UpdateInput(input.Substring(0, a) + c + input.Substring(b));
+            } else if (!char.IsControl(c) && (AllowedCharacters == null || AllowedCharacters.Contains(c))) {
+                UpdateInput(Value.Substring(0, a) + c + Value.Substring(b));
                 selection = charIndex = a + 1;
                 timeOffset = Engine.Scene.TimeActive;
             }
         }
 
         private void InsertString(int from, int to, string str = null)
-            => UpdateInput(input.Substring(0, from) + str + input.Substring(to));
+            => UpdateInput(Value.Substring(0, from) + str + Value.Substring(to));
 
         private void UpdateInput(string str) {
-            input = str;
-            widthAtIndex = new int[input.Length + 1];
+            Value = str;
+            widthAtIndex = new int[Value.Length + 1];
             int w = 0;
             for (int i = 0; i < widthAtIndex.Length - 1; i++) {
                 widthAtIndex[i] = w;
-                w += (int)font.Measure(input[i]).X + 1;
+                w += (int)font.Measure(Value[i]).X + 1;
             }
             widthAtIndex[widthAtIndex.Length - 1] = w;
-            OnInputUpdate(input);
+            OnInputUpdate(Value);
         }
 
         protected virtual void OnInputUpdate(string input) { }
@@ -89,12 +92,12 @@ namespace LevelEditorMod.Editor.UI {
 
             if (stepByWord) {
                 next += step;
-                while (next > 0 && next < input.Length && !MustSeparate(input[next], input[next - 1]))
+                while (next > 0 && next < Value.Length && !MustSeparate(Value[next], Value[next - 1]))
                     next += step;
             } else
                 next += step;
 
-            return Calc.Clamp(next, 0, input.Length); ;
+            return Calc.Clamp(next, 0, Value.Length); ;
         }
 
         public override void Update(Vector2 position = default) {
@@ -149,13 +152,13 @@ namespace LevelEditorMod.Editor.UI {
                     bool copy = MInput.Keyboard.Pressed(Keys.C), cut = MInput.Keyboard.Pressed(Keys.X);
 
                     if (MInput.Keyboard.Pressed(Keys.A)) {
-                        charIndex = input.Length;
+                        charIndex = Value.Length;
                         selection = 0;
                     }
                     
                     if (selection != charIndex && (copy || cut)) {
                         GetSelection(out int a, out int b);
-                        clipboard = input.Substring(a, b - a);
+                        clipboard = Value.Substring(a, b - a);
                         if (cut) {
                             InsertString(a, b);
                             selection = charIndex = a;
@@ -177,7 +180,7 @@ namespace LevelEditorMod.Editor.UI {
             base.Render(position);
 
             Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, hovering && !selected ? 0.25f : lerp));
-            font.Draw(input, position, Vector2.One, FG);
+            font.Draw(Value, position, Vector2.One, FG);
 
             Draw.Rect(position + Vector2.UnitY * Height, Width, 1, Line);
             if (lerp != 0f) {
