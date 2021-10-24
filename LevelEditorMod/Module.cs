@@ -12,7 +12,7 @@ namespace LevelEditorMod {
         }
 
         public override void Load() {
-            Plugins.Register(GetType().Assembly);
+            PluginInfo.GenerateFromAssembly(GetType().Assembly);
         }
 
         public override void Unload() { }

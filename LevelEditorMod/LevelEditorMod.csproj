@@ -97,7 +97,7 @@
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\FormattedText.cs" />
     <Compile Include="Module.cs" />
-    <Compile Include="Plugins.cs" />
+    <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
