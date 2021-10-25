@@ -5,9 +5,7 @@ namespace LevelEditorMod.Editor.Entities {
     [Plugin("wire")]
     public class Plugin_Wire : Entity {
         [Option("above")] public bool Above = false;
-        [Option("color")] public string Hex = "595866";
-
-        private Color Color => Calc.HexToColor(Hex);
+        [Option("color")] public Color Color = Calc.HexToColor("595866");
 
         public override void Render() {
             base.Render();

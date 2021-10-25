@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using static Celeste.Spikes;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("spikesUp")]
@@ -10,16 +11,16 @@ namespace LevelEditorMod.Editor.Entities {
     public class Plugin_Spikes : Entity {
         [Option("type")] public string Type = "default";
 
-        private Spikes.Directions dir;
+        private Directions dir;
 
         public override void Initialize() {
             base.Initialize();
 
             dir = Name switch {
-                "spikesRight" => Spikes.Directions.Right,
-                "spikesLeft" => Spikes.Directions.Left,
-                "spikesDown" => Spikes.Directions.Down,
-                _ => Spikes.Directions.Up,
+                "spikesRight" => Directions.Right,
+                "spikesLeft" => Directions.Left,
+                "spikesDown" => Directions.Down,
+                _ => Directions.Up,
             };
         }
 
@@ -33,22 +34,22 @@ namespace LevelEditorMod.Editor.Entities {
 
                 switch (dir) {
                     default:
-                    case Spikes.Directions.Up:
+                    case Directions.Up:
                         for (int x = 0; x < Width / 8; x++)
                             spikes.DrawJustified(Position + new Vector2(x * 8, 1), new Vector2(0.0f, 1.0f));
                         break;
 
-                    case Spikes.Directions.Down:
+                    case Directions.Down:
                         for (int x = 0; x < Width / 8; x++)
                             spikes.Draw(Position + new Vector2(x * 8, -1));
                         break;
 
-                    case Spikes.Directions.Left:
+                    case Directions.Left:
                         for (int y = 0; y < Height / 8; y++)
                             spikes.DrawJustified(Position + new Vector2(1, y * 8), new Vector2(1.0f, 0.0f));
                         break;
 
-                    case Spikes.Directions.Right:
+                    case Directions.Right:
                         for (int y = 0; y < Height / 8; y++)
                             spikes.Draw(Position + new Vector2(-1, y * 8));
                         break;

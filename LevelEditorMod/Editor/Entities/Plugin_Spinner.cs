@@ -1,22 +1,14 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
+using static Celeste.TrackSpinner;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("spinner")]
     public class Plugin_Spinner : Entity {
         [Option("attachToSolid")] public bool Attached = false;
-        [Option("color")] public string SpinnerColor = "Blue";
+        [Option("color")] public CrystalColor SpinnerColor = CrystalColor.Blue;
         [Option("dust")] public bool Dust = false;
-
-        private CrystalColor color;
-
-        public override void Initialize() {
-            base.Initialize();
-            if (!Enum.TryParse(SpinnerColor, out color))
-                color = CrystalColor.Blue;
-        }
 
         public override void Render() {
             base.Render();
@@ -25,7 +17,7 @@ namespace LevelEditorMod.Editor.Entities {
                 GFX.Game["danger/dustcreature/base00"].DrawCentered(Position);
                 GFX.Game["danger/dustcreature/center00"].DrawCentered(Position);
             } else {
-                MTexture spinner = GFX.Game[color switch {
+                MTexture spinner = GFX.Game[SpinnerColor switch {
                     CrystalColor.Blue => "danger/crystal/fg_blue03",
                     CrystalColor.Red => "danger/crystal/fg_red03",
                     CrystalColor.Purple => "danger/crystal/fg_purple03",
@@ -33,7 +25,7 @@ namespace LevelEditorMod.Editor.Entities {
                 }];
 
                 Color c = Color.White;
-                if (color == CrystalColor.Rainbow) {
+                if (SpinnerColor == CrystalColor.Rainbow) {
                     c = Calc.HsvToColor(0.4f + Calc.YoYo(Position.Length() % 280 / 280) * 0.4f, 0.4f, 0.9f);
                 }
                 //spinner.DrawCentered(Position + Vector2.UnitX, Color.Black);
@@ -75,7 +67,7 @@ namespace LevelEditorMod.Editor.Entities {
 
     [Plugin("trackSpinner")]
     public class Plugin_TrackSpinner : Plugin_MovingSpinner {
-        [Option("speed")] public string Speed = "Normal";
+        [Option("speed")] public Speeds Speed = Speeds.Normal;
         [Option("startCenter")] public bool StartAtCenter = false;
 
         public override void Render() {

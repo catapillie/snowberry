@@ -15,7 +15,7 @@ namespace LevelEditorMod.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            GFX.Game["scenery/flutterbird/idle00"].DrawJustified(Position, new Vector2(0.5f, 1.0f), colors[0]);
+            GFX.Game["scenery/flutterbird/idle00"].DrawJustified(Position, new Vector2(0.5f, 1.0f), Calc.Random.Choose(colors));
         }
     }
 }

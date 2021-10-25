@@ -51,10 +51,6 @@ namespace LevelEditorMod.Editor {
         }
 
         private PluginInfo plugin;
-        public object this[string option] {
-            get => plugin[this, option];
-            set => plugin[this, option] = value;
-        }
 
         internal Entity SetPosition(Vector2 position) {
             Position = position;
@@ -84,7 +80,7 @@ namespace LevelEditorMod.Editor {
         private Entity InitializeData(Dictionary<string, object> data) {
             if (data != null)
                 foreach (KeyValuePair<string, object> pair in data)
-                    this[pair.Key] = pair.Value;
+                    plugin[this, pair.Key] = pair.Value;
 
             Initialize();
             return this;

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Monocle;
 using System.Collections.Generic;
+using static Celeste.ClutterBlock;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("redBlocks")]
@@ -14,9 +15,9 @@ namespace LevelEditorMod.Editor.Entities {
             base.Initialize();
 
             ClutterBlock.Colors color = Name switch {
-                "greenBlocks" => ClutterBlock.Colors.Green,
-                "yellowBlocks" => ClutterBlock.Colors.Yellow,
-                _ => ClutterBlock.Colors.Red,
+                "greenBlocks" => Colors.Green,
+                "yellowBlocks" => Colors.Yellow,
+                _ => Colors.Red,
             };
             blocks = GFX.Game.GetAtlasSubtextures($"objects/resortclutter/{color}_");
         }

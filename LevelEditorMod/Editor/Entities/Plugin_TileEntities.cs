@@ -20,11 +20,11 @@ namespace LevelEditorMod.Editor.Entities {
     }
 
     public abstract class Plugin_TileEntity : Plugin_TileEntityBase {
-        [Option("tiletype")] public object TileType = '3';
+        [Option("tiletype")] public char TileType = '3';
 
         public override void Initialize() {
             base.Initialize();
-            Tiles = GFX.FGAutotiler.GenerateBox(TileType.ToString()[0], Width / 8, Height / 8).TileGrid.Tiles;
+            Tiles = GFX.FGAutotiler.GenerateBox(TileType, Width / 8, Height / 8).TileGrid.Tiles;
         }
     }
 

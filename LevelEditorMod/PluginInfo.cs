@@ -1,5 +1,6 @@
 ﻿using Celeste.Mod;
 using LevelEditorMod.Editor;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +17,15 @@ namespace LevelEditorMod {
         public object this[Entity entity, string option] {
             get {
                 if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
-                    return f.GetValue(entity);
+                    return ObjectToRaw(f.GetValue(entity));
                 }
                 return null;
             }
             set {
                 if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
-                    f.SetValue(entity, value);
+                    object val = RawToObject(f.FieldType, value);
+                    if (val != null)
+                        f.SetValue(entity, val);
                 }
             }
         }
@@ -35,7 +38,7 @@ namespace LevelEditorMod {
                     if (option.Name == null || option.Name == string.Empty) {
                         Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{name}' was ignored because it had a null or empty option name!");
                         continue;
-                    } else if (options.ContainsKey(option.Name))
+                    } else if (!options.ContainsKey(option.Name))
                         options.Add(option.Name, f);
                 }
             }
@@ -63,6 +66,34 @@ namespace LevelEditorMod {
                     Module.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' entity plugin");
                 }
             }
+        }
+
+        private static object RawToObject(Type targetType, object raw) {
+            if (targetType == typeof(Color)) {
+                return Monocle.Calc.HexToColor(raw.ToString());
+            }
+            if (targetType.IsEnum) {
+                try {
+                    ObjectToRaw(Enum.Parse(targetType, raw.ToString()));
+                    return Enum.Parse(targetType, raw.ToString());
+                } catch {
+                    return null;
+                }
+            }
+            if (targetType == typeof(char)) {
+                return raw.ToString()[0];
+            }
+            Console.WriteLine($"{raw}({raw.GetType().Name}) => {targetType.Name}");
+            return raw;
+        }
+
+        private static object ObjectToRaw(object obj) {
+            return obj switch {
+                Color color => BitConverter.ToString(new byte[] { color.R, color.G, color.B }).Replace("-", string.Empty),
+                Enum => obj.ToString(),
+                char ch => ch.ToString(),
+                _ => obj,
+            };
         }
     }
 }
