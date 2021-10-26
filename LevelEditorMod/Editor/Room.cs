@@ -116,7 +116,7 @@ namespace LevelEditorMod.Editor {
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        internal void Render(Rectangle viewRect, LevelEditor.Camera camera) {
+        internal void Render(Rectangle viewRect, Editor.Camera camera) {
             Vector2 offset = Position * 8;
 
             Vector2 zero = Vector2.Transform(offset, camera.Matrix);

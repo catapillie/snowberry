@@ -6,7 +6,7 @@ using Monocle;
 using System;
 
 namespace LevelEditorMod.Editor {
-    public class LevelEditor : Scene {
+    public class Editor : Scene {
         internal class Camera {
             private bool changedView = true;
 
@@ -87,7 +87,7 @@ namespace LevelEditorMod.Editor {
 
         private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
-        private LevelEditor(Map map) {
+        private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
 
             this.map = map;
@@ -101,7 +101,7 @@ namespace LevelEditorMod.Editor {
             Audio.Stop(Audio.CurrentAmbienceEventInstance);
             Audio.Stop(Audio.CurrentMusicEventInstance);
 
-            Engine.Scene = new LevelEditor(map);
+            Engine.Scene = new Editor(map);
         }
 
         public override void Update() {

@@ -23,7 +23,7 @@ namespace LevelEditorMod.Editor {
                 fillers.Add(filler);
         }
 
-        internal void Render(LevelEditor.Camera camera) {
+        internal void Render(Editor.Camera camera) {
             Rectangle viewRect = camera.ViewRect;
 
             Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
