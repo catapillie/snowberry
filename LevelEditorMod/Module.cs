@@ -1,4 +1,7 @@
 ﻿using Celeste.Mod;
+using LevelEditorMod.Editor;
+using Monocle;
+using System.IO;
 
 namespace LevelEditorMod {
     public class Module : EverestModule {
@@ -12,16 +15,16 @@ namespace LevelEditorMod {
         }
 
         public override void Load() {
-            Plugins.Register(GetType().Assembly);
+            PluginInfo.GenerateFromAssembly(GetType().Assembly);
         }
-
-        public override void Unload() { }
 
         public override void LoadContent(bool firstLoad) {
             base.LoadContent(firstLoad);
 
             Fonts.Load();
         }
+
+        public override void Unload() { }
 
         public static void Log(LogLevel level, string message)
             => Logger.Log(level, "Level Editor Mod", message);

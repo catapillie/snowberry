@@ -50,12 +50,15 @@ namespace LevelEditorMod.Editor {
             }
         }
 
+        private PluginInfo plugin;
+
         internal Entity SetPosition(Vector2 position) {
             Position = position;
             return this;
         }
 
-        public virtual void Initialize() { }
+        public virtual void ChangeDefault() { }
+        public virtual void Initialize() => ChangeDefault();
         public virtual void Render() { }
 
         #region Entity Instantiating
@@ -76,23 +79,17 @@ namespace LevelEditorMod.Editor {
 
         private Entity InitializeData(Dictionary<string, object> data) {
             if (data != null)
-                foreach (FieldInfo f in GetType().GetFields()) {
-                    if (f.GetCustomAttribute<OptionAttribute>() is OptionAttribute option) {
-                        if (option.Name == null || option.Name == string.Empty) {
-                            Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{Name}' was ignored because it had a null or empty option name!");
-                            continue;
-                        } else if (data.TryGetValue(option.Name, out object value))
-                            f.SetValue(this, value);
-                    }
-                }
+                foreach (KeyValuePair<string, object> pair in data)
+                    plugin[this, pair.Key] = pair.Value;
 
             Initialize();
             return this;
         }
 
         internal static Entity Create(string name, Room room) {
-            if (Plugins.Entities.TryGetValue(name, out var ctor)) {
-                Entity entity = ctor();
+            if (PluginInfo.All.TryGetValue(name, out PluginInfo plugin)) {
+                Entity entity = plugin.Instantiate();
+                entity.plugin = plugin;
 
                 entity.Name = name;
                 entity.Room = room;
@@ -105,8 +102,9 @@ namespace LevelEditorMod.Editor {
         }
 
         internal static Entity Create(Room room, EntityData entityData) {
-            if (Plugins.Entities.TryGetValue(entityData.Name, out var ctor)) {
-                Entity entity = ctor();
+            if (PluginInfo.All.TryGetValue(entityData.Name, out PluginInfo plugin)) {
+                Entity entity = plugin.Instantiate();
+                entity.plugin = plugin;
 
                 entity.Name = entityData.Name;
                 entity.Room = room;

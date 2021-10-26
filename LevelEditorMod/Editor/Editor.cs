@@ -8,9 +8,9 @@ using Monocle;
 using System;
 
 namespace LevelEditorMod.Editor {
-    public class LevelEditor : Scene {
+    public class Editor : Scene {
         internal class Camera {
-            private bool changedView;
+            private bool changedView = true;
 
             private Vector2 pos;
             public Vector2 Position {
