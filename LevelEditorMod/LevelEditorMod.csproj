@@ -101,7 +101,7 @@
     <Compile Include="Editor\Entities\Plugin_ZipMover.cs" />
     <Compile Include="Editor\Entity.cs" />
     <Compile Include="Editor\Entities\Plugin_Strawberry.cs" />
-    <Compile Include="Editor\LevelEditor.cs" />
+    <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\Map.cs" />
     <Compile Include="Editor\Room.cs" />
     <Compile Include="Editor\Triggers\Plugin_CameraOffsetTrigger.cs" />
