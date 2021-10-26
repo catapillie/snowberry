@@ -92,7 +92,7 @@ namespace LevelEditorMod.Editor {
 
         //private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
-        private LevelEditor(Map map) {
+        private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
 
             UIButton button;
@@ -106,7 +106,7 @@ namespace LevelEditorMod.Editor {
             });
             ui.Add(new UIButton("<reload>", Fonts.Bold, 4, 8) {
                 Position = Vector2.UnitX * button.Width,
-                OnPress = () => Engine.Scene = new LevelEditor(map),
+                OnPress = () => Engine.Scene = new Editor(map),
             });
             ui.Add(new UIValueTextField<float>(Fonts.Regular, 256) {
                 Position = Vector2.UnitY * (button.Height + 16),
@@ -123,7 +123,7 @@ namespace LevelEditorMod.Editor {
             Audio.Stop(Audio.CurrentAmbienceEventInstance);
             Audio.Stop(Audio.CurrentMusicEventInstance);
 
-            Engine.Scene = new LevelEditor(map) {
+            Engine.Scene = new Editor(map) {
                 leave = data.Area
             };
         }
