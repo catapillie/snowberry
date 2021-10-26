@@ -103,8 +103,8 @@ namespace LevelEditorMod.Editor.UI {
         public override void Update(Vector2 position = default) {
             base.Update(position);
 
-            int mouseX = (int)EditorInput.Mouse.Screen.X;
-            int mouseY = (int)EditorInput.Mouse.Screen.Y;
+            int mouseX = (int)Editor.Mouse.Screen.X;
+            int mouseY = (int)Editor.Mouse.Screen.Y;
             bool inside = new Rectangle((int)position.X - 1, (int)position.Y - 1, Width + 2, Height + 2).Contains(mouseX, mouseY);
 
             if (MInput.Mouse.CheckLeftButton) {

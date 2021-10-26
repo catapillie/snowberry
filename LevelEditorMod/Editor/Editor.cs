@@ -9,6 +9,14 @@ using System;
 
 namespace LevelEditorMod.Editor {
     public class Editor : Scene {
+        public static class Mouse {
+            public static Vector2 Screen { get; internal set; }
+            public static Vector2 ScreenLast { get; internal set; }
+
+            public static Vector2 World { get; internal set; }
+            public static Vector2 WorldLast { get; internal set; }
+        }
+
         internal class Camera {
             private bool changedView = true;
 
@@ -131,8 +139,8 @@ namespace LevelEditorMod.Editor {
         public override void Update() {
             base.Update();
 
-            EditorInput.Mouse.WorldLast = EditorInput.Mouse.World;
-            EditorInput.Mouse.ScreenLast = EditorInput.Mouse.Screen;
+            Mouse.WorldLast = Mouse.World;
+            Mouse.ScreenLast = Mouse.Screen;
 
             lastMousePos = mousePos;
             mousePos = MInput.Mouse.Position;
@@ -158,9 +166,9 @@ namespace LevelEditorMod.Editor {
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
             }
 
-            EditorInput.Mouse.World = Vector2.Transform(mousePos, camera.Inverse);
-            MouseState m = Mouse.GetState();
-            EditorInput.Mouse.Screen = new Vector2(m.X, m.Y) / 2;
+            Mouse.World = Vector2.Transform(mousePos, camera.Inverse);
+            MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
+            Mouse.Screen = new Vector2(m.X, m.Y) / 2;
 
             ui.Update();
         }
