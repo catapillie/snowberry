@@ -62,13 +62,19 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
+    <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
     <Compile Include="Editor\Entities\Plugin_Bonfire.cs" />
     <Compile Include="Editor\Entities\Plugin_Booster.cs" />
+    <Compile Include="Editor\Entities\Plugin_Cassette.cs" />
     <Compile Include="Editor\Entities\Plugin_CassetteBlock.cs" />
     <Compile Include="Editor\Entities\Plugin_ClutterBlock.cs" />
     <Compile Include="Editor\Entities\Plugin_DarkChaser.cs" />
     <Compile Include="Editor\Entities\Plugin_DreamBlock.cs" />
+    <Compile Include="Editor\Entities\Plugin_FinalBoss.cs" />
+    <Compile Include="Editor\Entities\Plugin_FireBall.cs" />
+    <Compile Include="Editor\Entities\Plugin_FloatingDebris.cs" />
     <Compile Include="Editor\Entities\Plugin_FlutterBird.cs" />
+    <Compile Include="Editor\Entities\Plugin_ForegroundDebris.cs" />
     <Compile Include="Editor\Entities\Plugin_GoldenBerry.cs" />
     <Compile Include="Editor\Entities\Plugin_JumpThru.cs" />
     <Compile Include="Editor\Entities\Plugin_Key.cs" />
@@ -78,10 +84,15 @@
     <Compile Include="Editor\Entities\Plugin_Payphone.cs" />
     <Compile Include="Editor\Entities\Plugin_Player.cs" />
     <Compile Include="Editor\Entities\Plugin_Refill.cs" />
+    <Compile Include="Editor\Entities\Plugin_Seeker.cs" />
+    <Compile Include="Editor\Entities\Plugin_SeekerStatue.cs" />
     <Compile Include="Editor\Entities\Plugin_Spikes.cs" />
     <Compile Include="Editor\Entities\Plugin_Spinner.cs" />
     <Compile Include="Editor\Entities\Plugin_SummitGem.cs" />
+    <Compile Include="Editor\Entities\Plugin_Tentacles.cs" />
     <Compile Include="Editor\Entities\Plugin_TileEntities.cs" />
+    <Compile Include="Editor\Entities\Plugin_Cobweb.cs" />
+    <Compile Include="Editor\Entities\Plugin_TowerViewer.cs" />
     <Compile Include="Editor\Entities\Plugin_Wire.cs" />
     <Compile Include="Editor\Entities\Plugin_ZipMover.cs" />
     <Compile Include="Editor\Entity.cs" />

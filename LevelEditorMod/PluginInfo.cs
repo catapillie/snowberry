@@ -83,7 +83,6 @@ namespace LevelEditorMod {
             if (targetType == typeof(char)) {
                 return raw.ToString()[0];
             }
-            Console.WriteLine($"{raw}({raw.GetType().Name}) => {targetType.Name}");
             return raw;
         }
 
