@@ -70,6 +70,8 @@
     <Compile Include="Editor\Entities\Plugin_ClutterBlock.cs" />
     <Compile Include="Editor\Entities\Plugin_DarkChaser.cs" />
     <Compile Include="Editor\Entities\Plugin_DreamBlock.cs" />
+    <Compile Include="Editor\Entities\Plugin_DreamMirror.cs" />
+    <Compile Include="Editor\Entities\Plugin_Feather.cs" />
     <Compile Include="Editor\Entities\Plugin_FinalBoss.cs" />
     <Compile Include="Editor\Entities\Plugin_FireBall.cs" />
     <Compile Include="Editor\Entities\Plugin_FloatingDebris.cs" />
@@ -84,11 +86,13 @@
     <Compile Include="Editor\Entities\Plugin_Payphone.cs" />
     <Compile Include="Editor\Entities\Plugin_Player.cs" />
     <Compile Include="Editor\Entities\Plugin_Refill.cs" />
+    <Compile Include="Editor\Entities\Plugin_ResortMirror.cs" />
     <Compile Include="Editor\Entities\Plugin_Seeker.cs" />
     <Compile Include="Editor\Entities\Plugin_SeekerStatue.cs" />
     <Compile Include="Editor\Entities\Plugin_Spikes.cs" />
     <Compile Include="Editor\Entities\Plugin_Spinner.cs" />
     <Compile Include="Editor\Entities\Plugin_SummitGem.cs" />
+    <Compile Include="Editor\Entities\Plugin_TempleMirror.cs" />
     <Compile Include="Editor\Entities\Plugin_Tentacles.cs" />
     <Compile Include="Editor\Entities\Plugin_TileEntities.cs" />
     <Compile Include="Editor\Entities\Plugin_Cobweb.cs" />
