@@ -163,6 +163,12 @@ namespace LevelEditorMod.Editor {
             // Triggers
             foreach (Entity trigger in triggers)
                 trigger.Render();
+
+            if (this == Editor.SelectedRoom) {
+                if (Editor.Selection.HasValue)
+                    Draw.Rect(Editor.Selection.Value, Color.Blue * 0.25f);
+            } else
+                Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.25f);
         }
     }
 }

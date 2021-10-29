@@ -9,14 +9,6 @@ using System;
 
 namespace LevelEditorMod.Editor {
     public class Editor : Scene {
-        public static class Mouse {
-            public static Vector2 Screen { get; internal set; }
-            public static Vector2 ScreenLast { get; internal set; }
-
-            public static Vector2 World { get; internal set; }
-            public static Vector2 WorldLast { get; internal set; }
-        }
-
         internal class Camera {
             private bool changedView = true;
 
@@ -66,6 +58,10 @@ namespace LevelEditorMod.Editor {
 
             public RenderTarget2D Buffer { get; private set; }
 
+            public Camera() {
+                Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width, Engine.Height);
+            }
+
             private void UpdateMatrices() {
                 Matrix m = Matrix.CreateTranslation((int)-Position.X, (int)-Position.Y, 0f) * Matrix.CreateScale(Math.Min(1f, Zoom));
                 if (Buffer != null) {
@@ -81,16 +77,21 @@ namespace LevelEditorMod.Editor {
 
                 changedView = false;
             }
+        }
 
-            public Camera() {
-                Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width, Engine.Height);
-            }
+        public static class Mouse {
+            public static Vector2 Screen { get; internal set; }
+            public static Vector2 ScreenLast { get; internal set; }
+
+            public static Vector2 World { get; internal set; }
+            public static Vector2 WorldLast { get; internal set; }
         }
 
         private static readonly Color bg = Calc.HexToColor("060607");
 
         private Camera camera;
         private Vector2 mousePos, lastMousePos;
+        private Vector2 worldClick;
 
         private Map map;
         private AreaKey leave;
@@ -99,6 +100,9 @@ namespace LevelEditorMod.Editor {
         private RenderTarget2D uiBuffer;
 
         //private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
+
+        internal static Rectangle? Selection;
+        internal static Room SelectedRoom;
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -169,9 +173,23 @@ namespace LevelEditorMod.Editor {
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouse = new Vector2(m.X, m.Y);
             Mouse.Screen = mouse / 2;
-            Mouse.World = Vector2.Transform(camera.Buffer == null ? mouse : mousePos, camera.Inverse);
+            Mouse.World = Calc.Round(Vector2.Transform(camera.Buffer == null ? mouse : mousePos, camera.Inverse));
 
             ui.Update();
+
+            // controls
+            if (MInput.Mouse.CheckLeftButton) {
+                if (MInput.Mouse.PressedLeftButton) {
+                    worldClick = Mouse.World;
+                    SelectedRoom = map.GetRoomAt(new Point((int)Mouse.World.X, (int)Mouse.World.Y));
+                }
+                int ax = (int)Math.Min(Mouse.World.X, worldClick.X);
+                int ay = (int)Math.Min(Mouse.World.Y, worldClick.Y);
+                int bx = (int)Math.Max(Mouse.World.X, worldClick.X);
+                int by = (int)Math.Max(Mouse.World.Y, worldClick.Y);
+                Selection = new Rectangle(ax, ay, bx - ax, by - ay);
+            } else
+                Selection = null;
         }
 
         public override void Begin() {
@@ -193,8 +211,9 @@ namespace LevelEditorMod.Editor {
             Engine.Instance.GraphicsDevice.SetRenderTarget(uiBuffer);
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+
             ui.Render();
-            //Fonts.Regular.Draw(infoText, Vector2.Zero, Vector2.One, Vector2.Zero, map.Name, camera.X, camera.Y, camera.Zoom);
+            
             Draw.SpriteBatch.End();
 
             #endregion

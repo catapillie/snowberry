@@ -23,6 +23,13 @@ namespace LevelEditorMod.Editor {
                 fillers.Add(filler);
         }
 
+        internal Room GetRoomAt(Point at) {
+            foreach (Room room in rooms)
+                if (new Rectangle(room.X * 8, room.Y * 8, room.Width * 8, room.Height * 8).Contains(at))
+                    return room;
+            return null;
+        }
+
         internal void Render(Editor.Camera camera) {
             Rectangle viewRect = camera.ViewRect;
 
