@@ -166,9 +166,10 @@ namespace LevelEditorMod.Editor {
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
             }
 
-            Mouse.World = Vector2.Transform(mousePos, camera.Inverse);
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
-            Mouse.Screen = new Vector2(m.X, m.Y) / 2;
+            Vector2 mouse = new Vector2(m.X, m.Y);
+            Mouse.Screen = mouse / 2;
+            Mouse.World = Vector2.Transform(camera.Buffer == null ? mouse : mousePos, camera.Inverse);
 
             ui.Update();
         }
