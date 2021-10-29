@@ -119,12 +119,11 @@ namespace LevelEditorMod.Editor {
         internal void Render(Rectangle viewRect, Editor.Camera camera) {
             Vector2 offset = Position * 8;
 
-            Vector2 zero = Vector2.Transform(offset, camera.Matrix);
-            float s = camera.Zoom < 1f ? camera.Zoom : 1f;
+            Vector2 zero = Calc.Round(Vector2.Transform(offset, camera.Matrix));
+            Vector2 size = Calc.Round(Vector2.Transform(offset + new Vector2(Width * 8, Height * 8), camera.Matrix) - zero);
             Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
-                (int)Math.Round(zero.X), (int)Math.Round(zero.Y),
-                (int)Math.Round(Width * 8 * s),
-                (int)Math.Round(Height * 8 * s));
+                (int)zero.X, (int)zero.Y,
+                (int)size.X, (int)size.Y);
 
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
 
