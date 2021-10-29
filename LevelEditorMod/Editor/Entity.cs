@@ -1,9 +1,7 @@
 ﻿using Celeste;
-using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace LevelEditorMod.Editor {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

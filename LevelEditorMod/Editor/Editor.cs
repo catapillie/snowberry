@@ -94,35 +94,15 @@ namespace LevelEditorMod.Editor {
         private Vector2 worldClick;
 
         private Map map;
-        private AreaKey leave;
 
         private readonly UIElement ui = new UIElement();
         private RenderTarget2D uiBuffer;
-
-        //private readonly static FormattedText infoText = FormattedText.Parse("Currently editing : {#00dce8}{map}{#<<}...\n{#cfa51d}Camera : [{#b343bf}{camx}{#<<}, {#b343bf}{camy}{#<<}] ×{#b343bf}{zoom}");
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
-
-            UIButton button;
-            ui.Add(button = new UIButton("return to level", Fonts.Regular, 2, 4) {
-                FG = Calc.HexToColor("f0f0f0"),
-                BG = Calc.HexToColor("db2323"),
-                PressedBG = Calc.HexToColor("f0f0f0"),
-                PressedFG = Calc.HexToColor("db2323"),
-                HoveredBG = Calc.HexToColor("b02020"),
-                OnPress = () => Engine.Scene = new LevelLoader(new Session(leave)),
-            });
-            ui.Add(new UIButton("<reload>", Fonts.Bold, 4, 8) {
-                Position = Vector2.UnitX * button.Width,
-                OnPress = () => Engine.Scene = new Editor(map),
-            });
-            ui.Add(new UIValueTextField<float>(Fonts.Regular, 256) {
-                Position = Vector2.UnitY * (button.Height + 16),
-            });
 
             this.map = map;
         }
@@ -135,9 +115,20 @@ namespace LevelEditorMod.Editor {
             Audio.Stop(Audio.CurrentAmbienceEventInstance);
             Audio.Stop(Audio.CurrentMusicEventInstance);
 
-            Engine.Scene = new Editor(map) {
-                leave = data.Area
-            };
+            Engine.Scene = new Editor(map);
+        }
+
+        public override void Begin() {
+            base.Begin();
+            camera = new Camera();
+            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
+        }
+
+        public override void End() {
+            base.End();
+            camera.Buffer?.Dispose();
+            uiBuffer.Dispose();
+            ui.Destroy();
         }
 
         public override void Update() {
@@ -190,19 +181,6 @@ namespace LevelEditorMod.Editor {
                 Selection = new Rectangle(ax, ay, bx - ax, by - ay);
             } else
                 Selection = null;
-        }
-
-        public override void Begin() {
-            base.Begin();
-            camera = new Camera();
-            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
-        }
-
-        public override void End() {
-            base.End();
-            camera.Buffer?.Dispose();
-            uiBuffer.Dispose();
-            ui.Destroy();
         }
 
         public override void Render() {
