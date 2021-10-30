@@ -121,21 +121,36 @@ namespace LevelEditorMod.Editor {
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        internal KeyValuePair<Entity, Selection>[] GetSelectedEntities(Rectangle rect) {
-            List<KeyValuePair<Entity, Selection>> selected = new List<KeyValuePair<Entity, Selection>>();
+        internal Dictionary<Entity, List<Tuple<Rectangle, int>>> GetSelectedEntities(Rectangle rect) {
+            Dictionary<Entity, List<Tuple<Rectangle, int>>> result = new Dictionary<Entity, List<Tuple<Rectangle, int>>>();
+            
             foreach (KeyValuePair<Entity, Selection> s in SelectionByEntity) {
-                Selection selection = s.Value;
-                if (selection.Main.HasValue) {
-                    if (rect.Intersects(selection.Main.Value)) {
-                        selected.Add(s);
-                    } else if (selection.Nodes != null) {
-                        foreach (Rectangle r in selection.Nodes)
-                            if (rect.Intersects(r))
-                                selected.Add(s);
+                List<Tuple<Rectangle, int>> selected = new List<Tuple<Rectangle, int>>();
+
+                Rectangle? main = s.Value.Main;
+                Rectangle[] nodes = s.Value.Nodes;
+                bool entitySelected = false;
+
+                if (main.HasValue) {
+                    if (rect.Intersects(main.Value)) {
+                        selected.Add(Tuple.Create(main.Value, -1));
+                        entitySelected = true;
+                    } 
+                    if (nodes != null) {
+                        for (int i = 0; i < nodes.Length; i++) {
+                            Rectangle r = nodes[i];
+                            if (rect.Intersects(r)) {
+                                selected.Add(Tuple.Create(r, i));
+                                entitySelected = true;
+                            }
+                        }
                     }
                 }
+                if (entitySelected)
+                    result.Add(s.Key, selected);
             }
-            return selected.ToArray();
+
+            return result;
         }
 
         internal void Render(Rectangle viewRect, Editor.Camera camera) {
@@ -190,10 +205,9 @@ namespace LevelEditorMod.Editor {
                     Draw.Rect(Editor.Selection.Value, Color.Blue * 0.25f);
                 if (Editor.SelectedEntities != null) {
                     foreach (var s in Editor.SelectedEntities) {
-                        Draw.Rect(s.Value.Main.Value, Color.Blue * 0.25f);
-                        if (s.Value.Nodes != null)
-                            foreach (Rectangle r in s.Value.Nodes)
-                                Draw.Rect(r, Color.Blue * 0.25f);
+                        foreach (var tuple in s.Value) {
+                            Draw.Rect(tuple.Item1, Color.Blue * 0.25f);
+                        }
                     }
                 }
             } else

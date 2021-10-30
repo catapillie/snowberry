@@ -101,7 +101,7 @@ namespace LevelEditorMod.Editor {
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
-        internal static KeyValuePair<Entity, Selection>[] SelectedEntities; 
+        internal static Dictionary<Entity, List<Tuple<Rectangle, int>>> SelectedEntities; 
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -185,7 +185,6 @@ namespace LevelEditorMod.Editor {
                     Selection = new Rectangle(ax, ay, bx - ax, by - ay);
 
                     SelectedEntities = SelectedRoom.GetSelectedEntities(Selection.Value);
-                    Console.WriteLine(SelectedEntities.Length);
                 }
             } else
                 Selection = null;
