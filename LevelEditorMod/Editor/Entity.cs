@@ -49,29 +49,42 @@ namespace LevelEditorMod.Editor {
             }
         }
 
+        private bool updateSelection = true;
+        private Rectangle[] selectionRectangles;
+        internal Rectangle[] SelectionRectangles {
+            get {
+                if (updateSelection) {
+                    selectionRectangles = Select();
+                    updateSelection = false;
+                }
+                return selectionRectangles;
+            }
+        }
+
         private PluginInfo plugin;
 
         internal Entity SetPosition(Vector2 position) {
             Position = position;
+            updateSelection = true;
             return this;
         }
 
-        protected Rectangle[] NodesToRectangles(int squareLength)
-            => NodesToRectangles(squareLength, squareLength, -squareLength / 2, -squareLength / 2);
+        internal void Move(Vector2 amount) {
+            Position += amount;
+            updateSelection = true;
+        }
 
-        protected Rectangle[] NodesToRectangles(int width, int height, int offsetX = 0, int offsetY = 0) {
-            Rectangle[] rects = new Rectangle[Nodes.Length];
-            for (int i = 0; i < rects.Length; i++) {
-                Vector2 node = Nodes[i];
-                rects[i] = new Rectangle((int)node.X + offsetX, (int)node.Y + offsetY, width, height);
+        internal void MoveNode(int i, Vector2 amount) {
+            if (i >= 0 && i < Nodes.Length) {
+                Nodes[i] += amount;
+                updateSelection = true;
             }
-            return rects;
         }
 
         public virtual void ChangeDefault() { }
         public virtual void Initialize() => ChangeDefault();
+        protected virtual Rectangle[] Select() => null;
         public virtual void Render() { }
-        public virtual Selection Select() => default;
 
         #region Entity Instantiating
 

@@ -101,7 +101,8 @@ namespace LevelEditorMod.Editor {
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
-        internal static Dictionary<Entity, List<Tuple<Rectangle, int>>> SelectedEntities; 
+        internal static List<EntitySelection> SelectedEntities;
+        private bool canSelect;
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -144,14 +145,14 @@ namespace LevelEditorMod.Editor {
             
             // zooming
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
-            float s = camera.Zoom;
+            float scale = camera.Zoom;
             if (wheel > 0)
-                s = s >= 1 ? s + 1 : s * 2f;
+                scale = scale >= 1 ? scale + 1 : scale * 2f;
             else if (wheel < 0)
-                s = s > 1 ? s - 1 : s / 2f;
-            s = Calc.Clamp(s, 0.0625f, 24f);
-            if (s != camera.Zoom)
-                camera.Zoom = s;
+                scale = scale > 1 ? scale - 1 : scale / 2f;
+            scale = Calc.Clamp(scale, 0.0625f, 24f);
+            if (scale != camera.Zoom)
+                camera.Zoom = scale;
 
             if (camera.Buffer != null)
                 mousePos /= camera.Zoom;
@@ -164,20 +165,32 @@ namespace LevelEditorMod.Editor {
             }
 
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
-            Vector2 mouse = new Vector2(m.X, m.Y);
-            Mouse.Screen = mouse / 2;
-            Mouse.World = Calc.Round(Vector2.Transform(camera.Buffer == null ? mouse : mousePos, camera.Inverse));
+            Vector2 mouseVec = new Vector2(m.X, m.Y);
+            Mouse.Screen = mouseVec / 2;
+            Mouse.World = Calc.Round(Vector2.Transform(camera.Buffer == null ? mouseVec : mousePos, camera.Inverse));
 
             ui.Update();
 
             // controls
             if (MInput.Mouse.CheckLeftButton) {
                 if (MInput.Mouse.PressedLeftButton) {
+                    Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
+
                     worldClick = Mouse.World;
-                    SelectedRoom = map.GetRoomAt(new Point((int)Mouse.World.X, (int)Mouse.World.Y));
+                    SelectedRoom = map.GetRoomAt(mouse);
+
+                    canSelect = true;
+                    if (SelectedEntities != null) {
+                        foreach (EntitySelection s in SelectedEntities) {
+                            if (s.Contains(mouse)) {
+                                canSelect = false;
+                                break;
+                            }
+                        }
+                    }
                 }
 
-                if (SelectedRoom != null) {
+                if (canSelect && SelectedRoom != null) {
                     int ax = (int)Math.Min(Mouse.World.X, worldClick.X);
                     int ay = (int)Math.Min(Mouse.World.Y, worldClick.Y);
                     int bx = (int)Math.Max(Mouse.World.X, worldClick.X);
@@ -185,6 +198,9 @@ namespace LevelEditorMod.Editor {
                     Selection = new Rectangle(ax, ay, bx - ax, by - ay);
 
                     SelectedEntities = SelectedRoom.GetSelectedEntities(Selection.Value);
+                } else if (SelectedEntities != null) {
+                    foreach (EntitySelection s in SelectedEntities)
+                        s.Move(Mouse.World - Mouse.WorldLast);
                 }
             } else
                 Selection = null;

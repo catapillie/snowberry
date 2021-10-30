@@ -29,8 +29,7 @@ namespace LevelEditorMod.Editor {
 
         private readonly List<Entity> entities = new List<Entity>();
         private readonly List<Entity> triggers = new List<Entity>();
-
-        private readonly Dictionary<Entity, Selection> SelectionByEntity = new Dictionary<Entity, Selection>();
+        private readonly List<Entity> allEntities = new List<Entity>();
 
         public int LoadSeed {
             get {
@@ -86,7 +85,7 @@ namespace LevelEditorMod.Editor {
             foreach (EntityData entity in data.Entities) {
                 if (Entity.TryCreate(this, entity, out Entity e)) {
                     entities.Add(e);
-                    SelectionByEntity.Add(e, e.Select());
+                    allEntities.Add(e);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
             }
@@ -100,7 +99,7 @@ namespace LevelEditorMod.Editor {
             foreach (EntityData trigger in data.Triggers) {
                 if (Entity.TryCreate(this, trigger, out Entity t)) {
                     triggers.Add(t);
-                    SelectionByEntity.Add(t, t.Select());
+                    allEntities.Add(t);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
@@ -121,33 +120,24 @@ namespace LevelEditorMod.Editor {
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
 
-        internal Dictionary<Entity, List<Tuple<Rectangle, int>>> GetSelectedEntities(Rectangle rect) {
-            Dictionary<Entity, List<Tuple<Rectangle, int>>> result = new Dictionary<Entity, List<Tuple<Rectangle, int>>>();
-            
-            foreach (KeyValuePair<Entity, Selection> s in SelectionByEntity) {
-                List<Tuple<Rectangle, int>> selected = new List<Tuple<Rectangle, int>>();
+        internal List<EntitySelection> GetSelectedEntities(Rectangle rect) {
+            List<EntitySelection> result = new List<EntitySelection>();
 
-                Rectangle? main = s.Value.Main;
-                Rectangle[] nodes = s.Value.Nodes;
-                bool entitySelected = false;
-
-                if (main.HasValue) {
-                    if (rect.Intersects(main.Value)) {
-                        selected.Add(Tuple.Create(main.Value, -1));
-                        entitySelected = true;
-                    } 
-                    if (nodes != null) {
-                        for (int i = 0; i < nodes.Length; i++) {
-                            Rectangle r = nodes[i];
-                            if (rect.Intersects(r)) {
-                                selected.Add(Tuple.Create(r, i));
-                                entitySelected = true;
-                            }
+            foreach (Entity entity in allEntities) {
+                var rects = entity.SelectionRectangles;
+                if (rects != null && rects.Length > 0) {
+                    List<EntitySelection.Selection> selection = new List<EntitySelection.Selection>();
+                    bool wasSelected = false;
+                    for (int i = 0; i < rects.Length; i++) {
+                        Rectangle r = rects[i];
+                        if (rect.Intersects(r)) {
+                            selection.Add(new EntitySelection.Selection(r, i - 1));
+                            wasSelected = true;
                         }
                     }
+                    if (wasSelected)
+                        result.Add(new EntitySelection(entity, selection));
                 }
-                if (entitySelected)
-                    result.Add(s.Key, selected);
             }
 
             return result;
@@ -204,9 +194,9 @@ namespace LevelEditorMod.Editor {
                 if (Editor.Selection.HasValue)
                     Draw.Rect(Editor.Selection.Value, Color.Blue * 0.25f);
                 if (Editor.SelectedEntities != null) {
-                    foreach (var s in Editor.SelectedEntities) {
-                        foreach (var tuple in s.Value) {
-                            Draw.Rect(tuple.Item1, Color.Blue * 0.25f);
+                    foreach (EntitySelection s in Editor.SelectedEntities) {
+                        foreach (EntitySelection.Selection selection in s.Selections) {
+                            Draw.Rect(selection.Rect, Color.Blue * 0.25f);
                         }
                     }
                 }

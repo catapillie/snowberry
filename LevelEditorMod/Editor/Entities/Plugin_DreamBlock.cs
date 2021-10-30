@@ -17,8 +17,15 @@ namespace LevelEditorMod.Editor.Entities {
                 DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2f, Color.White, 4, 2);
         }
 
-        public override Selection Select() {
-            return new Selection(Bounds, NodesToRectangles(Width, Height));
+        protected override Rectangle[] Select() {
+            if (Nodes.Length != 0) {
+                Vector2 node = Nodes[0];
+                return new Rectangle[] {
+                    Bounds, new Rectangle((int)node.X, (int)node.Y, Width, Height)
+                };
+            } else {
+                return new Rectangle[] { Bounds };
+            }
         }
     }
 }

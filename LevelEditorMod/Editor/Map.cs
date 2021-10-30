@@ -53,7 +53,6 @@ namespace LevelEditorMod.Editor {
             foreach (Rectangle filler in fillers) {
             	Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
             	Draw.Rect(rect, Color.White * 0.08f);
-            	Draw.HollowRect(rect, Color.OrangeRed);
             }
             Draw.SpriteBatch.End();
         }
