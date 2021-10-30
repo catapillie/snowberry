@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace LevelEditorMod.Editor {
@@ -28,6 +29,8 @@ namespace LevelEditorMod.Editor {
 
         private readonly List<Entity> entities = new List<Entity>();
         private readonly List<Entity> triggers = new List<Entity>();
+
+        private readonly Dictionary<Entity, Selection> SelectionByEntity = new Dictionary<Entity, Selection>();
 
         public int LoadSeed {
             get {
@@ -81,9 +84,10 @@ namespace LevelEditorMod.Editor {
 
             // Entities
             foreach (EntityData entity in data.Entities) {
-                if (Entity.TryCreate(this, entity, out Entity e))
+                if (Entity.TryCreate(this, entity, out Entity e)) {
                     entities.Add(e);
-                else
+                    SelectionByEntity.Add(e, e.Select());
+                } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
             }
 
@@ -94,9 +98,10 @@ namespace LevelEditorMod.Editor {
 
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
-                if (Entity.TryCreate(this, trigger, out Entity t))
+                if (Entity.TryCreate(this, trigger, out Entity t)) {
                     triggers.Add(t);
-                else
+                    SelectionByEntity.Add(t, t.Select());
+                } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
         }
@@ -114,6 +119,23 @@ namespace LevelEditorMod.Editor {
         private void Autotile() {
             fgTiles = GFX.FGAutotiler.GenerateMap(fgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
+        }
+
+        internal KeyValuePair<Entity, Selection>[] GetSelectedEntities(Rectangle rect) {
+            List<KeyValuePair<Entity, Selection>> selected = new List<KeyValuePair<Entity, Selection>>();
+            foreach (KeyValuePair<Entity, Selection> s in SelectionByEntity) {
+                Selection selection = s.Value;
+                if (selection.Main.HasValue) {
+                    if (rect.Intersects(selection.Main.Value)) {
+                        selected.Add(s);
+                    } else if (selection.Nodes != null) {
+                        foreach (Rectangle r in selection.Nodes)
+                            if (rect.Intersects(r))
+                                selected.Add(s);
+                    }
+                }
+            }
+            return selected.ToArray();
         }
 
         internal void Render(Rectangle viewRect, Editor.Camera camera) {
@@ -166,8 +188,16 @@ namespace LevelEditorMod.Editor {
             if (this == Editor.SelectedRoom) {
                 if (Editor.Selection.HasValue)
                     Draw.Rect(Editor.Selection.Value, Color.Blue * 0.25f);
+                if (Editor.SelectedEntities != null) {
+                    foreach (var s in Editor.SelectedEntities) {
+                        Draw.Rect(s.Value.Main.Value, Color.Blue * 0.25f);
+                        if (s.Value.Nodes != null)
+                            foreach (Rectangle r in s.Value.Nodes)
+                                Draw.Rect(r, Color.Blue * 0.25f);
+                    }
+                }
             } else
-                Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.25f);
+                Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.5f);
         }
     }
 }

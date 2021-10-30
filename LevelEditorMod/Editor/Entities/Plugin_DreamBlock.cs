@@ -16,5 +16,9 @@ namespace LevelEditorMod.Editor.Entities {
             if (Nodes.Length != 0)
                 DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2f, Color.White, 4, 2);
         }
+
+        public override Selection Select() {
+            return new Selection(Bounds, NodesToRectangles(Width, Height));
+        }
     }
 }

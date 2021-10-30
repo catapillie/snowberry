@@ -25,7 +25,7 @@ namespace LevelEditorMod.Editor {
     public abstract class Entity {
         protected Room Room { get; private set; }
 
-        protected string Name { get; private set; }
+        public string Name { get; private set; }
 
         protected Vector2 Position { get; private set; }
         protected int X => (int)Position.X;
@@ -34,6 +34,7 @@ namespace LevelEditorMod.Editor {
         protected int Height { get; private set; }
         protected Vector2 Center => Position + new Vector2(Width, Height) / 2f;
         protected Vector2 Origin { get; private set; }
+        protected Rectangle Bounds => new Rectangle(X, Y, Width, Height);
 
         private bool nodesChanged;
         private readonly List<Vector2> nodes = new List<Vector2>();
@@ -55,9 +56,22 @@ namespace LevelEditorMod.Editor {
             return this;
         }
 
+        protected Rectangle[] NodesToRectangles(int squareLength)
+            => NodesToRectangles(squareLength, squareLength, -squareLength / 2, -squareLength / 2);
+
+        protected Rectangle[] NodesToRectangles(int width, int height, int offsetX = 0, int offsetY = 0) {
+            Rectangle[] rects = new Rectangle[Nodes.Length];
+            for (int i = 0; i < rects.Length; i++) {
+                Vector2 node = Nodes[i];
+                rects[i] = new Rectangle((int)node.X + offsetX, (int)node.Y + offsetY, width, height);
+            }
+            return rects;
+        }
+
         public virtual void ChangeDefault() { }
         public virtual void Initialize() => ChangeDefault();
         public virtual void Render() { }
+        public virtual Selection Select() => default;
 
         #region Entity Instantiating
 

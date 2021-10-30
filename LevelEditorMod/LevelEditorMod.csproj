@@ -105,6 +105,7 @@
     <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\Map.cs" />
     <Compile Include="Editor\Room.cs" />
+    <Compile Include="Editor\Selection.cs" />
     <Compile Include="Editor\Triggers\Plugin_CameraOffsetTrigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_Trigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />

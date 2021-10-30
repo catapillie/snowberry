@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor {
     public class Editor : Scene {
@@ -100,6 +101,7 @@ namespace LevelEditorMod.Editor {
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
+        internal static KeyValuePair<Entity, Selection>[] SelectedEntities; 
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -174,11 +176,17 @@ namespace LevelEditorMod.Editor {
                     worldClick = Mouse.World;
                     SelectedRoom = map.GetRoomAt(new Point((int)Mouse.World.X, (int)Mouse.World.Y));
                 }
-                int ax = (int)Math.Min(Mouse.World.X, worldClick.X);
-                int ay = (int)Math.Min(Mouse.World.Y, worldClick.Y);
-                int bx = (int)Math.Max(Mouse.World.X, worldClick.X);
-                int by = (int)Math.Max(Mouse.World.Y, worldClick.Y);
-                Selection = new Rectangle(ax, ay, bx - ax, by - ay);
+
+                if (SelectedRoom != null) {
+                    int ax = (int)Math.Min(Mouse.World.X, worldClick.X);
+                    int ay = (int)Math.Min(Mouse.World.Y, worldClick.Y);
+                    int bx = (int)Math.Max(Mouse.World.X, worldClick.X);
+                    int by = (int)Math.Max(Mouse.World.Y, worldClick.Y);
+                    Selection = new Rectangle(ax, ay, bx - ax, by - ay);
+
+                    SelectedEntities = SelectedRoom.GetSelectedEntities(Selection.Value);
+                    Console.WriteLine(SelectedEntities.Length);
+                }
             } else
                 Selection = null;
         }
