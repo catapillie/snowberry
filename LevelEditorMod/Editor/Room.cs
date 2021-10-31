@@ -298,8 +298,8 @@ namespace LevelEditorMod.Editor {
                 entityElem.Attributes["originX"] = entity.Origin.X;
                 entityElem.Attributes["originY"] = entity.Origin.Y;
 
-				foreach(var opt in entity.plugin.GetOptions())
-                    entityElem.Attributes[opt] = entity.plugin[entity, opt];
+				foreach(var opt in entity.Plugin.GetOptions())
+                    entityElem.Attributes[opt] = entity.Plugin[entity, opt];
 
 				foreach(var node in entity.Nodes) {
                     BinaryPacker.Element n = new BinaryPacker.Element();
@@ -330,8 +330,8 @@ namespace LevelEditorMod.Editor {
                 triggersElem.Attributes["originX"] = tigger.Origin.X;
                 triggersElem.Attributes["originY"] = tigger.Origin.Y;
 
-                foreach(var opt in tigger.plugin.GetOptions())
-                    triggersElem.Attributes[opt] = tigger.plugin[tigger, opt];
+                foreach(var opt in tigger.Plugin.GetOptions())
+                    triggersElem.Attributes[opt] = tigger.Plugin[tigger, opt];
 
                 foreach(var node in tigger.Nodes) {
                     BinaryPacker.Element n = new BinaryPacker.Element();

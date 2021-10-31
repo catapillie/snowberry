@@ -6,40 +6,41 @@ using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.UI {
     public class UISelectionPanel : UIElement {
-        public class UIOption<T> : UIElement {
+        public class UIOption : UIElement {
             private readonly string label;
             private readonly UIElement input;
-            private readonly Func<T> get;
-            private readonly Action<T> set;
+            //private readonly Func<object> get;
+            //private readonly Action set;
 
-            public UIOption(string label, Func<T> get = null, Action<T> set = null) {
+            public UIOption(string label, UIElement input) {
                 this.label = $"{label} : ";
+                this.input = input;
                 int w = (int)Fonts.Regular.Measure(this.label).X;
 
-                this.get = get;
-                this.set = set;
+                if (input != null) {
+                    Add(input);
+                    input.Position = Vector2.UnitX * w;
+                }
 
-                Add(input = new UIValueTextField<T>(Fonts.Regular, 35, get().ToString()) {
-                    Position = Vector2.UnitX * w
-                });
-
-                Width = w + input.Width;
-                Height = Fonts.Regular.LineHeight;
+                Width = w + (input?.Width ?? 0);
+                Height = Math.Max(Fonts.Regular.LineHeight, input?.Height ?? 0);
             }
 
             public override void Update(Vector2 position = default) {
                 base.Update(position);
-                switch (input) {
-                    case UIValueTextField<T> textField:
-                        if (textField.Selected) {
-                            if (!textField.Error)
-                                set?.Invoke(textField.Value);
-                        } else {
-                            textField.UpdateInput(get?.Invoke().ToString() ?? "null");
-                        }
-                        break;
-                    default:
-                        break;
+                if (input != null) {
+                    //switch (input) {
+                    //    case UIValueTextField<T> textField:
+                    //        if (textField.Selected) {
+                    //            if (!textField.Error)
+                    //                set?.Invoke(textField.Value);
+                    //        } else {
+                    //            textField.UpdateInput(get?.Invoke().ToString() ?? "null");
+                    //        }
+                    //        break;
+                    //    default:
+                    //        break;
+                    //}
                 }
             }
 
@@ -57,22 +58,34 @@ namespace LevelEditorMod.Editor.UI {
                 name = entity.Name;
                 int spacing = Fonts.Regular.LineHeight + 2;
 
-                UIOption<int> x, y, w, h;
-                Add(x = new UIOption<int>("x", () => entity.X, x => selection.SetPosition(new Vector2(x, entity.Y), -1)) {
+                UIOption x, y, w, h;
+                Add(x = new UIOption("x", new UIValueTextField<int>(Fonts.Regular, 35, entity.X.ToString())) {
                     Position = new Vector2(0, spacing),
                 });
-                Add(y = new UIOption<int>("y", () => entity.Y, y => selection.SetPosition(new Vector2(entity.X, y), -1)) {
+                Add(y = new UIOption("y", new UIValueTextField<int>(Fonts.Regular, 35, entity.Y.ToString())) {
                     Position = new Vector2(x.Width + 2, spacing),
                 });
-                Add(w = new UIOption<int>("width", () => entity.Width, w => selection.SetWidth(w)) {
+                Add(w = new UIOption("width", new UIValueTextField<int>(Fonts.Regular, 35, entity.Width.ToString())) {
                     Position = new Vector2(0, spacing * 2),
                 });
-                Add(h = new UIOption<int>("height", () => entity.Height, h => selection.SetHeight(h)) {
+                Add(h = new UIOption("height", new UIValueTextField<int>(Fonts.Regular, 35, entity.Height.ToString())) {
                     Position = new Vector2(w.Width + 2, spacing * 2),
                 });
                 y.Position.X = h.Position.X = Math.Max(y.Position.X, h.Position.X);
 
-                Height = spacing * 3 + 6;
+                int l = 3;
+                foreach (var option in entity.Plugin.OptionDict) {
+                    if (option.Value.FieldType == typeof(bool)) {
+                        bool value = (bool)option.Value.GetValue(entity);
+                        Add(new UIOption(option.Key, new UICheckBox(0, value)) {
+                            Position = new Vector2(0, spacing * l),
+                        });
+                    }
+
+                    l++;
+                }
+
+                Height = spacing * l + 6;
             }
 
             public override void Render(Vector2 position = default) {

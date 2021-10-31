@@ -11,18 +11,18 @@ namespace LevelEditorMod {
         public static readonly Dictionary<string, PluginInfo> All = new Dictionary<string, PluginInfo>();
 
         private readonly Type Type;
-        private readonly Dictionary<string, FieldInfo> options = new Dictionary<string, FieldInfo>();
+        public readonly Dictionary<string, FieldInfo> OptionDict = new Dictionary<string, FieldInfo>();
         private readonly ConstructorInfo ctor;
 
         public object this[Entity entity, string option] {
             get {
-                if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
+                if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
                     return ObjectToRaw(f.GetValue(entity));
                 }
                 return null;
             }
             set {
-                if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
+                if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
                     object val = RawToObject(f.FieldType, value);
                     if (val != null)
                         f.SetValue(entity, val);
@@ -38,8 +38,8 @@ namespace LevelEditorMod {
                     if (option.Name == null || option.Name == string.Empty) {
                         Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{name}' was ignored because it had a null or empty option name!");
                         continue;
-                    } else if (!options.ContainsKey(option.Name))
-                        options.Add(option.Name, f);
+                    } else if (!OptionDict.ContainsKey(option.Name))
+                        OptionDict.Add(option.Name, f);
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace LevelEditorMod {
         }
 
         public List<string> GetOptions() {
-            return options.Keys.ToList();
+            return OptionDict.Keys.ToList();
         }
     }
 }
