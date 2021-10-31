@@ -83,8 +83,16 @@ namespace LevelEditorMod.Editor {
 
         public virtual void ChangeDefault() { }
         public virtual void Initialize() => ChangeDefault();
-        protected virtual Rectangle[] Select() => null;
-        public virtual void Render() { }
+		protected virtual Rectangle[] Select() {
+            List<Rectangle> ret = new List<Rectangle>();
+			ret.Add(Bounds.Width < 6 ? new Rectangle(X - 3, Y - 3, 6, 6) : Bounds );
+			foreach(var node in nodes) {
+                ret.Add(new Rectangle((int)node.X - 3, (int)node.Y - 3, 6, 6));
+			}
+            return ret.ToArray();
+		}
+
+		public virtual void Render() { }
 
         #region Entity Instantiating
 
