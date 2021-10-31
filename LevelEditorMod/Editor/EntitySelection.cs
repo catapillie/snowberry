@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor {
-    internal class EntitySelection {
+    public class EntitySelection {
         public class Selection {
             public Rectangle Rect;
             public int Index;
@@ -13,12 +13,12 @@ namespace LevelEditorMod.Editor {
             }
         }
 
-        private readonly Entity entity;
+        public readonly Entity Entity;
         public readonly List<Selection> Selections;
 
         public EntitySelection(Entity entity, List<Selection> selection) {
-            this.entity = entity;
-            this.Selections = selection;
+            Entity = entity;
+            Selections = selection;
         }
 
         public bool Contains(Point p) {
@@ -33,9 +33,24 @@ namespace LevelEditorMod.Editor {
                 s.Rect.X += (int)amount.X;
                 s.Rect.Y += (int)amount.Y;
                 if (s.Index < 0)
-                    entity.Move(amount);
+                    Entity.Move(amount);
                 else
-                    entity.MoveNode(s.Index, amount);
+                    Entity.MoveNode(s.Index, amount);
+            }
+        }
+
+        public void SetPosition(Vector2 position, int i) {
+            System.Console.WriteLine(i);
+            foreach (Selection s in Selections) {
+                if (s.Index == i) {
+                    s.Rect.X = (int)position.X;
+                    s.Rect.Y = (int)position.Y;
+                    if (s.Index < 0)
+                        Entity.SetPosition(position);
+                    else
+                        Entity.SetNode(s.Index, position);
+                    break;
+                }
             }
         }
     }

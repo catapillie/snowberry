@@ -102,6 +102,7 @@ namespace LevelEditorMod.Editor {
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
         internal static List<EntitySelection> SelectedEntities;
+        private UISelectionPanel selectionPanel;
         private bool canSelect;
 
         private Editor(Map map) {
@@ -125,6 +126,13 @@ namespace LevelEditorMod.Editor {
             base.Begin();
             camera = new Camera();
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
+
+            int h = 160;
+            ui.Add(selectionPanel = new UISelectionPanel() {
+                Position = new Vector2(0, uiBuffer.Height - h),
+                Width = uiBuffer.Width,
+                Height = h,
+            });
         }
 
         public override void End() {
@@ -171,8 +179,9 @@ namespace LevelEditorMod.Editor {
 
             ui.Update();
 
-            // controls
-            if (MInput.Mouse.CheckLeftButton) {
+            // control
+            bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
+            if (MInput.Mouse.CheckLeftButton && shift) {
                 if (MInput.Mouse.PressedLeftButton) {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
 
@@ -199,11 +208,19 @@ namespace LevelEditorMod.Editor {
 
                     SelectedEntities = SelectedRoom.GetSelectedEntities(Selection.Value);
                 } else if (SelectedEntities != null) {
+                    Vector2 worldSnapped = (Mouse.World / 8).Floor() * 8;
+                    Vector2 worldLastSnapped = (Mouse.WorldLast / 8).Floor() * 8;
+                    Vector2 move = worldSnapped - worldLastSnapped;
                     foreach (EntitySelection s in SelectedEntities)
-                        s.Move(Mouse.World - Mouse.WorldLast);
+                        s.Move(move);
                 }
             } else
                 Selection = null;
+
+            if (MInput.Mouse.ReleasedLeftButton && shift) {
+                if (canSelect)
+                    selectionPanel.Display(SelectedEntities);
+            }
         }
 
         public override void Render() {

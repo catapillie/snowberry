@@ -27,19 +27,19 @@ namespace LevelEditorMod.Editor {
 
         public string Name { get; private set; }
 
-        protected Vector2 Position { get; private set; }
-        protected int X => (int)Position.X;
-        protected int Y => (int)Position.Y;
-        protected int Width { get; private set; }
-        protected int Height { get; private set; }
-        protected Vector2 Center => Position + new Vector2(Width, Height) / 2f;
-        protected Vector2 Origin { get; private set; }
-        protected Rectangle Bounds => new Rectangle(X, Y, Width, Height);
+        public Vector2 Position { get; private set; }
+        public int X => (int)Position.X;
+        public int Y => (int)Position.Y;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public Vector2 Center => Position + new Vector2(Width, Height) / 2f;
+        public Vector2 Origin { get; private set; }
+        public Rectangle Bounds => new Rectangle(X, Y, Width, Height);
 
         private bool nodesChanged;
         private readonly List<Vector2> nodes = new List<Vector2>();
         private Vector2[] nodeArray;
-        protected Vector2[] Nodes {
+        public Vector2[] Nodes {
             get {
                 if (nodeArray == null || nodesChanged) {
                     nodeArray = nodes.ToArray();
@@ -72,6 +72,13 @@ namespace LevelEditorMod.Editor {
         internal void Move(Vector2 amount) {
             Position += amount;
             updateSelection = true;
+        }
+
+        internal void SetNode(int i, Vector2 position) {
+            if (i >= 0 && i < Nodes.Length) {
+                Nodes[i] = position;
+                updateSelection = true;
+            }
         }
 
         internal void MoveNode(int i, Vector2 amount) {

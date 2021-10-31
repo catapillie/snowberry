@@ -3,13 +3,13 @@ using Monocle;
 using System;
 
 namespace LevelEditorMod.Editor.UI {
-    public class UIValueTextField<T> : UITextField where T : struct {
+    public class UIValueTextField<T> : UITextField {
         new public Color Line = Color.Teal;
         new public Color LineSelected = Color.LimeGreen;
         public Color ErrLine = Calc.HexToColor("db2323");
         public Color ErrLineSelected = Calc.HexToColor("ffbb33");
 
-        private bool err;
+        public bool Error;
         private float errLerp;
 
         new public T Value { get; private set; }
@@ -29,11 +29,11 @@ namespace LevelEditorMod.Editor.UI {
 
         protected override void Initialize() {
             base.Initialize();
-            errLerp = err ? 1f : 0f;
+            errLerp = Error ? 1f : 0f;
         }
 
         public override void Update(Vector2 position = default) {
-            errLerp = Calc.Approach(errLerp, err ? 1f : 0f, Engine.DeltaTime * 7f);
+            errLerp = Calc.Approach(errLerp, Error ? 1f : 0f, Engine.DeltaTime * 7f);
             base.Line = Color.Lerp(Line, ErrLine, errLerp);
             base.LineSelected = Color.Lerp(LineSelected, ErrLineSelected, errLerp);
 
@@ -43,10 +43,10 @@ namespace LevelEditorMod.Editor.UI {
         protected override void OnInputUpdate(string input) {
             try {
                 Value = (T) Convert.ChangeType(input, typeof(T));
-                err = false;
+                Error = false;
             } catch {
                 Value = default;
-                err = true;
+                Error = true;
             }
         }
     }

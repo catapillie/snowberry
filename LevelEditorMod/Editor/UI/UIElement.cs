@@ -37,5 +37,11 @@ namespace LevelEditorMod.Editor.UI {
                 element.Initialize();
             }
         }
+
+        public void Clear() {
+            foreach (UIElement element in children)
+                element?.Destroy();
+            children.Clear();
+        }
     }
 }
