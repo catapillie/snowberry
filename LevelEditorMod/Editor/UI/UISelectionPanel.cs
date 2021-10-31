@@ -103,13 +103,14 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         public override void Render(Vector2 position = default) {
+            Draw.SpriteBatch.End();
+
             Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
 
             Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
             Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = rect;
 
-            Draw.SpriteBatch.End();
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
 
             Draw.Rect(rect, BG);
