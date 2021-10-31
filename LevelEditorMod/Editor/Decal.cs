@@ -22,7 +22,8 @@ namespace LevelEditorMod.Editor {
             this.room = room;
 
             // messy, see Celeste.Decal.orig_ctor
-            texture = GFX.Game[Path.Combine("decals", Texture = data.Texture.Replace(Path.GetExtension(data.Texture), "")).Replace('\\', '/')];
+            var ext = Path.GetExtension(data.Texture);
+            texture = GFX.Game[Path.Combine("decals", Texture = ext.Length > 0 ? data.Texture.Replace(Path.GetExtension(data.Texture), "") : data.Texture).Replace('\\', '/')];
             position = data.Position;
             scale = data.Scale;
         }
