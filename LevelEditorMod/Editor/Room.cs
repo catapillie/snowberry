@@ -31,10 +31,14 @@ namespace LevelEditorMod.Editor {
         public int MusicProgress { get; private set; }
         public int AmbienceProgress { get; private set; }
 
+        // Camera offset data
+        public Vector2 CameraOffset { get; private set; }
+
         // Misc data
         public bool Dark { get; private set; }
         public bool Underwater { get; private set; }
         public bool Space { get; private set; }
+        public WindController.Patterns WindPattern { get; private set; }
 
         // Tiles
         private readonly VirtualMap<char> fgTileMap;
@@ -86,10 +90,14 @@ namespace LevelEditorMod.Editor {
             MusicProgress = data.MusicProgress;
             AmbienceProgress = data.AmbienceProgress;
 
+            // Camera
+            CameraOffset = data.CameraOffset;
+
             // Misc
             Dark = data.Dark;
             Underwater = data.Underwater;
             Space = data.Space;
+            WindPattern = data.WindPattern;
 
             // BgTiles
             string[] array = tileSplitter.Split(data.Bg);
@@ -260,14 +268,16 @@ namespace LevelEditorMod.Editor {
             ret.Attributes["musicLayer3"] = MusicLayers[2];
             ret.Attributes["musicLayer4"] = MusicLayers[3];
 
-            ret.Attributes["dark"] = Dark;
-            ret.Attributes["underwater"] = Underwater;
-            ret.Attributes["space"] = Space;
-
             ret.Attributes["musicProgress"] = MusicProgress;
             ret.Attributes["ambienceProgress"] = AmbienceProgress;
 
-            // TODO: triggers are exactly the same
+            ret.Attributes["dark"] = Dark;
+            ret.Attributes["underwater"] = Underwater;
+            ret.Attributes["space"] = Space;
+            ret.Attributes["windPattern"] = WindPattern.ToString();
+
+            ret.Attributes["cameraOffsetX"] = CameraOffset.X;
+            ret.Attributes["cameraOffsetY"] = CameraOffset.Y;
 
             BinaryPacker.Element entitiesElement = new BinaryPacker.Element();
             entitiesElement.Attributes = new Dictionary<string, object>();
@@ -300,6 +310,38 @@ namespace LevelEditorMod.Editor {
                 }
 
                 entitiesElement.Children.Add(entityElem);
+            }
+
+            BinaryPacker.Element triggersElement = new BinaryPacker.Element();
+            triggersElement.Attributes = new Dictionary<string, object>();
+            triggersElement.Name = "triggers";
+            triggersElement.Children = new List<BinaryPacker.Element>();
+            ret.Children.Add(triggersElement);
+
+            foreach(var tigger in triggers) {
+                BinaryPacker.Element triggersElem = new BinaryPacker.Element();
+                triggersElem.Name = tigger.Name;
+                triggersElem.Children = new List<BinaryPacker.Element>();
+                triggersElem.Attributes = new Dictionary<string, object>();
+                triggersElem.Attributes["x"] = tigger.X - X * 8;
+                triggersElem.Attributes["y"] = tigger.Y - Y * 8;
+                triggersElem.Attributes["width"] = tigger.Width;
+                triggersElem.Attributes["height"] = tigger.Height;
+                triggersElem.Attributes["originX"] = tigger.Origin.X;
+                triggersElem.Attributes["originY"] = tigger.Origin.Y;
+
+                foreach(var opt in tigger.plugin.GetOptions())
+                    triggersElem.Attributes[opt] = tigger.plugin[tigger, opt];
+
+                foreach(var node in tigger.Nodes) {
+                    BinaryPacker.Element n = new BinaryPacker.Element();
+                    n.Attributes = new Dictionary<string, object>();
+                    n.Attributes["x"] = node.X - X * 8;
+                    n.Attributes["y"] = node.Y - Y * 8;
+                    triggersElem.Children.Add(n);
+                }
+
+                triggersElement.Children.Add(triggersElem);
             }
 
             string fgTiles = "";
