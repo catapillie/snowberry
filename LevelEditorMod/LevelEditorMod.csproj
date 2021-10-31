@@ -48,6 +48,9 @@
       <HintPath>..\..\..\Mono.Cecil.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>..\..\..\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\..\MonoMod.Utils.dll</HintPath>
       <Private>False</Private>
@@ -78,6 +81,7 @@
     <Compile Include="Editor\Entities\Plugin_FloatingDebris.cs" />
     <Compile Include="Editor\Entities\Plugin_FlutterBird.cs" />
     <Compile Include="Editor\Entities\Plugin_ForegroundDebris.cs" />
+    <Compile Include="Editor\Entities\Plugin_Cloud.cs" />
     <Compile Include="Editor\Entities\Plugin_GoldenBerry.cs" />
     <Compile Include="Editor\Entities\Plugin_JumpThru.cs" />
     <Compile Include="Editor\Entities\Plugin_Key.cs" />
@@ -112,6 +116,7 @@
     <Compile Include="Editor\UI\UIButton.cs" />
     <Compile Include="Editor\UI\UICheckBox.cs" />
     <Compile Include="Editor\UI\UISelectionPanel.cs" />
+    <Compile Include="Editor\UI\UILabel.cs" />
     <Compile Include="Editor\UI\UIValueTextField.cs" />
     <Compile Include="Editor\UI\UIElement.cs" />
     <Compile Include="Editor\UI\UITextField.cs" />

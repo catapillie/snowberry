@@ -13,6 +13,8 @@ namespace LevelEditorMod.Editor {
 
         public Rectangle Bounds { get; private set; }
 
+        public Map Map { get; private set; }
+
         public int X => Bounds.X;
         public int Y => Bounds.Y;
         public int Width => Bounds.Width;
@@ -20,6 +22,25 @@ namespace LevelEditorMod.Editor {
         public Vector2 Position => new Vector2(X, Y);
         public Vector2 Size => new Vector2(Width, Height);
 
+        // Music data
+        public string Music { get; private set; }
+        public string AltMusic { get; private set; }
+        public string Ambience { get; private set; }
+        public bool[] MusicLayers { get; private set; }
+
+        public int MusicProgress { get; private set; }
+        public int AmbienceProgress { get; private set; }
+
+        // Camera offset data
+        public Vector2 CameraOffset { get; private set; }
+
+        // Misc data
+        public bool Dark { get; private set; }
+        public bool Underwater { get; private set; }
+        public bool Space { get; private set; }
+        public WindController.Patterns WindPattern { get; private set; }
+
+        // Tiles
         private readonly VirtualMap<char> fgTileMap;
         private readonly VirtualMap<char> bgTileMap;
         private VirtualMap<MTexture> fgTiles, bgTiles;
@@ -51,8 +72,33 @@ namespace LevelEditorMod.Editor {
             bgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
         }
 
-        internal Room(LevelData data)
+        internal Room(LevelData data, Map map)
             : this(data.Name, data.TileBounds) {
+            Map = map;
+
+            // Music
+            Music = data.Music;
+            AltMusic = data.AltMusic;
+            Ambience = data.Ambience;
+
+            MusicLayers = new bool[4];
+            MusicLayers[0] = data.MusicLayers[0] > 0;
+            MusicLayers[1] = data.MusicLayers[1] > 0;
+            MusicLayers[2] = data.MusicLayers[2] > 0;
+            MusicLayers[3] = data.MusicLayers[3] > 0;
+
+            MusicProgress = data.MusicProgress;
+            AmbienceProgress = data.AmbienceProgress;
+
+            // Camera
+            CameraOffset = data.CameraOffset;
+
+            // Misc
+            Dark = data.Dark;
+            Underwater = data.Underwater;
+            Space = data.Space;
+            WindPattern = data.WindPattern;
+
             // BgTiles
             string[] array = tileSplitter.Split(data.Bg);
             for (int i = 0; i < array.Length; i++) {
@@ -202,6 +248,132 @@ namespace LevelEditorMod.Editor {
                 }
             } else
                 Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.5f);
+        }
+
+        public BinaryPacker.Element CreateLevelData() {
+            BinaryPacker.Element ret = new BinaryPacker.Element();
+            ret.Attributes = new Dictionary<string, object>();
+
+            ret.Attributes["name"] = "lvl_" + Name;
+            ret.Attributes["x"] = X * 8;
+            ret.Attributes["y"] = Y * 8;
+            ret.Attributes["width"] = Width * 8;
+            ret.Attributes["height"] = Height * 8;
+
+            ret.Attributes["music"] = Music;
+            ret.Attributes["alt_music"] = AltMusic;
+            ret.Attributes["ambience"] = Ambience;
+            ret.Attributes["musicLayer1"] = MusicLayers[0];
+            ret.Attributes["musicLayer2"] = MusicLayers[1];
+            ret.Attributes["musicLayer3"] = MusicLayers[2];
+            ret.Attributes["musicLayer4"] = MusicLayers[3];
+
+            ret.Attributes["musicProgress"] = MusicProgress;
+            ret.Attributes["ambienceProgress"] = AmbienceProgress;
+
+            ret.Attributes["dark"] = Dark;
+            ret.Attributes["underwater"] = Underwater;
+            ret.Attributes["space"] = Space;
+            ret.Attributes["windPattern"] = WindPattern.ToString();
+
+            ret.Attributes["cameraOffsetX"] = CameraOffset.X;
+            ret.Attributes["cameraOffsetY"] = CameraOffset.Y;
+
+            BinaryPacker.Element entitiesElement = new BinaryPacker.Element();
+            entitiesElement.Attributes = new Dictionary<string, object>();
+            entitiesElement.Name = "entities";
+            entitiesElement.Children = new List<BinaryPacker.Element>();
+            ret.Children = new List<BinaryPacker.Element>();
+            ret.Children.Add(entitiesElement);
+
+			foreach(var entity in entities) {
+                BinaryPacker.Element entityElem = new BinaryPacker.Element();
+                entityElem.Name = entity.Name;
+                entityElem.Children = new List<BinaryPacker.Element>();
+                entityElem.Attributes = new Dictionary<string, object>();
+                entityElem.Attributes["x"] = entity.X - X * 8;
+                entityElem.Attributes["y"] = entity.Y - Y * 8;
+                entityElem.Attributes["width"] = entity.Width;
+                entityElem.Attributes["height"] = entity.Height;
+                entityElem.Attributes["originX"] = entity.Origin.X;
+                entityElem.Attributes["originY"] = entity.Origin.Y;
+
+				foreach(var opt in entity.plugin.GetOptions())
+                    entityElem.Attributes[opt] = entity.plugin[entity, opt];
+
+				foreach(var node in entity.Nodes) {
+                    BinaryPacker.Element n = new BinaryPacker.Element();
+                    n.Attributes = new Dictionary<string, object>();
+                    n.Attributes["x"] = node.X - X * 8;
+                    n.Attributes["y"] = node.Y - Y * 8;
+                    entityElem.Children.Add(n);
+                }
+
+                entitiesElement.Children.Add(entityElem);
+            }
+
+            BinaryPacker.Element triggersElement = new BinaryPacker.Element();
+            triggersElement.Attributes = new Dictionary<string, object>();
+            triggersElement.Name = "triggers";
+            triggersElement.Children = new List<BinaryPacker.Element>();
+            ret.Children.Add(triggersElement);
+
+            foreach(var tigger in triggers) {
+                BinaryPacker.Element triggersElem = new BinaryPacker.Element();
+                triggersElem.Name = tigger.Name;
+                triggersElem.Children = new List<BinaryPacker.Element>();
+                triggersElem.Attributes = new Dictionary<string, object>();
+                triggersElem.Attributes["x"] = tigger.X - X * 8;
+                triggersElem.Attributes["y"] = tigger.Y - Y * 8;
+                triggersElem.Attributes["width"] = tigger.Width;
+                triggersElem.Attributes["height"] = tigger.Height;
+                triggersElem.Attributes["originX"] = tigger.Origin.X;
+                triggersElem.Attributes["originY"] = tigger.Origin.Y;
+
+                foreach(var opt in tigger.plugin.GetOptions())
+                    triggersElem.Attributes[opt] = tigger.plugin[tigger, opt];
+
+                foreach(var node in tigger.Nodes) {
+                    BinaryPacker.Element n = new BinaryPacker.Element();
+                    n.Attributes = new Dictionary<string, object>();
+                    n.Attributes["x"] = node.X - X * 8;
+                    n.Attributes["y"] = node.Y - Y * 8;
+                    triggersElem.Children.Add(n);
+                }
+
+                triggersElement.Children.Add(triggersElem);
+            }
+
+            string fgTiles = "";
+			for(int x = 0; x < fgTileMap.Rows; x++) {
+                for(int y = 0; y < fgTileMap.Columns; y++) {
+                    fgTiles += /*((int)*/fgTileMap[y, x]/*).ToString()*/;
+                    //if(y != fgTileMap.Rows - 1) fgTiles += ",";
+                }
+                fgTiles += "\n";
+            }
+            string bgTiles = "";
+            for(int x = 0; x < bgTileMap.Rows; x++) {
+                for(int y = 0; y < bgTileMap.Columns; y++) {
+                    bgTiles += /*((int)*/bgTileMap[y, x]/*).ToString()*/;
+                    //if(y != bgTileMap.Rows - 1) bgTiles += ",";
+                }
+                bgTiles += "\n";
+            }
+            
+            BinaryPacker.Element fgElem = new BinaryPacker.Element();
+            fgElem.Attributes = new Dictionary<string, object>();
+            fgElem.Name = "solids";
+            fgElem.Attributes["innerText"] = fgTiles;
+            ret.Children.Add(fgElem);
+
+            BinaryPacker.Element bgElem = new BinaryPacker.Element();
+            bgElem.Attributes = new Dictionary<string, object>();
+            bgElem.Name = "bg";
+            bgElem.Attributes["innerText"] = bgTiles;
+            ret.Children.Add(bgElem);
+
+            return ret;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 
 namespace LevelEditorMod {
-    internal class PluginInfo {
+    public class PluginInfo {
         public static readonly Dictionary<string, PluginInfo> All = new Dictionary<string, PluginInfo>();
 
         private readonly Type Type;
@@ -93,6 +93,10 @@ namespace LevelEditorMod {
                 char ch => ch.ToString(),
                 _ => obj,
             };
+        }
+
+        public List<string> GetOptions() {
+            return options.Keys.ToList();
         }
     }
 }

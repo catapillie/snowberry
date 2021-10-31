@@ -23,7 +23,7 @@ namespace LevelEditorMod.Editor {
     }
 
     public abstract class Entity {
-        protected Room Room { get; private set; }
+        public Room Room { get; private set; }
 
         public string Name { get; private set; }
 
@@ -61,7 +61,7 @@ namespace LevelEditorMod.Editor {
             }
         }
 
-        private PluginInfo plugin;
+        public PluginInfo plugin { get; private set; }
 
         internal Entity SetPosition(Vector2 position) {
             Position = position;
