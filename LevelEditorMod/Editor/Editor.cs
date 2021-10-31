@@ -127,11 +127,11 @@ namespace LevelEditorMod.Editor {
             camera = new Camera();
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
 
-            int h = 160;
+            int w = 160;
             ui.Add(selectionPanel = new UISelectionPanel() {
-                Position = new Vector2(0, uiBuffer.Height - h),
-                Width = uiBuffer.Width,
-                Height = h,
+                Position = Vector2.UnitX * (uiBuffer.Width - w),
+                Width = w,
+                Height = uiBuffer.Height,
             });
         }
 

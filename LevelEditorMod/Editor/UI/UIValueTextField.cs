@@ -19,7 +19,6 @@ namespace LevelEditorMod.Editor.UI {
 
         public UIValueTextField(Font font, int width, string input = "")
             : base(font, width, input) {
-            Console.WriteLine(Type.GetTypeCode(typeof(T)));
             AllowedCharacters = Type.GetTypeCode(typeof(T)) switch {
                 TypeCode.Int32 => integerChars,
                 TypeCode.Single => floatChars,

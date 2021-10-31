@@ -40,18 +40,37 @@ namespace LevelEditorMod.Editor {
         }
 
         public void SetPosition(Vector2 position, int i) {
-            System.Console.WriteLine(i);
             foreach (Selection s in Selections) {
                 if (s.Index == i) {
                     s.Rect.X = (int)position.X;
                     s.Rect.Y = (int)position.Y;
-                    if (s.Index < 0)
-                        Entity.SetPosition(position);
-                    else
-                        Entity.SetNode(s.Index, position);
                     break;
                 }
             }
+            if (i < 0)
+                Entity.SetPosition(position);
+            else
+                Entity.SetNode(i, position);
+        }
+
+        public void SetWidth(int width) {
+            foreach (Selection s in Selections) {
+                if (s.Index == -1) {
+                    s.Rect.Width = width;
+                    break;
+                }
+            }
+            Entity.SetWidth(width);
+        }
+
+        public void SetHeight(int height) {
+            foreach (Selection s in Selections) {
+                if (s.Index == -1) {
+                    s.Rect.Height = height;
+                    break;
+                }
+            }
+            Entity.SetHeight(height);
         }
     }
 }

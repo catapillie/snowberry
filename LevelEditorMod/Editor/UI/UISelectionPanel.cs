@@ -12,7 +12,7 @@ namespace LevelEditorMod.Editor.UI {
             private readonly Func<T> get;
             private readonly Action<T> set;
 
-            public UIOption(string label, Func<T> get, Action<T> set) {
+            public UIOption(string label, Func<T> get = null, Action<T> set = null) {
                 this.label = $"{label} : ";
                 int w = (int)Fonts.Regular.Measure(this.label).X;
 
@@ -33,9 +33,9 @@ namespace LevelEditorMod.Editor.UI {
                     case UIValueTextField<T> textField:
                         if (textField.Selected) {
                             if (!textField.Error)
-                                set(textField.Value);
+                                set?.Invoke(textField.Value);
                         } else {
-                            textField.UpdateInput(get().ToString());
+                            textField.UpdateInput(get?.Invoke().ToString() ?? "null");
                         }
                         break;
                     default:
@@ -55,46 +55,41 @@ namespace LevelEditorMod.Editor.UI {
             public UIEntry(EntitySelection selection) {
                 Entity entity = selection.Entity;
                 name = entity.Name;
-                Width = (int)Fonts.Regular.Measure(entity.Name).X + 3 + 16;
-                int spacing = Fonts.Regular.LineHeight + 1;
+                int spacing = Fonts.Regular.LineHeight + 2;
 
-                Add(new UIOption<int>("x", () => entity.X, x => selection.SetPosition(new Vector2(x, entity.Y), -1)) {
-                    Position = Vector2.UnitY * spacing,
+                UIOption<int> x, y, w, h;
+                Add(x = new UIOption<int>("x", () => entity.X, x => selection.SetPosition(new Vector2(x, entity.Y), -1)) {
+                    Position = new Vector2(0, spacing),
                 });
-                Add(new UIOption<int>("y", () => entity.Y, y => selection.SetPosition(new Vector2(entity.X, y), -1)) {
-                    Position = Vector2.UnitY * spacing * 2,
+                Add(y = new UIOption<int>("y", () => entity.Y, y => selection.SetPosition(new Vector2(entity.X, y), -1)) {
+                    Position = new Vector2(x.Width + 2, spacing),
                 });
+                Add(w = new UIOption<int>("width", () => entity.Width, w => selection.SetWidth(w)) {
+                    Position = new Vector2(0, spacing * 2),
+                });
+                Add(h = new UIOption<int>("height", () => entity.Height, h => selection.SetHeight(h)) {
+                    Position = new Vector2(w.Width + 2, spacing * 2),
+                });
+                y.Position.X = h.Position.X = Math.Max(y.Position.X, h.Position.X);
 
-                //Add(new UIOption<int>("width", entity.Width) {
-                //    Position = Vector2.UnitY * spacing * 3,
-                //});
-                //Add(new UIOption<int>("height", entity.Height) {
-                //    Position = Vector2.UnitY * spacing * 4,
-                //});
-            }
-
-            public override void Update(Vector2 position = default) {
-                base.Update(position);
-                Height = Parent.Height - 1;
+                Height = spacing * 3 + 6;
             }
 
             public override void Render(Vector2 position = default) {
                 base.Render(position);
-                Fonts.Regular.Draw(name, position, Vector2.One, Color.White);
-                Draw.Rect(position.X + Width - 2, position.Y, 1, Height, Color.DarkGray);
+                Fonts.Regular.Draw(name, position + Vector2.UnitX * Parent.Width / 2, Vector2.One, Vector2.UnitX * 0.5f, Color.DarkKhaki);
             }
         }
 
         public Color BG = Calc.HexToColor("09090a");
-        public Color Line = Color.DarkGray;
 
         public void Display(List<EntitySelection> selection) {
             if (selection != null) {
                 Clear();
-                Vector2 offset = new Vector2(1, 2);
+                Vector2 offset = new Vector2(1, 1);
                 foreach (EntitySelection s in selection) {
                     UIEntry entry = AddEntry(s, offset);
-                    offset.X += entry.Width;
+                    offset.Y += entry.Height;
                 }
             }
         }
@@ -118,7 +113,6 @@ namespace LevelEditorMod.Editor.UI {
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
 
             Draw.Rect(rect, BG);
-            Draw.Rect(position.X + 1, position.Y + 1, Width - 2, 1, Line);
 
             base.Render(position);
 

@@ -88,6 +88,16 @@ namespace LevelEditorMod.Editor {
             }
         }
 
+        internal void SetWidth(int width) {
+            Width = width;
+            updateSelection = true;
+        }
+
+        internal void SetHeight(int heigth) {
+            Height = heigth;
+            updateSelection = true;
+        }
+
         public virtual void ChangeDefault() { }
         public virtual void Initialize() => ChangeDefault();
         protected virtual Rectangle[] Select() => null;
