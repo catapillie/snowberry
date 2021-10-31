@@ -13,6 +13,8 @@ namespace LevelEditorMod.Editor {
 
         public Rectangle Bounds { get; private set; }
 
+        public Map Map { get; private set; }
+
         public int X => Bounds.X;
         public int Y => Bounds.Y;
         public int Width => Bounds.Width;
@@ -51,8 +53,9 @@ namespace LevelEditorMod.Editor {
             bgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
         }
 
-        internal Room(LevelData data)
+        internal Room(LevelData data, Map map)
             : this(data.Name, data.TileBounds) {
+            Map = map;
             // BgTiles
             string[] array = tileSplitter.Split(data.Bg);
             for (int i = 0; i < array.Length; i++) {
