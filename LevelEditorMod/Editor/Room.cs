@@ -206,5 +206,82 @@ namespace LevelEditorMod.Editor {
             } else
                 Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.5f);
         }
+
+        public BinaryPacker.Element CreateLevelData() {
+            BinaryPacker.Element ret = new BinaryPacker.Element();
+            ret.Attributes = new Dictionary<string, object>();
+
+            ret.Attributes["name"] = "lvl_" + Name;
+            ret.Attributes["x"] = X * 8;
+            ret.Attributes["y"] = Y * 8;
+            ret.Attributes["width"] = Width * 8;
+            ret.Attributes["height"] = Height * 8;
+
+            // TODO: triggers are exactly the same
+
+            BinaryPacker.Element entitiesElement = new BinaryPacker.Element();
+            entitiesElement.Attributes = new Dictionary<string, object>();
+            entitiesElement.Name = "entities";
+            entitiesElement.Children = new List<BinaryPacker.Element>();
+            ret.Children = new List<BinaryPacker.Element>();
+            ret.Children.Add(entitiesElement);
+
+			foreach(var entity in entities) {
+                BinaryPacker.Element entityElem = new BinaryPacker.Element();
+                entityElem.Name = entity.Name;
+                entityElem.Children = new List<BinaryPacker.Element>();
+                entityElem.Attributes = new Dictionary<string, object>();
+                entityElem.Attributes["x"] = entity.X - X * 8;
+                entityElem.Attributes["y"] = entity.Y - Y * 8;
+                entityElem.Attributes["width"] = entity.Width;
+                entityElem.Attributes["height"] = entity.Height;
+                entityElem.Attributes["originX"] = entity.Origin.X;
+                entityElem.Attributes["originY"] = entity.Origin.Y;
+
+				foreach(var opt in entity.plugin.GetOptions())
+                    entityElem.Attributes[opt] = entity.plugin[entity, opt];
+
+				foreach(var node in entity.Nodes) {
+                    BinaryPacker.Element n = new BinaryPacker.Element();
+                    n.Attributes = new Dictionary<string, object>();
+                    n.Attributes["x"] = node.X - X * 8;
+                    n.Attributes["y"] = node.Y - Y * 8;
+                    entityElem.Children.Add(n);
+                }
+
+                entitiesElement.Children.Add(entityElem);
+            }
+
+            string fgTiles = "";
+			for(int x = 0; x < fgTileMap.Rows; x++) {
+                for(int y = 0; y < fgTileMap.Columns; y++) {
+                    fgTiles += /*((int)*/fgTileMap[y, x]/*).ToString()*/;
+                    //if(y != fgTileMap.Rows - 1) fgTiles += ",";
+                }
+                fgTiles += "\n";
+            }
+            string bgTiles = "";
+            for(int x = 0; x < bgTileMap.Rows; x++) {
+                for(int y = 0; y < bgTileMap.Columns; y++) {
+                    bgTiles += /*((int)*/bgTileMap[y, x]/*).ToString()*/;
+                    //if(y != bgTileMap.Rows - 1) bgTiles += ",";
+                }
+                bgTiles += "\n";
+            }
+            
+            BinaryPacker.Element fgElem = new BinaryPacker.Element();
+            fgElem.Attributes = new Dictionary<string, object>();
+            fgElem.Name = "solids";
+            fgElem.Attributes["innerText"] = fgTiles;
+            ret.Children.Add(fgElem);
+
+            BinaryPacker.Element bgElem = new BinaryPacker.Element();
+            bgElem.Attributes = new Dictionary<string, object>();
+            bgElem.Name = "bg";
+            bgElem.Attributes["innerText"] = bgTiles;
+            ret.Children.Add(bgElem);
+
+            return ret;
+        }
     }
 }

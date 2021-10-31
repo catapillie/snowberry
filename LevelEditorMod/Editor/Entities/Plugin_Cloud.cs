@@ -11,7 +11,7 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
             
             string type = Fragile ? "fragile" : "cloud";
-            string suffix = Room.Map.Mode == AreaMode.Normal ? "" : "Remix";
+            string suffix = Room.Map.From.Mode == AreaMode.Normal ? "" : "Remix";
             GFX.Game[$"objects/clouds/{type}{suffix}00"].DrawCentered(Position);
         }
     }

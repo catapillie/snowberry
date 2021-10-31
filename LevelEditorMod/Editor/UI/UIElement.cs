@@ -37,5 +37,11 @@ namespace LevelEditorMod.Editor.UI {
                 element.Initialize();
             }
         }
+
+        public void AddBelow(UIElement element) {
+            Add(element);
+            foreach(UIElement child in children)
+                element.Position += new Vector2(0, child.Height);
+        }
     }
 }

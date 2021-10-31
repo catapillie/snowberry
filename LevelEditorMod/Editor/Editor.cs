@@ -104,6 +104,10 @@ namespace LevelEditorMod.Editor {
         internal static List<EntitySelection> SelectedEntities;
         private bool canSelect;
 
+        private static bool generatePlaytestMapData = false;
+        private static Session playtestSession;
+        private static MapData playtestMapData;
+
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
 
@@ -125,6 +129,30 @@ namespace LevelEditorMod.Editor {
             base.Begin();
             camera = new Camera();
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
+
+            var nameLabel = new UILabel($"Map: {map.From.SID} ({map.From.Mode})");
+            ui.AddBelow(nameLabel);
+            nameLabel.Position += new Vector2(10, 0);
+
+            var roomLabel = new UILabel(() => $"Room: {SelectedRoom?.Name ?? "none"}");
+            ui.AddBelow(roomLabel);
+            roomLabel.Position += new Vector2(10, 10);
+
+            UIButton rtm = new UIButton("Return to Map", Fonts.Regular, 6, 6) {
+				OnPress = () => LevelEnter.Go(new Session(map.From), true)
+			};
+			ui.AddBelow(rtm);
+
+            UIButton test = new UIButton("Playtest", Fonts.Regular, 6, 6) {
+                OnPress = () => {
+                    generatePlaytestMapData = true;
+                    playtestMapData = new MapData(map.From);
+                    playtestSession = new Session(map.From);
+                    LevelEnter.Go(playtestSession, true);
+                    generatePlaytestMapData = false;
+                },
+            };
+            ui.AddBelow(test);
         }
 
         public override void End() {
@@ -219,9 +247,9 @@ namespace LevelEditorMod.Editor {
 
             #endregion
 
-            #region Map Rendering
+			#region Map Rendering
 
-            if (camera.Buffer != null)
+			if(camera.Buffer != null)
                 Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
             else
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -245,6 +273,25 @@ namespace LevelEditorMod.Editor {
             Draw.SpriteBatch.End();
 
             #endregion
+        }
+
+        private static void CreatePlaytestMapDataHook(Action<MapData> orig_Load, MapData self) {
+            if(!generatePlaytestMapData)
+                orig_Load(self);
+            else {
+                //CreatePlaytestMapData(self);
+                if(Engine.Scene is Editor editor) {
+                    editor.map.GenerateMapData(self);
+                } else orig_Load(self);
+            }
+		}
+
+        private static MapData HookSessionGetAreaData(Func<Session, MapData> orig, Session self) {
+            if(self == playtestSession) {
+                return playtestMapData;
+			}
+
+			return orig(self);
         }
     }
 }

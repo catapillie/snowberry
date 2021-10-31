@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
@@ -10,7 +11,7 @@ namespace LevelEditorMod.Editor {
         private readonly List<Rectangle> fillers = new List<Rectangle>();
 
         public readonly string Name;
-        public readonly AreaMode Mode;
+        public readonly AreaKey From;
 
         internal Map(string name) {
             Name = name;
@@ -22,7 +23,7 @@ namespace LevelEditorMod.Editor {
                 rooms.Add(new Room(roomData, this));
             foreach (Rectangle filler in data.Filler)
                 fillers.Add(filler);
-            Mode = data.Area.Mode;
+            From = data.Area;
         }
 
         internal Room GetRoomAt(Point at) {
@@ -57,6 +58,56 @@ namespace LevelEditorMod.Editor {
             	Draw.Rect(rect, Color.White * 0.08f);
             }
             Draw.SpriteBatch.End();
+        }
+
+        public void GenerateMapData(MapData data){
+			foreach(var room in rooms)
+                data.Levels.Add(new LevelData(room.CreateLevelData()));
+            Module.Log(LogLevel.Info, "meta: " + data.Meta);
+            // ...
+            // bounds
+            int num = int.MaxValue;
+            int num2 = int.MaxValue;
+            int num3 = int.MinValue;
+            int num4 = int.MinValue;
+            foreach(LevelData level2 in data.Levels) {
+                if(level2.Bounds.Left < num) {
+                    num = level2.Bounds.Left;
+                }
+
+                if(level2.Bounds.Top < num2) {
+                    num2 = level2.Bounds.Top;
+                }
+
+                if(level2.Bounds.Right > num3) {
+                    num3 = level2.Bounds.Right;
+                }
+
+                if(level2.Bounds.Bottom > num4) {
+                    num4 = level2.Bounds.Bottom;
+                }
+            }
+
+            /*foreach(Rectangle item in Filler) {
+                if(item.Left < num) {
+                    num = item.Left;
+                }
+
+                if(item.Top < num2) {
+                    num2 = item.Top;
+                }
+
+                if(item.Right > num3) {
+                    num3 = item.Right;
+                }
+
+                if(item.Bottom > num4) {
+                    num4 = item.Bottom;
+                }
+            }*/
+
+            int num5 = 64;
+            data.Bounds = new Rectangle(num - num5, num2 - num5, num3 - num + num5 * 2, num4 - num2 + num5 * 2);
         }
     }
 }
