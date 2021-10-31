@@ -22,6 +22,21 @@ namespace LevelEditorMod.Editor {
         public Vector2 Position => new Vector2(X, Y);
         public Vector2 Size => new Vector2(Width, Height);
 
+        // Music data
+        public string Music { get; private set; }
+        public string AltMusic { get; private set; }
+        public string Ambience { get; private set; }
+        public bool[] MusicLayers { get; private set; }
+
+        public int MusicProgress { get; private set; }
+        public int AmbienceProgress { get; private set; }
+
+        // Misc data
+        public bool Dark { get; private set; }
+        public bool Underwater { get; private set; }
+        public bool Space { get; private set; }
+
+        // Tiles
         private readonly VirtualMap<char> fgTileMap;
         private readonly VirtualMap<char> bgTileMap;
         private VirtualMap<MTexture> fgTiles, bgTiles;
@@ -56,6 +71,26 @@ namespace LevelEditorMod.Editor {
         internal Room(LevelData data, Map map)
             : this(data.Name, data.TileBounds) {
             Map = map;
+
+            // Music
+            Music = data.Music;
+            AltMusic = data.AltMusic;
+            Ambience = data.Ambience;
+
+            MusicLayers = new bool[4];
+            MusicLayers[0] = data.MusicLayers[0] > 0;
+            MusicLayers[1] = data.MusicLayers[1] > 0;
+            MusicLayers[2] = data.MusicLayers[2] > 0;
+            MusicLayers[3] = data.MusicLayers[3] > 0;
+
+            MusicProgress = data.MusicProgress;
+            AmbienceProgress = data.AmbienceProgress;
+
+            // Misc
+            Dark = data.Dark;
+            Underwater = data.Underwater;
+            Space = data.Space;
+
             // BgTiles
             string[] array = tileSplitter.Split(data.Bg);
             for (int i = 0; i < array.Length; i++) {
@@ -216,6 +251,21 @@ namespace LevelEditorMod.Editor {
             ret.Attributes["y"] = Y * 8;
             ret.Attributes["width"] = Width * 8;
             ret.Attributes["height"] = Height * 8;
+
+            ret.Attributes["music"] = Music;
+            ret.Attributes["alt_music"] = AltMusic;
+            ret.Attributes["ambience"] = Ambience;
+            ret.Attributes["musicLayer1"] = MusicLayers[0];
+            ret.Attributes["musicLayer2"] = MusicLayers[1];
+            ret.Attributes["musicLayer3"] = MusicLayers[2];
+            ret.Attributes["musicLayer4"] = MusicLayers[3];
+
+            ret.Attributes["dark"] = Dark;
+            ret.Attributes["underwater"] = Underwater;
+            ret.Attributes["space"] = Space;
+
+            ret.Attributes["musicProgress"] = MusicProgress;
+            ret.Attributes["ambienceProgress"] = AmbienceProgress;
 
             // TODO: triggers are exactly the same
 

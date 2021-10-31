@@ -139,12 +139,20 @@ namespace LevelEditorMod.Editor {
             roomLabel.Position += new Vector2(10, 10);
 
             UIButton rtm = new UIButton("Return to Map", Fonts.Regular, 6, 6) {
-				OnPress = () => LevelEnter.Go(new Session(map.From), true)
+				OnPress = () => {
+                    Audio.SetMusic(null);
+                    Audio.SetAmbience(null);
+
+                    LevelEnter.Go(new Session(map.From), true);
+				}
 			};
 			ui.AddBelow(rtm);
 
             UIButton test = new UIButton("Playtest", Fonts.Regular, 6, 6) {
                 OnPress = () => {
+                    Audio.SetMusic(null);
+                    Audio.SetAmbience(null);
+
                     generatePlaytestMapData = true;
                     playtestMapData = new MapData(map.From);
                     playtestSession = new Session(map.From);
