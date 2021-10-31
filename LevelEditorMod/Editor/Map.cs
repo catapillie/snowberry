@@ -9,6 +9,8 @@ namespace LevelEditorMod.Editor {
     public class Map {
         private readonly List<Room> rooms = new List<Room>();
         private readonly List<Rectangle> fillers = new List<Rectangle>();
+        // TODO: represent stylegrounds in-editor
+        private readonly BinaryPacker.Element bgStylegounds, fgStylegrounds;
 
         public readonly string Name;
         public readonly AreaKey From;
@@ -24,6 +26,8 @@ namespace LevelEditorMod.Editor {
             foreach (Rectangle filler in data.Filler)
                 fillers.Add(filler);
             From = data.Area;
+            bgStylegounds = data.Background;
+            fgStylegrounds = data.Foreground;
         }
 
         internal Room GetRoomAt(Point at) {
@@ -65,6 +69,8 @@ namespace LevelEditorMod.Editor {
                 data.Levels.Add(new LevelData(room.CreateLevelData()));
             Module.Log(LogLevel.Info, "meta: " + data.Meta);
             // ...
+            data.Foreground = fgStylegrounds;
+            data.Background = bgStylegounds;
             // bounds
             int num = int.MaxValue;
             int num2 = int.MaxValue;
