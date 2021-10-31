@@ -78,6 +78,7 @@
     <Compile Include="Editor\Entities\Plugin_FloatingDebris.cs" />
     <Compile Include="Editor\Entities\Plugin_FlutterBird.cs" />
     <Compile Include="Editor\Entities\Plugin_ForegroundDebris.cs" />
+    <Compile Include="Editor\Entities\Plugin_Cloud.cs" />
     <Compile Include="Editor\Entities\Plugin_GoldenBerry.cs" />
     <Compile Include="Editor\Entities\Plugin_JumpThru.cs" />
     <Compile Include="Editor\Entities\Plugin_Key.cs" />

@@ -10,6 +10,7 @@ namespace LevelEditorMod.Editor {
         private readonly List<Rectangle> fillers = new List<Rectangle>();
 
         public readonly string Name;
+        public readonly AreaMode Mode;
 
         internal Map(string name) {
             Name = name;
@@ -18,9 +19,10 @@ namespace LevelEditorMod.Editor {
         internal Map(MapData data)
             : this(data.Filename) {
             foreach (LevelData roomData in data.Levels)
-                rooms.Add(new Room(roomData));
+                rooms.Add(new Room(roomData, this));
             foreach (Rectangle filler in data.Filler)
                 fillers.Add(filler);
+            Mode = data.Area.Mode;
         }
 
         internal Room GetRoomAt(Point at) {
