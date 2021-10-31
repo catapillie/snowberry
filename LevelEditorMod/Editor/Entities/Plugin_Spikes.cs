@@ -26,7 +26,7 @@ namespace LevelEditorMod.Editor.Entities {
 
         public override void Render() {
             base.Render();
-
+            
             if (Type == "tentacles") {
                 // TODO: this part
             } else {
