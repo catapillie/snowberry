@@ -67,6 +67,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
+    <Compile Include="Editor\Entities\Plugin_Checkpoint.cs" />
     <Compile Include="Editor\Entities\Plugin_Spring.cs" />
     <Compile Include="Editor\Entities\Plugin_CrumblePlatform.cs" />
     <Compile Include="Editor\Entities\Plugin_Bonfire.cs" />
