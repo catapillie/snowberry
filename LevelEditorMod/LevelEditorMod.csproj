@@ -112,6 +112,7 @@
     <Compile Include="Editor\Map.cs" />
     <Compile Include="Editor\Room.cs" />
     <Compile Include="Editor\EntitySelection.cs" />
+    <Compile Include="Editor\Tool.cs" />
     <Compile Include="Editor\Triggers\Plugin_CameraOffsetTrigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_Trigger.cs" />
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Editor\UI\UIColorPicker.cs" />
     <Compile Include="Editor\UI\UISelectionPanel.cs" />
     <Compile Include="Editor\UI\UILabel.cs" />
+    <Compile Include="Editor\UI\UIToolbar.cs" />
     <Compile Include="Editor\UI\UIValueTextField.cs" />
     <Compile Include="Editor\UI\UIElement.cs" />
     <Compile Include="Editor\UI\UITextField.cs" />
