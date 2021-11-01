@@ -7,15 +7,16 @@ using System.Collections.Generic;
 namespace LevelEditorMod.Editor.UI {
     public class UISelectionPanel : UIElement {
         public class UIOption : UIElement {
-            private readonly string label;
             private readonly UIElement input;
             //private readonly Func<object> get;
             //private readonly Action set;
 
-            public UIOption(string label, UIElement input) {
-                this.label = $"{label} : ";
+            public UIOption(string name, UIElement input) {
                 this.input = input;
-                int w = (int)Fonts.Regular.Measure(this.label).X;
+
+                UILabel label;
+                Add(label = new UILabel($"{name} : "));
+                int w = label.Width + 1;
 
                 if (input != null) {
                     Add(input);
@@ -43,20 +44,21 @@ namespace LevelEditorMod.Editor.UI {
                     //}
                 }
             }
-
-            public override void Render(Vector2 position = default) {
-                base.Render(position);
-                Fonts.Regular.Draw(label, position, Vector2.One, Color.White);
-            }
         }
 
         public class UIEntry : UIElement {
-            private readonly string name;
+            private UILabel label;
 
-            public UIEntry(EntitySelection selection) {
+            public UIEntry(EntitySelection selection, int width) {
+                Width = width;
+
                 Entity entity = selection.Entity;
-                name = entity.Name;
                 int spacing = Fonts.Regular.LineHeight + 2;
+
+                Add(label = new UILabel(entity.Name) {
+                    FG = Color.DarkKhaki
+                });
+                label.Position = Vector2.UnitX * (width / 2 - label.Width / 2);
 
                 UIOption x, y, w, h;
                 Add(x = new UIOption("x", new UIValueTextField<int>(Fonts.Regular, 35, entity.X.ToString())) {
@@ -73,24 +75,29 @@ namespace LevelEditorMod.Editor.UI {
                 });
                 y.Position.X = h.Position.X = Math.Max(y.Position.X, h.Position.X);
 
-                int l = 3;
+                int l = 3 * spacing;
                 foreach (var option in entity.Plugin.OptionDict) {
+                    object value = option.Value.GetValue(entity);
                     if (option.Value.FieldType == typeof(bool)) {
-                        bool value = (bool)option.Value.GetValue(entity);
-                        Add(new UIOption(option.Key, new UICheckBox(0, value)) {
-                            Position = new Vector2(0, spacing * l),
+                        Add(new UIOption(option.Key, new UICheckBox(-1, (bool)value)) {
+                            Position = new Vector2(0, l),
                         });
+                        l += 11;
+                    } else if (option.Value.FieldType == typeof(Color)) {
+                        Add(new UIOption(option.Key, new UIColorPicker(100, 80, 16, 12, (Color)value)) {
+                            Position = new Vector2(0, l + 2),
+                        });
+                        l += 90;
                     }
-
-                    l++;
+                    
                 }
 
-                Height = spacing * l + 6;
+                Height = l + 8;
             }
 
             public override void Render(Vector2 position = default) {
                 base.Render(position);
-                Fonts.Regular.Draw(name, position + Vector2.UnitX * Parent.Width / 2, Vector2.One, Vector2.UnitX * 0.5f, Color.DarkKhaki);
+                Draw.Rect(position + label.Position + Vector2.UnitY * label.Height, label.Width, 1, label.FG);
             }
         }
 
@@ -109,7 +116,7 @@ namespace LevelEditorMod.Editor.UI {
 
         private UIEntry AddEntry(EntitySelection s, Vector2 offset) {
             UIEntry entry;
-            Add(entry = new UIEntry(s) {
+            Add(entry = new UIEntry(s, Width) {
                 Position = offset
             });
             return entry;

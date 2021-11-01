@@ -117,6 +117,7 @@
     <Compile Include="Editor\Triggers\Plugin_EventTrigger.cs" />
     <Compile Include="Editor\UI\UIButton.cs" />
     <Compile Include="Editor\UI\UICheckBox.cs" />
+    <Compile Include="Editor\UI\UIColorPicker.cs" />
     <Compile Include="Editor\UI\UISelectionPanel.cs" />
     <Compile Include="Editor\UI\UILabel.cs" />
     <Compile Include="Editor\UI\UIValueTextField.cs" />
