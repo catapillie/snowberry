@@ -5,7 +5,7 @@ using Monocle;
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("fireBall")]
     public class Plugin_FireBall : Entity {
-        [Option("amout")] public int Amount = 3;
+        [Option("amount")] public int Amount = 3;
         [Option("offset")] public float Offset = 0.0f;
         [Option("speed")] public float Speed = 1.0f;
         [Option("notCoreMode")] public bool NotCoreMode = false;

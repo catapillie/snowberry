@@ -12,6 +12,7 @@ namespace LevelEditorMod.Editor.UI {
         public bool Error;
         private float errLerp;
 
+        public Action<T> OnValidInputChange;
         new public T Value { get; private set; }
 
         private static readonly char[] integerChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-' };
@@ -40,8 +41,10 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         protected override void OnInputUpdate(string input) {
+            base.OnInputUpdate(input);
             try {
                 Value = (T) Convert.ChangeType(input, typeof(T));
+                OnValidInputChange?.Invoke(Value);
                 Error = false;
             } catch {
                 Value = default;

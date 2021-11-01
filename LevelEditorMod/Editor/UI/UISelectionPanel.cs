@@ -3,19 +3,20 @@ using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace LevelEditorMod.Editor.UI {
     public class UISelectionPanel : UIElement {
         public class UIOption : UIElement {
             private readonly UIElement input;
-            //private readonly Func<object> get;
-            //private readonly Action set;
 
             public UIOption(string name, UIElement input) {
                 this.input = input;
 
                 UILabel label;
-                Add(label = new UILabel($"{name} : "));
+                Add(label = new UILabel($"{name} : ") {
+                    FG = Color.Gray,
+                });
                 int w = label.Width + 1;
 
                 if (input != null) {
@@ -26,28 +27,10 @@ namespace LevelEditorMod.Editor.UI {
                 Width = w + (input?.Width ?? 0);
                 Height = Math.Max(Fonts.Regular.LineHeight, input?.Height ?? 0);
             }
-
-            public override void Update(Vector2 position = default) {
-                base.Update(position);
-                if (input != null) {
-                    //switch (input) {
-                    //    case UIValueTextField<T> textField:
-                    //        if (textField.Selected) {
-                    //            if (!textField.Error)
-                    //                set?.Invoke(textField.Value);
-                    //        } else {
-                    //            textField.UpdateInput(get?.Invoke().ToString() ?? "null");
-                    //        }
-                    //        break;
-                    //    default:
-                    //        break;
-                    //}
-                }
-            }
         }
 
         public class UIEntry : UIElement {
-            private UILabel label;
+            private readonly UILabel label;
 
             public UIEntry(EntitySelection selection, int width) {
                 Width = width;
@@ -79,20 +62,60 @@ namespace LevelEditorMod.Editor.UI {
                 foreach (var option in entity.Plugin.OptionDict) {
                     object value = option.Value.GetValue(entity);
                     if (option.Value.FieldType == typeof(bool)) {
-                        Add(new UIOption(option.Key, new UICheckBox(-1, (bool)value)) {
-                            Position = new Vector2(0, l),
-                        });
-                        l += 11;
+                        Add(BoolOption(option.Key, (bool)value, entity, option.Value, l));
+                        l += spacing;
                     } else if (option.Value.FieldType == typeof(Color)) {
-                        Add(new UIOption(option.Key, new UIColorPicker(100, 80, 16, 12, (Color)value)) {
-                            Position = new Vector2(0, l + 2),
-                        });
+                        Add(ColorOption(option.Key, (Color)value, entity, option.Value, l));
                         l += 90;
+                    } else if (option.Value.FieldType == typeof(string)) {
+                        Add(StringOption(option.Key, value.ToString(), entity, option.Value, l));
+                        l += spacing;
+                    } else if (option.Value.FieldType == typeof(int)) {
+                        Add(LiteralValueOption<int>(option.Key, value.ToString(), entity, option.Value, l));
+                        l += spacing;
+                    } else if (option.Value.FieldType == typeof(float)) {
+                        Add(LiteralValueOption<float>(option.Key, value.ToString(), entity, option.Value, l));
+                        l += spacing;
                     }
-                    
                 }
 
                 Height = l + 8;
+            }
+
+            private UIOption StringOption(string name, string value, Entity entity, FieldInfo field, int y) {
+                var checkbox = new UITextField(Fonts.Regular, 80, value) {
+                    OnInputChange = str => field.SetValue(entity, str),
+                };
+                return new UIOption(name, checkbox) {
+                    Position = new Vector2(0, y)
+                };
+            }
+
+            private UIOption LiteralValueOption<T>(string name, string value, Entity entity, FieldInfo field, int y) {
+                var checkbox = new UIValueTextField<T>(Fonts.Regular, 80, value) {
+                    OnValidInputChange = v => field.SetValue(entity, v),
+                };
+                return new UIOption(name, checkbox) {
+                    Position = new Vector2(0, y)
+                };
+            }
+
+            private UIOption BoolOption(string name, bool value, Entity entity, FieldInfo field, int y) {
+                var checkbox = new UICheckBox(-1, value) {
+                    OnPress = b => field.SetValue(entity, b),
+                };
+                return new UIOption(name, checkbox) {
+                    Position = new Vector2(0, y)
+                };
+            }
+
+            private UIOption ColorOption(string name, Color value, Entity entity, FieldInfo field, int y) {
+                var colorpicker = new UIColorPicker(100, 80, 16, 12, value) {
+                    OnColorChange = color => field.SetValue(entity, color),
+                };
+                return new UIOption(name, colorpicker) {
+                    Position = new Vector2(0, y)
+                };
             }
 
             public override void Render(Vector2 position = default) {

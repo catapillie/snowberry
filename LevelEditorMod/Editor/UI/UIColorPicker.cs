@@ -11,6 +11,7 @@ namespace LevelEditorMod.Editor.UI {
         private readonly UITextField hexTextField;
         private bool hueEdit, svEdit;
 
+        public Action<Color> OnColorChange;
         public Color Value { get; private set; }
         private float h, s, v;
 
@@ -64,6 +65,7 @@ namespace LevelEditorMod.Editor.UI {
                         h = Calc.Clamp(mouseY - position.Y, 0, svHeight) / svHeight;
                     }
                     SetColor(Calc.HsvToColor(h, s, v));
+                    OnColorChange?.Invoke(Value);
                 }
             } else if (MInput.Mouse.ReleasedLeftButton)
                 svEdit = hueEdit = false;

@@ -11,6 +11,7 @@ namespace LevelEditorMod.Editor.UI {
         private bool hovering;
         private int charIndex, selection;
 
+        public Action<string> OnInputChange;
         public string Value { get; private set; }
         private int[] widthAtIndex;
         private readonly Font font;
@@ -32,7 +33,7 @@ namespace LevelEditorMod.Editor.UI {
         public UITextField(Font font, int width, string input = "") {
             this.font = font;
             UpdateInput(input ?? "null");
-            charIndex = selection = this.Value.Length;
+            charIndex = selection = Value.Length;
 
             Width = Math.Max(1, width);
             Height = font.LineHeight;
@@ -73,7 +74,9 @@ namespace LevelEditorMod.Editor.UI {
             OnInputUpdate(Value);
         }
 
-        protected virtual void OnInputUpdate(string input) { }
+        protected virtual void OnInputUpdate(string input) {
+            OnInputChange?.Invoke(input);
+        }
 
         private void GetSelection(out int a, out int b) {
             if (charIndex < selection) {
