@@ -33,6 +33,7 @@ namespace LevelEditorMod.Editor.UI {
 
             SetColor(color);
             HSV(color, out h, out s, out v);
+            Console.WriteLine(h + " " + s + " " + v);
         }
 
         public void SetColor(Color c) {
@@ -113,13 +114,14 @@ namespace LevelEditorMod.Editor.UI {
             float max = Math.Max(Math.Max(r, g), b);
             float d = max - min;
 
-            hue = 0;
+            hue = 0f;
             if (max == r)
-                hue = 60 * ((g - b) / d % 6);
+                hue = 60f * ((g - b) / d % 6f);
             else if (max == g)
-                hue = 60 * ((b - r) / d + 2);
+                hue = 60f * ((b - r) / d + 2f);
             else if (max == b)
-                hue = 60 * ((r - g) / d + 4);
+                hue = 60f * ((r - g) / d + 4f);
+            hue /= 360f;
 
             saturation = max == 0 ? 0 : d / max;
             value = max;
