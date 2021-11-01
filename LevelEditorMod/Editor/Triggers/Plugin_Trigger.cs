@@ -9,6 +9,7 @@ namespace LevelEditorMod.Editor.Triggers {
     [Plugin("stopBoostTrigger")]
     [Plugin("windAttackTrigger")]
     [Plugin("birdPathTrigger")]
+    [Plugin("changeRespawnTrigger")]
     [Plugin("everest/completeAreaTrigger")]
     public class Plugin_Trigger : Entity {
         protected virtual Color Color { get; } = Calc.HexToColor("0c5f7a");
