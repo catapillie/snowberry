@@ -49,7 +49,7 @@ namespace LevelEditorMod {
                         EditorModule editorModule = (EditorModule) ctor.Invoke(new object[] { });
                         LevelEditor.EditorModules.Add(editorModule);
 
-                        PluginInfo.GenerateFromAssembly(asm);
+                        PluginInfo.GenerateFromAssembly(asm, editorModule);
 
                         Log(LogLevel.Info, $"Successfully loaded Level Editor Module '{editorModule.Name}'");
                     }
