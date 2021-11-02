@@ -14,6 +14,8 @@ namespace LevelEditorMod {
         private readonly Dictionary<string, FieldInfo> options = new Dictionary<string, FieldInfo>();
         private readonly ConstructorInfo ctor;
 
+        public readonly EditorModule EditorModule;
+
         public object this[Entity entity, string option] {
             get {
                 if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
@@ -30,9 +32,10 @@ namespace LevelEditorMod {
             }
         }
 
-        public PluginInfo(string name, Type t, ConstructorInfo ctor) {
+        public PluginInfo(string name, Type t, ConstructorInfo ctor, EditorModule module) {
             this.ctor = ctor;
             Type = t;
+            EditorModule = module;
             foreach (FieldInfo f in t.GetFields()) {
                 if (f.GetCustomAttribute<OptionAttribute>() is OptionAttribute option) {
                     if (option.Name == null || option.Name == string.Empty) {
@@ -47,7 +50,7 @@ namespace LevelEditorMod {
         public Entity Instantiate()
             => (Entity)ctor.Invoke(new object[] { });
 
-        public static void GenerateFromAssembly(Assembly assembly) {
+        public static void GenerateFromAssembly(Assembly assembly, EditorModule module) {
             foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Entity).IsAssignableFrom(t))) {
                 foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>(inherit: false)) {
                     if (pl.Name == null || pl.Name == string.Empty) {
@@ -61,7 +64,7 @@ namespace LevelEditorMod {
                         continue;
                     }
 
-                    All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor));
+                    All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor, module));
 
                     Module.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' entity plugin");
                 }

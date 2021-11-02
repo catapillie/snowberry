@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
+    <Compile Include="Editor\EditorModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
     <Compile Include="Editor\Entities\Plugin_Checkpoint.cs" />
     <Compile Include="Editor\Entities\Plugin_Spring.cs" />
@@ -127,9 +128,11 @@
     <Compile Include="Graphics\Fonts.cs" />
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\FormattedText.cs" />
+    <Compile Include="LevelEditor.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CelesteEditorModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">
