@@ -253,6 +253,8 @@ namespace LevelEditorMod.Editor {
         }
 
         public override void Render() {
+            var tool = Tool.Tools[Toolbar.CurrentTool];
+
             #region UI Rendering
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(uiBuffer);
@@ -266,8 +268,11 @@ namespace LevelEditorMod.Editor {
             #endregion
 
             #region Tool Rendering
-            var tool = Tool.Tools[Toolbar.CurrentTool];
-            tool.Render();
+
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+            tool.RenderScreenSpace();
+            Draw.SpriteBatch.End();
+
             #endregion
 
             #region Map Rendering
@@ -279,6 +284,9 @@ namespace LevelEditorMod.Editor {
 
             Engine.Instance.GraphicsDevice.Clear(bg);
             Map.Render(camera);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+            tool.RenderWorldSpace();
+            Draw.SpriteBatch.End();
 
             #endregion
 

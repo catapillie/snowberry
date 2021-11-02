@@ -164,6 +164,24 @@ namespace LevelEditorMod.Editor {
             return bgTileMap[(int)p.X, (int)p.Y];
         }
 
+        public void SetFgTile(Vector2 at, char tile) {
+            Vector2 p = (at - Position * 8) / 8;
+            char orig = fgTileMap[(int)p.X, (int)p.Y];
+            if(orig != tile) {
+                fgTileMap[(int)p.X, (int)p.Y] = tile;
+                Autotile();
+            }
+        }
+
+        public void SetBgTile(Vector2 at, char tile) {
+            Vector2 p = (at - Position * 8) / 8;
+            char orig = bgTileMap[(int)p.X, (int)p.Y];
+            if(orig != tile) {
+                bgTileMap[(int)p.X, (int)p.Y] = tile;
+                Autotile();
+            }
+        }
+
         private void Autotile() {
             fgTiles = GFX.FGAutotiler.GenerateMap(fgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
