@@ -150,20 +150,32 @@ namespace LevelEditorMod.Editor {
 		}
 
 		public override UIElement CreatePanel() {
-			UIElement panel = new UIElement() {
-				Width = 200
+			UIElement panel = new UIScrollPane() {
+				Width = 130
 			};
-			panel.AddBelow(new UILabel("Foreground"));
+			var fgLabel = new UILabel("Foreground");
+			fgLabel.Position = new Vector2((panel.Width - fgLabel.Width) / 2, 0);
+			fgLabel.FG = Color.DarkKhaki;
+			fgLabel.Underline = true;
+			panel.AddBelow(fgLabel);
 			int i = 0;
 			foreach(var item in FgTilesets) {
 				int copy = i;
-				panel.Add(new UIButton(item.Name.Split('/').Last(), Fonts.Regular, 6, 6) {
+				var button = new UIButton((pos, col) => RenderTileGrid(pos, item.Square, col), 8 * 3, 8 * 3, 6, 6) {
 					OnPress = () => {
 						CurLeftTileset = copy;
 						LeftFg = true;
 					},
-					Position = new Vector2(i % 2 == 0 ? 0 : 80, (i / 2 + 1) * 25 + 8)
-				});
+					FG = Color.White,
+					PressedFG = Color.Gray,
+					HoveredFG = Color.LightGray,
+					Position = new Vector2(i % 2 == 0 ? 12 : 8 * 3 + 52, (i / 2) * (8 * 3 + 30) + fgLabel.Height + 20)
+				};
+				button.Height += 10;
+				var label = new UILabel(item.Name.Split('/').Last(), Fonts.Pico8);
+				panel.Add(button);
+				label.Position += new Vector2(button.Position.X + (button.Width - Fonts.Pico8.Measure(label.Value()).X) / 2, 8 * 3 + 13 + button.Position.Y);
+				panel.Add(label);
 				i++;
 			}
 			panel.AddBelow(new UILabel("Background"));
@@ -185,10 +197,12 @@ namespace LevelEditorMod.Editor {
 			bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
 
 			if(MInput.Mouse.CheckLeftButton && shift)
-				if(LeftFg)
-					Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
-				else
-					Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
+				if(Editor.SelectedRoom != null)
+					if(Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8))
+						if(LeftFg)
+							Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
+						else
+							Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
 		}
 
 		public override void RenderWorldSpace() {
@@ -199,12 +213,16 @@ namespace LevelEditorMod.Editor {
 		}
 
 		private static void RenderTileGrid(Vector2 position, TileGrid tile) {
+			RenderTileGrid(position, tile, Color.White);
+		}
+
+		private static void RenderTileGrid(Vector2 position, TileGrid tile, Color color) {
 			if(tile == null)
 				return;
 			for(int x = 0; x < tile.Tiles.Columns; x++) {
 				for(int y = 0; y < tile.Tiles.Rows; y++) {
 					if(tile.Tiles[x, y] != null)
-						tile.Tiles[x, y].Draw(position + new Vector2(x, y) * 8);
+						tile.Tiles[x, y].Draw(position + new Vector2(x, y) * 8, Vector2.Zero, color);
 				}
 			}
 		}

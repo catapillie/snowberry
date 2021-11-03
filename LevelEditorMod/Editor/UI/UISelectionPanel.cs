@@ -39,7 +39,8 @@ namespace LevelEditorMod.Editor.UI {
                 int spacing = Fonts.Regular.LineHeight + 2;
 
                 Add(label = new UILabel(entity.Name) {
-                    FG = Color.DarkKhaki
+                    FG = Color.DarkKhaki,
+                    Underline = true
                 });
                 label.Position = Vector2.UnitX * (width / 2 - label.Width / 2);
 
@@ -116,11 +117,6 @@ namespace LevelEditorMod.Editor.UI {
                 return new UIOption(name, colorpicker) {
                     Position = new Vector2(0, y)
                 };
-            }
-
-            public override void Render(Vector2 position = default) {
-                base.Render(position);
-                Draw.Rect(position + label.Position + Vector2.UnitY * label.Height, label.Width, 1, label.FG);
             }
         }
 

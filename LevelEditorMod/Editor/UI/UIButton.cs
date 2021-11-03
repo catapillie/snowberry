@@ -8,7 +8,8 @@ namespace LevelEditorMod.Editor.UI {
         private readonly Vector2 space, minSize;
         private string text;
         private Font font;
-        private MTexture icon;
+        //private MTexture icon;
+        private Action<Vector2, Color> icon;
 
         public Color FG = Calc.HexToColor("f0f0f0");
         public Color BG = Calc.HexToColor("1d1d21");
@@ -55,12 +56,18 @@ namespace LevelEditorMod.Editor.UI {
             FG = PressedFG = HoveredFG = Color.White;
         }
 
+        public UIButton(Action<Vector2, Color> action, int icoWidth, int icoHeight, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8)
+            : this(spaceX, spaceY, minWidth, minHeight) {
+            SetIconAction(action, icoWidth, icoHeight);
+            FG = PressedFG = HoveredFG = Color.White;
+        }
+
         private void SetSize(int width, int height) {
             Width = (int)Math.Max(width + space.X * 2, Math.Max(6, minSize.X));
             Height = (int)Math.Max(height + space.Y * 2, Math.Max(8, minSize.Y));
         }
 
-        protected void SetText(string text, Font font = null) {
+        public void SetText(string text, Font font = null) {
             icon = null;
             this.text = text;
             this.font = font ?? this.font;
@@ -68,9 +75,14 @@ namespace LevelEditorMod.Editor.UI {
             SetSize((int)size.X + 6, (int)size.Y + 3);
         }
 
-        protected void SetIcon(MTexture icon) {
-            this.icon = icon;
+        public void SetIcon(MTexture icon) {
+            this.icon = (at, color) => icon.Draw(at, Vector2.Zero, color);
             SetSize(icon.Width + 6, icon.Height + 3);
+        }
+
+        public void SetIconAction(Action<Vector2, Color> action, int icoWidth, int icoHeight) {
+            icon = action;
+            SetSize(icoWidth + 6, icoHeight + 3);
         }
 
         public override void Update(Vector2 position = default) {
@@ -121,8 +133,7 @@ namespace LevelEditorMod.Editor.UI {
             Color fg = Color.Lerp(hovering ? HoveredFG : FG, PressedFG, lerp);
             if (text != null && font != null)
                 font.Draw(text, at, Vector2.One, fg);
-            else if (icon != null)
-                icon.Draw(at, Vector2.Zero, fg);
-        }
+            else icon?.Invoke(at, fg);
+		}
     }
 }
