@@ -5,6 +5,7 @@ using Monocle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LevelEditorMod.Editor {
@@ -395,33 +396,31 @@ namespace LevelEditorMod.Editor {
                 bgDecalsElem.Children.Add(decalElem);
             }
 
-            string fgTiles = "";
-			for(int x = 0; x < fgTileMap.Rows; x++) {
-                for(int y = 0; y < fgTileMap.Columns; y++) {
-                    fgTiles += /*((int)*/fgTileMap[y, x]/*).ToString()*/;
-                    //if(y != fgTileMap.Rows - 1) fgTiles += ",";
+            StringBuilder fgTiles = new StringBuilder();
+			for(int y = 0; y < fgTileMap.Rows; y++) {
+                for(int x = 0; x < fgTileMap.Columns; x++) {
+                    fgTiles.Append(fgTileMap[x, y]);
                 }
-                fgTiles += "\n";
+                fgTiles.Append("\n");
             }
-            string bgTiles = "";
-            for(int x = 0; x < bgTileMap.Rows; x++) {
-                for(int y = 0; y < bgTileMap.Columns; y++) {
-                    bgTiles += /*((int)*/bgTileMap[y, x]/*).ToString()*/;
-                    //if(y != bgTileMap.Rows - 1) bgTiles += ",";
+            StringBuilder bgTiles = new StringBuilder();
+            for(int y = 0; y < bgTileMap.Rows; y++) {
+                for(int x = 0; x < bgTileMap.Columns; x++) {
+                    bgTiles.Append(bgTileMap[x, y]);
                 }
-                bgTiles += "\n";
+                bgTiles.Append("\n");
             }
 
-			Element fgElem = new Element();
+            Element fgElem = new Element();
             fgElem.Attributes = new Dictionary<string, object>();
             fgElem.Name = "solids";
-            fgElem.Attributes["innerText"] = fgTiles;
+            fgElem.Attributes["innerText"] = fgTiles.ToString();
             ret.Children.Add(fgElem);
 
 			Element bgElem = new Element();
             bgElem.Attributes = new Dictionary<string, object>();
             bgElem.Name = "bg";
-            bgElem.Attributes["innerText"] = bgTiles;
+            bgElem.Attributes["innerText"] = bgTiles.ToString();
             ret.Children.Add(bgElem);
 
             return ret;
