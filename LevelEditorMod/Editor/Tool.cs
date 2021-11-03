@@ -150,8 +150,9 @@ namespace LevelEditorMod.Editor {
 		}
 
 		public override UIElement CreatePanel() {
-			UIElement panel = new UIScrollPane() {
-				Width = 130
+			UIScrollPane panel = new UIScrollPane() {
+				Width = 130,
+				BottomPadding = 30
 			};
 			var fgLabel = new UILabel("Foreground");
 			fgLabel.Position = new Vector2((panel.Width - fgLabel.Width) / 2, 0);

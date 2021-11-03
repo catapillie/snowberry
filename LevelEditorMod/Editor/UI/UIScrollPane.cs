@@ -8,6 +8,7 @@ namespace LevelEditorMod.Editor.UI {
 	class UIScrollPane : UIElement {
 
 		public Color BG = Calc.HexToColor("202929");
+        public int BottomPadding = 0;
 
 		public UIScrollPane() {
 			BG.A = 127;
@@ -40,9 +41,14 @@ namespace LevelEditorMod.Editor.UI {
 			base.Update(position);
             if(Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y)) {
                 int wheel = Math.Sign(MInput.Mouse.WheelDelta);
-                if(wheel > 0)
+                UIElement low = null, high = null;
+				foreach(var item in children) {
+                    if(low == null || item.Position.Y > low.Position.Y) low = item;
+                    if(high == null || item.Position.Y < high.Position.Y) high = item;
+                }
+                if(wheel > 0 && high.Position.Y + high.Height + 13 < Position.Y)
                     children.ForEach(ch => ch.Position += Vector2.UnitY * 13);
-                else if(wheel < 0)
+                else if(wheel < 0 && low.Position.Y + 13 + BottomPadding > Position.Y + Height)
                     children.ForEach(ch => ch.Position -= Vector2.UnitY * 13);
             }
         }
