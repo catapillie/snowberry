@@ -187,14 +187,17 @@ namespace LevelEditorMod.Editor {
 
             lastMousePos = mousePos;
             mousePos = MInput.Mouse.Position;
-            
+
             // zooming
+            bool canZoom = ui.CanScrollThrough();
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
             float scale = camera.Zoom;
-            if (wheel > 0)
-                scale = scale >= 1 ? scale + 1 : scale * 2f;
-            else if (wheel < 0)
-                scale = scale > 1 ? scale - 1 : scale / 2f;
+            if(canZoom) {
+                if(wheel > 0)
+                    scale = scale >= 1 ? scale + 1 : scale * 2f;
+                else if(wheel < 0)
+                    scale = scale > 1 ? scale - 1 : scale / 2f;
+            }
             scale = Calc.Clamp(scale, 0.0625f, 24f);
             if (scale != camera.Zoom)
                 camera.Zoom = scale;

@@ -178,16 +178,29 @@ namespace LevelEditorMod.Editor {
 				panel.Add(label);
 				i++;
 			}
-			panel.AddBelow(new UILabel("Background"));
+			var bgLabel = new UILabel("Background");
+			bgLabel.Position = new Vector2((panel.Width - bgLabel.Width) / 2, (int)Math.Ceiling(FgTilesets.Count / 2f) * (8 * 3 + 30) + fgLabel.Height + 40);
+			bgLabel.FG = Color.DarkKhaki;
+			bgLabel.Underline = true;
+			panel.Add(bgLabel);
 			i = 0;
 			foreach(var item in BgTilesets) {
 				int copy = i;
-				panel.AddBelow(new UIButton(item.Name.Split('/').Last(), Fonts.Regular, 6, 6) {
+				var button = new UIButton((pos, col) => RenderTileGrid(pos, item.Square, col), 8 * 3, 8 * 3, 6, 6) {
 					OnPress = () => {
 						CurLeftTileset = copy;
 						LeftFg = false;
-					}
-				});
+					},
+					FG = Color.White,
+					PressedFG = Color.Gray,
+					HoveredFG = Color.LightGray,
+					Position = new Vector2(i % 2 == 0 ? 12 : 8 * 3 + 52, (i / 2) * (8 * 3 + 30) + (bgLabel.Position.Y) + 20)
+				};
+				button.Height += 10;
+				var label = new UILabel(item.Name.Split('/').Last(), Fonts.Pico8);
+				panel.Add(button);
+				label.Position += new Vector2(button.Position.X + (button.Width - Fonts.Pico8.Measure(label.Value()).X) / 2, 8 * 3 + 13 + button.Position.Y);
+				panel.Add(label);
 				i++;
 			}
 			return panel;
@@ -202,7 +215,7 @@ namespace LevelEditorMod.Editor {
 						if(LeftFg)
 							Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
 						else
-							Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
+							Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, BgTilesets[CurLeftTileset].Key);
 		}
 
 		public override void RenderWorldSpace() {

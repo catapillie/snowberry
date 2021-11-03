@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.UI {
     public class UIElement {
-        private readonly List<UIElement> children = new List<UIElement>();
+        protected readonly List<UIElement> children = new List<UIElement>();
         private readonly List<UIElement> toRemove = new List<UIElement>();
         private readonly List<UIElement> toAdd = new List<UIElement>();
         private bool canModify = true;
@@ -11,6 +11,11 @@ namespace LevelEditorMod.Editor.UI {
 
         public Vector2 Position;
         public int Width, Height;
+
+        public bool GrabsScroll = false;
+        public bool GrabsClick = true;
+
+        public Rectangle Bounds => new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
 
         public virtual void Update(Vector2 position = default) {
             canModify = false;
@@ -75,6 +80,10 @@ namespace LevelEditorMod.Editor.UI {
         public void RemoveAll(ICollection<UIElement> elems) {
 			foreach(var item in elems) 
                 Remove(item);
+        }
+
+        public bool CanScrollThrough() {
+            return !GrabsScroll && !children.Exists(a => !a.CanScrollThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
         }
     }
 }
