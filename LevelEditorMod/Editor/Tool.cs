@@ -104,9 +104,9 @@ namespace LevelEditorMod.Editor {
 			}
 		}
 
-		public static int CurLeftTileset = 1;
+		public static int CurLeftTileset = 2;
 		public static bool LeftFg = true;
-		public static int CurRightTileset = 1;
+		public static int CurRightTileset = 0;
 		public static bool RightFg = true;
 
 		public List<TilesetData> FgTilesets = new List<TilesetData>();
