@@ -38,6 +38,8 @@ namespace LevelEditorMod.Editor.UI {
 
             minSize = new Vector2(minWidth, minHeight);
             space = new Vector2(spaceX, spaceY);
+
+            GrabsClick = true;
         }
 
         public UIButton(int width, int height, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8)

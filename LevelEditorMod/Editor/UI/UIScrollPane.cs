@@ -13,6 +13,7 @@ namespace LevelEditorMod.Editor.UI {
 		public UIScrollPane() {
 			BG.A = 127;
 			GrabsScroll = true;
+            GrabsClick = true;
 		}
 
         public override void Render(Vector2 position = default) {

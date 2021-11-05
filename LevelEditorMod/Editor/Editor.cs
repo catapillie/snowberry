@@ -205,13 +205,16 @@ namespace LevelEditorMod.Editor {
             if (camera.Buffer != null)
                 mousePos /= camera.Zoom;
 
+			// controls
+			bool canClick = ui.CanClickThrough();
+
             // panning
-            if (MInput.Mouse.CheckRightButton) {
+            if(MInput.Mouse.CheckRightButton && canClick) {
                 Vector2 move = lastMousePos - mousePos;
-                if (move != Vector2.Zero)
+                if(move != Vector2.Zero)
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
             }
-
+            
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
@@ -220,19 +223,18 @@ namespace LevelEditorMod.Editor {
             ui.Update();
 
             // room select
-            bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
-            if(MInput.Mouse.CheckLeftButton && shift) {
+            if(MInput.Mouse.CheckLeftButton && canClick) {
                 if(MInput.Mouse.PressedLeftButton) {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
-
+                    
                     worldClick = Mouse.World;
                     SelectedRoom = Map.GetRoomAt(mouse);
                 }
             }
 
-            // tool updating
-            var tool = Tool.Tools[Toolbar.CurrentTool];
-            tool.Update();
+			// tool updating
+			var tool = Tool.Tools[Toolbar.CurrentTool];
+            tool.Update(canClick);
         }
 
         public void SwitchTool(int toolIdx) {

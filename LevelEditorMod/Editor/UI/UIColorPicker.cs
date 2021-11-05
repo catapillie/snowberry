@@ -33,6 +33,7 @@ namespace LevelEditorMod.Editor.UI {
 
             SetColor(color);
             HSV(color, out h, out s, out v);
+            GrabsClick = true;
         }
 
         public void SetColor(Color c) {

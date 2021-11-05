@@ -120,6 +120,10 @@ namespace LevelEditorMod.Editor.UI {
             }
         }
 
+        public UISelectionPanel() {
+            GrabsClick = true;
+        }
+
         public Color BG = Calc.HexToColor("09090a");
 
         public void Display(List<EntitySelection> selection) {

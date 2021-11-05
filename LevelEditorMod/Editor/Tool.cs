@@ -20,7 +20,7 @@ namespace LevelEditorMod.Editor {
 
 		public abstract UIElement CreatePanel();
 
-		public abstract void Update();
+		public abstract void Update(bool canClick);
 
 		public virtual void RenderScreenSpace() { }
 
@@ -41,12 +41,10 @@ namespace LevelEditorMod.Editor {
 			};
 		}
 
-		public override void Update() {
+		public override void Update(bool canClick) {
 			var editor = Editor.GetCurrent();
 
-			bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
-
-			if(MInput.Mouse.CheckLeftButton && shift) {
+			if(MInput.Mouse.CheckLeftButton && canClick) {
 				if(MInput.Mouse.PressedLeftButton) {
 					Point mouse = new Point((int)Editor.Mouse.World.X, (int)Editor.Mouse.World.Y);
 
@@ -79,7 +77,7 @@ namespace LevelEditorMod.Editor {
 			} else
 				Editor.Selection = null;
 
-			if(MInput.Mouse.ReleasedLeftButton && shift) {
+			if(MInput.Mouse.ReleasedLeftButton && canClick) {
 				if(canSelect && editor.ToolPanel is UISelectionPanel selectionPanel)
 					selectionPanel.Display(Editor.SelectedEntities);
 			}
@@ -207,10 +205,8 @@ namespace LevelEditorMod.Editor {
 			return panel;
 		}
 
-		public override void Update() {
-			bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
-
-			if(MInput.Mouse.CheckLeftButton && shift)
+		public override void Update(bool canClick) {
+			if(MInput.Mouse.CheckLeftButton && canClick)
 				if(Editor.SelectedRoom != null)
 					if(Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8))
 						if(LeftFg)

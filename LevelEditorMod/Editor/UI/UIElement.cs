@@ -13,9 +13,9 @@ namespace LevelEditorMod.Editor.UI {
         public int Width, Height;
 
         public bool GrabsScroll = false;
-        public bool GrabsClick = true;
+        public bool GrabsClick = false;
 
-        public Rectangle Bounds => new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+        public Rectangle Bounds => new Rectangle((int)(Position.X + (Parent?.Bounds.X ?? 0)), (int)(Position.Y + (Parent?.Bounds.Y ?? 0)), Width, Height);
 
         public virtual void Update(Vector2 position = default) {
             canModify = false;
@@ -84,6 +84,10 @@ namespace LevelEditorMod.Editor.UI {
 
         public bool CanScrollThrough() {
             return !GrabsScroll && !children.Exists(a => !a.CanScrollThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
+        }
+
+        public bool CanClickThrough() {
+            return !GrabsClick && !children.Exists(a => !a.CanClickThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
         }
     }
 }
