@@ -106,9 +106,21 @@ namespace LevelEditorMod.Editor {
 
 		public static int CurLeftTileset = 1;
 		public static bool LeftFg = true;
+		public static int CurRightTileset = 1;
+		public static bool RightFg = true;
 
 		public List<TilesetData> FgTilesets = new List<TilesetData>();
 		public List<TilesetData> BgTilesets = new List<TilesetData>();
+
+		private List<UIButton> fgTilesetButtons = new List<UIButton>();
+		private List<UIButton> bgTilesetButtons = new List<UIButton>();
+
+		private static readonly Color TilesetBtnBg = Calc.HexToColor("1d1d21");
+		private static readonly Color TilesetBtnHoverBg = Calc.HexToColor("18181c");
+		private static readonly Color TilesetBtnPressBg = Calc.HexToColor("131317");
+		private static readonly Color LeftTilesetBtnBg = Calc.HexToColor("274292");
+		private static readonly Color RightTilesetBtnBg = Calc.HexToColor("922727");
+		private static readonly Color BothTilesetBtnBg = Calc.HexToColor("7d2792");
 
 		public TileBrushTool() {
 			FgTilesets = GetTilesets(false);
@@ -148,6 +160,8 @@ namespace LevelEditorMod.Editor {
 		}
 
 		public override UIElement CreatePanel() {
+			bgTilesetButtons.Clear();
+			fgTilesetButtons.Clear();
 			UIScrollPane panel = new UIScrollPane() {
 				Width = 130
 			};
@@ -164,6 +178,10 @@ namespace LevelEditorMod.Editor {
 						CurLeftTileset = copy;
 						LeftFg = true;
 					},
+					OnRightPress = () => {
+						CurRightTileset = copy;
+						RightFg = true;
+					},
 					FG = Color.White,
 					PressedFG = Color.Gray,
 					HoveredFG = Color.LightGray,
@@ -175,6 +193,7 @@ namespace LevelEditorMod.Editor {
 				label.Position += new Vector2(button.Position.X + (button.Width - Fonts.Pico8.Measure(label.Value()).X) / 2, 8 * 3 + 13 + button.Position.Y);
 				panel.Add(label);
 				i++;
+				fgTilesetButtons.Add(button);
 			}
 			var bgLabel = new UILabel("Background");
 			bgLabel.Position = new Vector2((panel.Width - bgLabel.Width) / 2, (int)Math.Ceiling(FgTilesets.Count / 2f) * (8 * 3 + 30) + fgLabel.Height + 40);
@@ -189,6 +208,10 @@ namespace LevelEditorMod.Editor {
 						CurLeftTileset = copy;
 						LeftFg = false;
 					},
+					OnRightPress = () => {
+						CurRightTileset = copy;
+						RightFg = false;
+					},
 					FG = Color.White,
 					PressedFG = Color.Gray,
 					HoveredFG = Color.LightGray,
@@ -200,18 +223,50 @@ namespace LevelEditorMod.Editor {
 				label.Position += new Vector2(button.Position.X + (button.Width - Fonts.Pico8.Measure(label.Value()).X) / 2, 8 * 3 + 13 + button.Position.Y);
 				panel.Add(label);
 				i++;
+				bgTilesetButtons.Add(button);
 			}
 			return panel;
 		}
 
 		public override void Update(bool canClick) {
-			if(MInput.Mouse.CheckLeftButton && canClick)
+			bool fg = MInput.Mouse.CheckLeftButton ? LeftFg : RightFg;
+			int tileset = MInput.Mouse.CheckLeftButton ? CurLeftTileset : CurRightTileset;
+			if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick)
 				if(Editor.SelectedRoom != null)
 					if(Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8))
-						if(LeftFg)
-							Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[CurLeftTileset].Key);
+						if(fg)
+							Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[tileset].Key);
 						else
-							Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, BgTilesets[CurLeftTileset].Key);
+							Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, BgTilesets[tileset].Key);
+
+			for(int i = 0; i < fgTilesetButtons.Count; i++) {
+				UIButton button = fgTilesetButtons[i];
+				if(LeftFg && RightFg && CurLeftTileset == CurRightTileset && CurLeftTileset == i)
+					button.BG = button.PressedBG = button.HoveredBG = BothTilesetBtnBg;
+				else if(LeftFg && CurLeftTileset == i)
+					button.BG = button.PressedBG = button.HoveredBG = LeftTilesetBtnBg;
+				else if(RightFg && CurRightTileset == i)
+					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
+				else {
+					button.BG = TilesetBtnBg;
+					button.PressedBG = TilesetBtnPressBg;
+					button.HoveredBG = TilesetBtnHoverBg;
+				}
+			}
+			for(int i = 0; i < bgTilesetButtons.Count; i++) {
+				UIButton button = bgTilesetButtons[i];
+				if(!LeftFg && !RightFg && CurLeftTileset == CurRightTileset && CurLeftTileset == i)
+					button.BG = button.PressedBG = button.HoveredBG = BothTilesetBtnBg;
+				else if(!LeftFg && CurLeftTileset == i)
+					button.BG = button.PressedBG = button.HoveredBG = LeftTilesetBtnBg;
+				else if(!RightFg && CurRightTileset == i)
+					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
+				else {
+					button.BG = TilesetBtnBg;
+					button.PressedBG = TilesetBtnPressBg;
+					button.HoveredBG = TilesetBtnHoverBg;
+				}
+			}
 		}
 
 		public override void RenderWorldSpace() {

@@ -8,7 +8,6 @@ namespace LevelEditorMod.Editor.UI {
         private readonly Vector2 space, minSize;
         private string text;
         private Font font;
-        //private MTexture icon;
         private Action<Vector2, Color> icon;
 
         public Color FG = Calc.HexToColor("f0f0f0");
@@ -26,7 +25,7 @@ namespace LevelEditorMod.Editor.UI {
             topFill, bottomFill,
             mid;
 
-        public Action OnPress;
+        public Action OnPress, OnRightPress;
 
         private UIButton(int spaceX, int spaceY, int minWidth, int minHeight) {
             MTexture full = GFX.Gui["editor/button"];
@@ -94,12 +93,17 @@ namespace LevelEditorMod.Editor.UI {
             int mouseY = (int)Editor.Mouse.Screen.Y;
             hovering = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
 
-            if (MInput.Mouse.PressedLeftButton && hovering)
+            if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
                 pressed = true;
-            else if (MInput.Mouse.ReleasedLeftButton) {
-                if (hovering && pressed)
-                    Pressed();
-                pressed = false;
+            else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+                if(hovering && pressed) {
+					if(MInput.Mouse.ReleasedLeftButton)
+                        Pressed();
+                    else
+                        OnRightPress?.Invoke();
+				}
+
+				pressed = false;
             }
 
             lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
