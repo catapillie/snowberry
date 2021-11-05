@@ -14,7 +14,7 @@ namespace LevelEditorMod.Editor {
 	// selection filters (entity/trigger/decal, layers/tags??) can be handled in the panel
 	public abstract class Tool {
 
-		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new TileBrushTool() };
+		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new TileBrushTool(), new RoomTool() };
 
 		public abstract string GetName();
 
@@ -288,6 +288,40 @@ namespace LevelEditorMod.Editor {
 					if(tile.Tiles[x, y] != null)
 						tile.Tiles[x, y].Draw(position + new Vector2(x, y) * 8, Vector2.Zero, color);
 				}
+			}
+		}
+	}
+
+	public class RoomTool : Tool {
+
+		private Room lastSelected = null;
+		public static bool ScheduledRefresh = false;
+
+		public override UIElement CreatePanel() {
+			// room selection panel containing room metadata
+			var ret = new UIRoomSelectionPanel() {
+				Width = 160
+			};
+			ret.Refresh();
+			return ret;
+		}
+
+		public override string GetName() {
+			return "Room Tool";
+		}
+
+		public override void Update(bool canClick) {
+			// move, resize, add rooms
+			if(canClick) {
+
+			}
+
+			// refresh the display
+			if(lastSelected != Editor.SelectedRoom || ScheduledRefresh) {
+				ScheduledRefresh = false;
+				lastSelected = Editor.SelectedRoom;
+				if(Editor.GetCurrent().ToolPanel is UIRoomSelectionPanel selectionPanel)
+					selectionPanel.Refresh();
 			}
 		}
 	}

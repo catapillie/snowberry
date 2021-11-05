@@ -56,9 +56,11 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         public void AddBelow(UIElement element) {
+            UIElement low = null;
+            foreach(var item in children)
+                if(low == null || item.Position.Y > low.Position.Y) low = item;
             Add(element);
-            foreach (UIElement child in children)
-                element.Position += new Vector2(0, child.Height);
+            element.Position += new Vector2(0, (low?.Position.Y + low?.Height) ?? 0);
         }
 
         public void AddRight(UIElement element) {

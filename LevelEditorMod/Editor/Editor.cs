@@ -139,7 +139,7 @@ namespace LevelEditorMod.Editor {
 
             var nameLabel = new UILabel($"Map: {Map.From.SID} ({Map.From.Mode})");
             ui.AddBelow(nameLabel);
-            nameLabel.Position += new Vector2(10, 0);
+            nameLabel.Position += new Vector2(10, 10);
 
             var roomLabel = new UILabel(() => $"Room: {SelectedRoom?.Name ?? "none"}");
             ui.AddBelow(roomLabel);
