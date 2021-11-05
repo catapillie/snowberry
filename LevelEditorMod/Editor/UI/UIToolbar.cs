@@ -14,7 +14,7 @@ namespace LevelEditorMod.Editor.UI {
 		private static readonly Color BtnPressedBG = Calc.HexToColor("1e4c6f");
 		private static readonly Color BtnHoveredFG = Calc.HexToColor("8abacf");
 		private static readonly Color BtnHoveredBG = Calc.HexToColor("123e5f");
-		private static readonly Color BtnSelectedFG = Calc.HexToColor("9bd5cb");
+		private static readonly Color BtnSelectedFG = Calc.HexToColor("ace6dc");
 		private static readonly Color BtnSelectedBG = Calc.HexToColor("213c38");
 
 		public int CurrentTool;
