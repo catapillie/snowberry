@@ -209,7 +209,7 @@ namespace LevelEditorMod.Editor {
 			bool canClick = ui.CanClickThrough();
 
             // panning
-            if(MInput.Mouse.CheckRightButton && canClick) {
+            if(MInput.Mouse.CheckMiddleButton && canClick) {
                 Vector2 move = lastMousePos - mousePos;
                 if(move != Vector2.Zero)
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
