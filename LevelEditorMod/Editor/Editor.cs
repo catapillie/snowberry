@@ -113,26 +113,27 @@ namespace LevelEditorMod.Editor {
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
-
             Map = map;
         }
 
         internal static void Open(MapData data) {
-            Map map = new Map(data);
-
-            Module.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
-
             Audio.Stop(Audio.CurrentAmbienceEventInstance);
             Audio.Stop(Audio.CurrentMusicEventInstance);
+
+            Map map = null;
+            if (data != null) {
+                Module.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
+                map = new Map(data);
+            }
 
             Engine.Scene = new Editor(map);
         }
 
-        public override void Begin() {
-            base.Begin();
-            camera = new Camera();
-            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
+        private void MenuUI() {
+            ui.Add(new UIMainMenu(uiBuffer.Width, uiBuffer.Height));
+        }
 
+        private void MappingUI() {
             Toolbar = new UIToolbar(this);
             ui.Add(Toolbar);
             Toolbar.Width = uiBuffer.Width;
@@ -146,14 +147,14 @@ namespace LevelEditorMod.Editor {
             roomLabel.Position += new Vector2(10, 10);
 
             UIButton rtm = new UIButton("Return to Map", Fonts.Regular, 6, 6) {
-				OnPress = () => {
+                OnPress = () => {
                     Audio.SetMusic(null);
                     Audio.SetAmbience(null);
 
                     LevelEnter.Go(new Session(Map.From), true);
-				}
-			};
-			ui.AddBelow(rtm);
+                }
+            };
+            ui.AddBelow(rtm);
 
             UIButton test = new UIButton("Playtest", Fonts.Regular, 6, 6) {
                 OnPress = () => {
@@ -170,6 +171,17 @@ namespace LevelEditorMod.Editor {
             ui.AddBelow(test);
 
             SwitchTool(0);
+        }
+
+        public override void Begin() {
+            base.Begin();
+            camera = new Camera();
+            uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
+
+            if (Map == null)
+                MenuUI();
+            else
+                MappingUI();
         }
 
         public override void End() {
@@ -222,19 +234,21 @@ namespace LevelEditorMod.Editor {
 
             ui.Update();
 
-            // room select
-            if(MInput.Mouse.CheckLeftButton && canClick) {
-                if(MInput.Mouse.PressedLeftButton) {
-                    Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
-                    
-                    worldClick = Mouse.World;
-                    SelectedRoom = Map.GetRoomAt(mouse);
-                }
-            }
+            if (Map != null) {
+                // room select
+                if (MInput.Mouse.CheckLeftButton && canClick) {
+                    if (MInput.Mouse.PressedLeftButton) {
+                        Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
 
-			// tool updating
-			var tool = Tool.Tools[Toolbar.CurrentTool];
-            tool.Update(canClick);
+                        worldClick = Mouse.World;
+                        SelectedRoom = Map.GetRoomAt(mouse);
+                    }
+                }
+
+                // tool updating
+                var tool = Tool.Tools[Toolbar.CurrentTool];
+                tool.Update(canClick);
+            }
         }
 
         public void SwitchTool(int toolIdx) {
@@ -258,7 +272,7 @@ namespace LevelEditorMod.Editor {
         }
 
         public override void Render() {
-            var tool = Tool.Tools[Toolbar.CurrentTool];
+            var tool = Map == null ? null : Tool.Tools[Toolbar.CurrentTool];
 
             #region UI Rendering
 
@@ -274,9 +288,11 @@ namespace LevelEditorMod.Editor {
 
             #region Tool Rendering
 
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-            tool.RenderScreenSpace();
-            Draw.SpriteBatch.End();
+            if (Map != null) {
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+                tool.RenderScreenSpace();
+                Draw.SpriteBatch.End();
+            }
 
             #endregion
 
@@ -288,10 +304,12 @@ namespace LevelEditorMod.Editor {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Engine.Instance.GraphicsDevice.Clear(bg);
-            Map.Render(camera);
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-            tool.RenderWorldSpace();
-            Draw.SpriteBatch.End();
+            if (Map != null) {
+                Map.Render(camera);
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+                tool.RenderWorldSpace();
+                Draw.SpriteBatch.End();
+            }
 
             #endregion
 
