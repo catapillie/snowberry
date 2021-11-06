@@ -369,6 +369,7 @@ namespace LevelEditorMod.Editor {
 			if((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
 				Entity toAdd = Entity.Create(selection, Editor.SelectedRoom);
 				toAdd.SetPosition((Editor.Mouse.World / 8).Round() * 8);
+				toAdd.ApplyDefaults(); // do it again for nodes, since we change position after
 				Editor.SelectedRoom.AllEntities.Add(toAdd);
 				if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
 				else Editor.SelectedRoom.Entities.Add(toAdd);
