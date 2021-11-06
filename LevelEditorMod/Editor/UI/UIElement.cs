@@ -55,6 +55,11 @@ namespace LevelEditorMod.Editor.UI {
                 toAdd.Add(element);
         }
 
+        public void AddBelow(UIElement element, Vector2 offset) {
+            AddBelow(element);
+            element.Position += offset;
+        }
+
         public void AddBelow(UIElement element) {
             UIElement low = null;
             foreach(var item in children)

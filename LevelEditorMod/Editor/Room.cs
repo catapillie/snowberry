@@ -13,9 +13,9 @@ namespace LevelEditorMod.Editor {
     using Element = BinaryPacker.Element;
 
     public class Room {
-        public string Name { get; private set; }
+        public string Name;
 
-        public Rectangle Bounds { get; private set; }
+        public Rectangle Bounds;
 
         public Map Map { get; private set; }
 
@@ -27,22 +27,22 @@ namespace LevelEditorMod.Editor {
         public Vector2 Size => new Vector2(Width, Height);
 
         // Music data
-        public string Music { get; private set; }
-        public string AltMusic { get; private set; }
-        public string Ambience { get; private set; }
-        public bool[] MusicLayers { get; private set; }
+        public string Music;
+        public string AltMusic;
+        public string Ambience;
+        public bool[] MusicLayers;
 
-        public int MusicProgress { get; private set; }
-        public int AmbienceProgress { get; private set; }
+        public int MusicProgress;
+        public int AmbienceProgress;
 
         // Camera offset data
-        public Vector2 CameraOffset { get; private set; }
+        public Vector2 CameraOffset;
 
         // Misc data
-        public bool Dark { get; private set; }
-        public bool Underwater { get; private set; }
-        public bool Space { get; private set; }
-        public WindController.Patterns WindPattern { get; private set; }
+        public bool Dark;
+        public bool Underwater;
+        public bool Space;
+        public WindController.Patterns WindPattern;
 
         // Tiles
         private readonly VirtualMap<char> fgTileMap;

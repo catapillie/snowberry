@@ -7,13 +7,15 @@ using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor {
     public class Map {
-        private readonly List<Room> rooms = new List<Room>();
+
         private readonly List<Rectangle> fillers = new List<Rectangle>();
         // TODO: represent stylegrounds in-editor
         private readonly BinaryPacker.Element bgStylegounds, fgStylegrounds;
 
         public readonly string Name;
         public readonly AreaKey From;
+
+        public readonly List<Room> Rooms = new List<Room>();
 
         internal Map(string name) {
             Name = name;
@@ -22,7 +24,7 @@ namespace LevelEditorMod.Editor {
         internal Map(MapData data)
             : this(data.Filename) {
             foreach (LevelData roomData in data.Levels)
-                rooms.Add(new Room(roomData, this));
+                Rooms.Add(new Room(roomData, this));
             foreach (Rectangle filler in data.Filler)
                 fillers.Add(filler);
             From = data.Area;
@@ -31,7 +33,7 @@ namespace LevelEditorMod.Editor {
         }
 
         internal Room GetRoomAt(Point at) {
-            foreach (Room room in rooms)
+            foreach (Room room in Rooms)
                 if (new Rectangle(room.X * 8, room.Y * 8, room.Width * 8, room.Height * 8).Contains(at))
                     return room;
             return null;
@@ -43,7 +45,7 @@ namespace LevelEditorMod.Editor {
             Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
 
-            foreach (Room room in rooms) {
+            foreach (Room room in Rooms) {
 				Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
 				if (!viewRect.Intersects(rect))
 					continue;
@@ -65,7 +67,7 @@ namespace LevelEditorMod.Editor {
         }
 
         public void GenerateMapData(MapData data){
-			foreach(var room in rooms)
+			foreach(var room in Rooms)
                 data.Levels.Add(new LevelData(room.CreateLevelData()));
             Module.Log(LogLevel.Info, "meta: " + data.Meta);
             // ...

@@ -12,7 +12,7 @@ namespace LevelEditorMod.Editor.UI {
         public bool ShowScrollBar = true;
 
 		public UIScrollPane() {
-			BG.A = 127;
+			BG.A = 185;
 			GrabsScroll = true;
             GrabsClick = true;
 		}
