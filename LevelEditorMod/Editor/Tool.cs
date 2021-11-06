@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using LevelEditorMod.Editor.Triggers;
 using LevelEditorMod.Editor.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +15,7 @@ namespace LevelEditorMod.Editor {
 	// selection filters (entity/trigger/decal, layers/tags??) can be handled in the panel
 	public abstract class Tool {
 
-		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new TileBrushTool(), new RoomTool() };
+		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new TileBrushTool(), new RoomTool(), new PlacementTool() };
 
 		public abstract string GetName();
 
@@ -115,9 +116,6 @@ namespace LevelEditorMod.Editor {
 		private List<UIButton> fgTilesetButtons = new List<UIButton>();
 		private List<UIButton> bgTilesetButtons = new List<UIButton>();
 
-		private static readonly Color TilesetBtnBg = Calc.HexToColor("1d1d21");
-		private static readonly Color TilesetBtnHoverBg = Calc.HexToColor("18181c");
-		private static readonly Color TilesetBtnPressBg = Calc.HexToColor("131317");
 		private static readonly Color LeftTilesetBtnBg = Calc.HexToColor("274292");
 		private static readonly Color RightTilesetBtnBg = Calc.HexToColor("922727");
 		private static readonly Color BothTilesetBtnBg = Calc.HexToColor("7d2792");
@@ -248,9 +246,9 @@ namespace LevelEditorMod.Editor {
 				else if(RightFg && CurRightTileset == i)
 					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
 				else {
-					button.BG = TilesetBtnBg;
-					button.PressedBG = TilesetBtnPressBg;
-					button.HoveredBG = TilesetBtnHoverBg;
+					button.BG = UIButton.DefaultBG;
+					button.PressedBG = UIButton.DefaultPressedBG;
+					button.HoveredBG = UIButton.DefaultHoveredBG;
 				}
 			}
 			for(int i = 0; i < bgTilesetButtons.Count; i++) {
@@ -262,9 +260,9 @@ namespace LevelEditorMod.Editor {
 				else if(!RightFg && CurRightTileset == i)
 					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
 				else {
-					button.BG = TilesetBtnBg;
-					button.PressedBG = TilesetBtnPressBg;
-					button.HoveredBG = TilesetBtnHoverBg;
+					button.BG = UIButton.DefaultBG;
+					button.PressedBG = UIButton.DefaultPressedBG;
+					button.HoveredBG = UIButton.DefaultHoveredBG;
 				}
 			}
 		}
@@ -322,6 +320,79 @@ namespace LevelEditorMod.Editor {
 				lastSelected = Editor.SelectedRoom;
 				if(Editor.GetCurrent().ToolPanel is UIRoomSelectionPanel selectionPanel)
 					selectionPanel.Refresh();
+			}
+		}
+	}
+
+	public class PlacementTool : Tool {
+
+		string curLeftSelection = null, curRightSelection = null;
+		Dictionary<string, UIButton> placementButtons = new Dictionary<string, UIButton>();
+		Entity preview = null;
+
+		private static readonly Color LeftPlacementBtnBg = Calc.HexToColor("274292");
+		private static readonly Color RightPlacementBtnBg = Calc.HexToColor("922727");
+		private static readonly Color BothPlacementBtnBg = Calc.HexToColor("7d2792");
+
+		public override UIElement CreatePanel() {
+			placementButtons.Clear();
+			var ret = new UIScrollPane();
+			ret.Width = 180;
+			foreach(var item in PluginInfo.All) {
+				UIButton b;
+				ret.AddBelow(b = new UIButton(item.Key, Fonts.Regular, 4, 4) {
+					OnPress = () => curLeftSelection = curLeftSelection != item.Key ? item.Key : null,
+					OnRightPress = () => curRightSelection = curRightSelection != item.Key ? item.Key : null
+				});
+				placementButtons[item.Key] = b;
+			}
+			return ret;
+		}
+
+		public override string GetName() {
+			return "Object Placement";
+		}
+
+		public override void Update(bool canClick) {
+			string selection = MInput.Mouse.PressedLeftButton ? curLeftSelection : curRightSelection;
+			if((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
+				Entity toAdd = Entity.Create(selection, Editor.SelectedRoom);
+				toAdd.SetPosition((Editor.Mouse.World / 8).Round() * 8);
+				Editor.SelectedRoom.AllEntities.Add(toAdd);
+				if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
+				else Editor.SelectedRoom.Entities.Add(toAdd);
+			}
+
+			if((preview == null && curLeftSelection != null) || (preview != null && curLeftSelection != null && !preview.Name.Equals(curLeftSelection))) {
+				preview = Entity.Create(curLeftSelection, Editor.SelectedRoom);
+			} else if(curLeftSelection == null)
+				preview = null;
+			preview?.SetPosition((Editor.Mouse.World / 8).Round() * 8);
+			// this is Stupid
+			preview?.ApplyDefaults();
+
+			foreach(var item in placementButtons) {
+				var button = item.Value;
+				if(item.Key.Equals(curLeftSelection) && item.Key.Equals(curRightSelection))
+					button.BG = button.PressedBG = button.HoveredBG = BothPlacementBtnBg;
+				else if(item.Key.Equals(curLeftSelection))
+					button.BG = button.PressedBG = button.HoveredBG = LeftPlacementBtnBg;
+				else if(item.Key.Equals(curRightSelection))
+					button.BG = button.PressedBG = button.HoveredBG = RightPlacementBtnBg;
+				else {
+					button.BG = UIButton.DefaultBG;
+					button.HoveredBG = UIButton.DefaultHoveredBG;
+					button.PressedBG = UIButton.DefaultPressedBG;
+				}
+			}
+		}
+
+		public override void RenderWorldSpace() {
+			base.RenderWorldSpace();
+			if(preview != null) {
+				Calc.PushRandom(preview.GetHashCode());
+				preview.Render();
+				Calc.PopRandom();
 			}
 		}
 	}

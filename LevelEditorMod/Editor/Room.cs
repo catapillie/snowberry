@@ -52,9 +52,9 @@ namespace LevelEditorMod.Editor {
         private readonly List<Decal> fgDecals = new List<Decal>();
         private readonly List<Decal> bgDecals = new List<Decal>();
 
-        private readonly List<Entity> entities = new List<Entity>();
-        private readonly List<Entity> triggers = new List<Entity>();
-        private readonly List<Entity> allEntities = new List<Entity>();
+        public readonly List<Entity> Entities = new List<Entity>();
+        public readonly List<Entity> Triggers = new List<Entity>();
+        public readonly List<Entity> AllEntities = new List<Entity>();
 
         public int LoadSeed {
             get {
@@ -134,22 +134,24 @@ namespace LevelEditorMod.Editor {
             // Entities
             foreach (EntityData entity in data.Entities) {
                 if (Entity.TryCreate(this, entity, out Entity e)) {
-                    entities.Add(e);
-                    allEntities.Add(e);
+                    Entities.Add(e);
+                    AllEntities.Add(e);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
             }
 
             // Player Spawnpoints (excluded from LevelData.Entities)
             foreach (Vector2 spawn in data.Spawns) {
-                entities.Add(Entity.Create("player", this).SetPosition(spawn));
+                var spawnEntity = Entity.Create("player", this).SetPosition(spawn);
+                Entities.Add(spawnEntity);
+                AllEntities.Add(spawnEntity);
             }
 
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
                 if (Entity.TryCreate(this, trigger, out Entity t)) {
-                    triggers.Add(t);
-                    allEntities.Add(t);
+                    Triggers.Add(t);
+                    AllEntities.Add(t);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
@@ -191,7 +193,7 @@ namespace LevelEditorMod.Editor {
         internal List<EntitySelection> GetSelectedEntities(Rectangle rect) {
             List<EntitySelection> result = new List<EntitySelection>();
 
-            foreach (Entity entity in allEntities) {
+            foreach (Entity entity in AllEntities) {
                 var rects = entity.SelectionRectangles;
                 if (rects != null && rects.Length > 0) {
                     List<EntitySelection.Selection> selection = new List<EntitySelection.Selection>();
@@ -238,7 +240,7 @@ namespace LevelEditorMod.Editor {
                 decal.Render(offset);
 
             // Entities
-            foreach (Entity entity in entities) {
+            foreach (Entity entity in Entities) {
                 Calc.PushRandom(entity.GetHashCode());
                 entity.Render();
                 Calc.PopRandom();
@@ -255,7 +257,7 @@ namespace LevelEditorMod.Editor {
                 decal.Render(offset);
 
             // Triggers
-            foreach (Entity trigger in triggers)
+            foreach (Entity trigger in Triggers)
                 trigger.Render();
 
             if (this == Editor.SelectedRoom) {
@@ -308,7 +310,7 @@ namespace LevelEditorMod.Editor {
             ret.Children = new List<Element>();
             ret.Children.Add(entitiesElement);
 
-			foreach(var entity in entities) {
+			foreach(var entity in Entities) {
 				Element entityElem = new Element();
                 entityElem.Name = entity.Name;
                 entityElem.Children = new List<Element>();
@@ -340,7 +342,7 @@ namespace LevelEditorMod.Editor {
             triggersElement.Children = new List<Element>();
             ret.Children.Add(triggersElement);
 
-            foreach(var tigger in triggers) {
+            foreach(var tigger in Triggers) {
 				Element triggersElem = new Element();
                 triggersElem.Name = tigger.Name;
                 triggersElem.Children = new List<Element>();

@@ -63,5 +63,13 @@ namespace LevelEditorMod.Editor.Entities {
 
             light.DrawJustified(Position + Vector2.UnitX * Width / 2f, new Vector2(0.5f, 0.0f));
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            SetWidth(16);
+            SetHeight(16);
+            ResetNodes();
+            AddNode(Position + new Vector2(24, 0));
+        }
     }
 }

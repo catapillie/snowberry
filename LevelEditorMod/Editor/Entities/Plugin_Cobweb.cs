@@ -15,5 +15,11 @@ namespace LevelEditorMod.Editor.Entities {
             foreach (Vector2 node in Nodes)
                 new SimpleCurve(mid, node, (mid + node) / 2f + Vector2.UnitY * 4).Render(Color, 20);
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            ResetNodes();
+            AddNode(Position + new Vector2(16, 0));
+        }
     }
 }

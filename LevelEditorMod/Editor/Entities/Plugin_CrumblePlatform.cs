@@ -19,5 +19,11 @@ namespace LevelEditorMod.Editor.Entities {
 				mTexture2.GetSubtexture(num2 * 8, 0, 8, 8).DrawCentered(new Vector2(4 + j + X, 4f + Y));
 			}
 		}
-    }
+
+		public override void ApplyDefaults() {
+			base.ChangeDefault();
+			SetWidth(16);
+			SetHeight(8);
+		}
+	}
 }

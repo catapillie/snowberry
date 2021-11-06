@@ -29,5 +29,11 @@ namespace LevelEditorMod.Editor.Entities {
                 }
             }
         }
-    }
+
+		public override void ApplyDefaults() {
+			base.ChangeDefault();
+            SetWidth(16);
+            SetHeight(16);
+		}
+	}
 }

@@ -60,5 +60,11 @@ namespace LevelEditorMod.Editor.Entities {
                     map[i, j] = true;
             return true;
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            SetWidth(16);
+            SetHeight(16);
+        }
     }
 }

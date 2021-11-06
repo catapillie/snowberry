@@ -88,6 +88,16 @@ namespace LevelEditorMod.Editor {
             }
         }
 
+        internal void AddNode(Vector2 position) {
+            nodes.Add(position);
+            nodesChanged = true;
+        }
+
+        internal void ResetNodes() {
+            nodes.Clear();
+            nodesChanged = true;
+        }
+
         internal void SetWidth(int width) {
             Width = width;
             updateSelection = true;
@@ -98,7 +108,7 @@ namespace LevelEditorMod.Editor {
             updateSelection = true;
         }
 
-        public virtual void ChangeDefault() { }
+        public virtual void ChangeDefault() {}
         public virtual void Initialize() => ChangeDefault();
 		protected virtual Rectangle[] Select() {
             List<Rectangle> ret = new List<Rectangle>();
@@ -113,6 +123,8 @@ namespace LevelEditorMod.Editor {
 
         #region Entity Instantiating
 
+        public virtual void ApplyDefaults() {}
+
         private Entity InitializeData(EntityData entityData) {
             Vector2 offset = Room.Position * 8;
 
@@ -121,6 +133,7 @@ namespace LevelEditorMod.Editor {
             Height = entityData.Height;
             Origin = entityData.Origin;
 
+            nodes.Clear();
             foreach (Vector2 node in entityData.Nodes)
                 nodes.Add(node + offset);
 
@@ -136,7 +149,7 @@ namespace LevelEditorMod.Editor {
             return this;
         }
 
-        internal static Entity Create(string name, Room room) {
+        public static Entity Create(string name, Room room) {
             if (PluginInfo.All.TryGetValue(name, out PluginInfo plugin)) {
                 Entity entity = plugin.Instantiate();
                 entity.Plugin = plugin;
@@ -144,6 +157,7 @@ namespace LevelEditorMod.Editor {
                 entity.Name = name;
                 entity.Room = room;
 
+                entity.ApplyDefaults();
                 entity.Initialize();
                 return entity;
             }

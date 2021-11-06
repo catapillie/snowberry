@@ -17,6 +17,12 @@ namespace LevelEditorMod.Editor.Entities {
                         Tiles[x, y]?.Draw(Position + new Vector2(x, y) * 8, Vector2.Zero, c);
             }
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            SetWidth(16);
+            SetHeight(16);
+        }
     }
 
     public abstract class Plugin_TileEntity : Plugin_TileEntityBase {
@@ -26,7 +32,7 @@ namespace LevelEditorMod.Editor.Entities {
             base.Initialize();
             Tiles = GFX.FGAutotiler.GenerateBox(TileType, Width / 8, Height / 8).TileGrid.Tiles;
         }
-    }
+	}
 
     [Plugin("introCrusher")]
     public class Plugin_IntroCrusher : Plugin_TileEntity {
@@ -42,6 +48,12 @@ namespace LevelEditorMod.Editor.Entities {
                         Tiles[x, y]?.Draw(Nodes[0] + new Vector2(x, y) * 8, Vector2.Zero, c);
             }
             DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2, Color.White, 8, 4);
+        }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            ResetNodes();
+            AddNode(Position + new Vector2(0, 24));
         }
     }
 

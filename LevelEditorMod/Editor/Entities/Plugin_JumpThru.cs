@@ -29,5 +29,11 @@ namespace LevelEditorMod.Editor.Entities {
                 tex.GetSubtexture(tx * 8, ty * 8, 8, 8).Draw(Position + Vector2.UnitX * i * 8);
             }
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            SetWidth(16);
+            SetHeight(8);
+        }
     }
 }

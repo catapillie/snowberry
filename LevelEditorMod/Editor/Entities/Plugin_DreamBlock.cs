@@ -27,5 +27,11 @@ namespace LevelEditorMod.Editor.Entities {
                 return new Rectangle[] { Bounds };
             }
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            SetWidth(16);
+            SetHeight(16);
+        }
     }
 }

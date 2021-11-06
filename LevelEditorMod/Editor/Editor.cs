@@ -228,7 +228,11 @@ namespace LevelEditorMod.Editor {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
                     
                     worldClick = Mouse.World;
+                    var before = SelectedRoom;
                     SelectedRoom = Map.GetRoomAt(mouse);
+                    // don't let tools click when clicking onto new rooms
+                    if(SelectedRoom != before)
+                        canClick = false;
                 }
             }
 

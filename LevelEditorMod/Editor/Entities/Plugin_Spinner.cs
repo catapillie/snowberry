@@ -63,6 +63,12 @@ namespace LevelEditorMod.Editor.Entities {
                 blade.DrawCentered(stop);
             }
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            ResetNodes();
+            AddNode(Position + new Vector2(16, 0));
+        }
     }
 
     [Plugin("trackSpinner")]

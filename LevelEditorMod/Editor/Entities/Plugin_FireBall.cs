@@ -28,5 +28,11 @@ namespace LevelEditorMod.Editor.Entities {
                     orb.DrawCentered(Position + d * ((f + Offset) % 1f));
             }
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            ResetNodes();
+            AddNode(Position + new Vector2(16, 0));
+        }
     }
 }

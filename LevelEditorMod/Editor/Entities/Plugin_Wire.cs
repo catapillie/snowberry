@@ -17,5 +17,11 @@ namespace LevelEditorMod.Editor.Entities {
             SimpleCurve curve = new SimpleCurve(start, end, control);
             curve.Render(Color, 20);
         }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            ResetNodes();
+            AddNode(Position + new Vector2(16, 0));
+        }
     }
 }
