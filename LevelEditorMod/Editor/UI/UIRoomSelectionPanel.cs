@@ -15,8 +15,8 @@ namespace LevelEditorMod.Editor.UI {
 		}
 
 		public override void Render(Vector2 position = default) {
-			base.Render(position);
 			Draw.Rect(Bounds, BG);
+			base.Render(position);
 		}
 
 		public void Refresh() {
