@@ -9,7 +9,6 @@ namespace LevelEditorMod {
             public static readonly Color DarkCyan = Calc.HexToColor("1da4ad");
             public static readonly Color Red = Calc.HexToColor("db2323");
             public static readonly Color DarkRed = Calc.HexToColor("b02020");
-            public static readonly Color MediumBlue = Calc.HexToColor("08516e");
             public static readonly Color DarkGray = Calc.HexToColor("060607");
             public static readonly Color CloudGray = Calc.HexToColor("293036");
         }

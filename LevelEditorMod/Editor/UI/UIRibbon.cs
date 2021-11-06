@@ -7,12 +7,12 @@ namespace LevelEditorMod.Editor.UI {
         private readonly string text;
 
         public Color FG = Util.Colors.White;
-        public Color BG = Util.Colors.MediumBlue;
-        public Color BGAccent = Color.Black * 0.5f;
+        public Color BG = Calc.HexToColor("f25c54");
+        public Color BGAccent = Calc.HexToColor("f7b267");
 
         private readonly int leftSpace;
         private readonly bool leftEdge, rightEdge;
-        public int Accent;
+        public int Accent = 1;
 
         public UIRibbon(string text, int leftSpace = 8, int rightSpace = 8, bool leftEdge = false, bool rightEdge = true)
             : this(text, Fonts.Regular, leftSpace, rightSpace, leftEdge, rightEdge) { }

@@ -1,0 +1,7 @@
+# *** Main Menu ***
+
+	LEVELEDITORMOD_MAINMENU_CREATE=			+ nouvelle map
+	LEVELEDITORMOD_MAINMENU_LOAD=			↓ charger une map
+	LEVELEDITORMOD_MAINMENU_EXIT=			← quitter
+	LEVELEDITORMOD_MAINMENU_SETTINGS=		paramètres
+	LEVELEDITORMOD_MAINMENU_CREDITS=		par catapillie, leppa, Viv

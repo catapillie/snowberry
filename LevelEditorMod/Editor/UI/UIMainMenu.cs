@@ -34,7 +34,6 @@ namespace LevelEditorMod.Editor.UI {
                     this.selector = selector;
                     this.n = n;
 
-                    Accent = 1;
                     raw = Dialog.Has(area.Name) ? $"» {area.Name}" : "...";
                     w = (int)Fonts.Regular.Measure(raw).X;
                     W = Width + w + 5;
@@ -131,20 +130,20 @@ namespace LevelEditorMod.Editor.UI {
             //    Underline = true,
             //    FG = Util.Colors.White,
             //};
-            UIButton create = new UIButton("+ new level", Fonts.Regular, 16, 24) {
+            UIButton create = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_CREATE"), Fonts.Regular, 16, 24) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Cyan,
                 PressedBG = Util.Colors.White,
                 PressedFG = Util.Colors.Cyan,
                 HoveredBG = Util.Colors.DarkCyan,
             };
-            UIButton load = new UIButton("↓ load existing level ", Fonts.Regular, 5, 4) {
+            UIButton load = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD"), Fonts.Regular, 5, 4) {
                 OnPress = () => {
                     state = States.Load;
                     levelSelector.Reload();
                 },
             };
-            UIButton exit = new UIButton("← exit", Fonts.Regular, 10, 4) {
+            UIButton exit = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_EXIT"), Fonts.Regular, 10, 4) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Red,
                 PressedBG = Util.Colors.White,
@@ -161,15 +160,15 @@ namespace LevelEditorMod.Editor.UI {
             RegroupIn(buttons, create, load, exit);
             buttons.Position = new Vector2(width - buttons.Width, height - buttons.Height) / 2;
 
-            settings = new UIButton("settings", Fonts.Regular, 4, 8);
+            settings = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_SETTINGS"), Fonts.Regular, 4, 8);
             Add(settings);
             settings.Position = Vector2.UnitX * (Width - settings.Width) + new Vector2(-8, 8);
 
-            Add(version = new UIRibbon($"ver{Module.Instance.Metadata.VersionString}") {
-                Position = new Vector2(0, 22),
-            });
-            Add(authors = new UIRibbon($"by catapillie, leppa") {
+            Add(authors = new UIRibbon(Dialog.Clean("LEVELEDITORMOD_MAINMENU_CREDITS")) {
                 Position = new Vector2(0, 8),
+            });
+            Add(version = new UIRibbon($"ver{Module.Instance.Metadata.VersionString}") {
+                Position = new Vector2(0, 23),
             });
         }
 
@@ -196,8 +195,8 @@ namespace LevelEditorMod.Editor.UI {
             }
 
             float startEase = 1 - Ease.CubeInOut(stateLerp[0]);
-            authors.Position.X = startEase * -authors.Width;
-            version.Position.X = startEase * -version.Width;
+            authors.Position.X = (int)Math.Round(startEase * (-authors.Width - 2));
+            version.Position.X = (int)Math.Round(startEase * (-version.Width - 2));
             settings.Position.Y = (int)Math.Round(startEase * (-settings.Height - 16) + 8);
 
             float loadEase = Ease.CubeInOut(stateLerp[2]);
