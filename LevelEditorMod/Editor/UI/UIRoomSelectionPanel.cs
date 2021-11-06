@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Celeste;
+using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 using System.Text.RegularExpressions;
 using static LevelEditorMod.Editor.UI.UISelectionPanel;
 
@@ -118,6 +120,10 @@ namespace LevelEditorMod.Editor.UI {
             AddBelow(new UIOption("dark", new UICheckBox(-1, room.Dark) { OnPress = val => room.Dark = val }), new Vector2(4, 3));
             AddBelow(new UIOption("underwater", new UICheckBox(-1, room.Underwater) { OnPress = val => room.Underwater = val }), new Vector2(4, 0));
             AddBelow(new UIOption("space", new UICheckBox(-1, room.Space) { OnPress = val => room.Space = val }), new Vector2(4, 0));
+            // TODO: value text field
+            AddBelow(new UIOption("wind pattern", new UITextField(Fonts.Regular, 60, room.WindPattern.ToString()) {
+                OnInputChange = text => room.WindPattern = Enum.TryParse(text, out WindController.Patterns pattern) ? pattern : room.WindPattern
+            }), new Vector2(4, 3));
         }
 
 		public override void Update(Vector2 position = default) {
