@@ -78,7 +78,18 @@ namespace LevelEditorMod.Editor {
 			} else
 				Editor.Selection = null;
 
-			if(MInput.Mouse.ReleasedLeftButton && canClick) {
+			bool entitiesRemoved = false;
+			if(MInput.Keyboard.Check(Keys.Delete)) {
+				foreach(var item in Editor.SelectedEntities) {
+					entitiesRemoved = true;
+					item.Entity.Room.AllEntities.Remove(item.Entity);
+					item.Entity.Room.Entities.Remove(item.Entity);
+					item.Entity.Room.Triggers.Remove(item.Entity);
+				}
+				Editor.SelectedEntities.Clear();
+			}
+
+			if((MInput.Mouse.ReleasedLeftButton && canClick) || entitiesRemoved) {
 				if(canSelect && editor.ToolPanel is UISelectionPanel selectionPanel)
 					selectionPanel.Display(Editor.SelectedEntities);
 			}
