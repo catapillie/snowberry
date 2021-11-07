@@ -12,6 +12,7 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("type")] public string Type = "default";
 
         private Directions dir;
+        bool initialized = false;
 
         public override void Initialize() {
             base.Initialize();
@@ -22,6 +23,7 @@ namespace LevelEditorMod.Editor.Entities {
                 "spikesDown" => Directions.Down,
                 _ => Directions.Up,
             };
+            initialized = true;
         }
 
         public override void Render() {
@@ -56,5 +58,15 @@ namespace LevelEditorMod.Editor.Entities {
                 }
             }
         }
-    }
+
+		public override void ApplyDefaults() {
+			base.ApplyDefaults();
+            if(initialized)
+			    if(dir == Directions.Up || dir == Directions.Down) {
+                    SetWidth(8);
+			    }else if(dir == Directions.Left || dir == Directions.Right) {
+                    SetHeight(8);
+                }
+        }
+	}
 }

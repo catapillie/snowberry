@@ -386,11 +386,6 @@ namespace LevelEditorMod.Editor {
 				else Editor.SelectedRoom.Entities.Add(toAdd);
 			}
 
-			if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)
-				lastPress = Editor.Mouse.World;
-			else if(!MInput.Mouse.CheckLeftButton && !MInput.Mouse.CheckRightButton)
-				lastPress = null;
-
 			if((preview == null && selection != null) || (preview != null && selection != null && !preview.Name.Equals(selection))) {
 				preview = BuildEntity(selection);
 			} else if(selection == null)
@@ -398,6 +393,11 @@ namespace LevelEditorMod.Editor {
 			if(preview != null) {
 				UpdateEntity(preview, area);
 			}
+
+			if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)
+				lastPress = Editor.Mouse.World;
+			else if(!MInput.Mouse.CheckLeftButton && !MInput.Mouse.CheckRightButton)
+				lastPress = null;
 
 			foreach(var item in placementButtons) {
 				var button = item.Value;
@@ -420,12 +420,20 @@ namespace LevelEditorMod.Editor {
 		}
 
 		private void UpdateEntity(Entity e, Rectangle area) {
-			if(lastPress != null && e.Width > 0 && e.Height > 0)
-				e.SetPosition(new Vector2((area.Left / 8) * 8, (area.Top / 8) * 8));
-			else
-				e.SetPosition((Editor.Mouse.World / 8).Round() * 8);
+			// need to apply its defaults, to update its size, to set its position, to apply its (node and size) defaults, and update size again
 			// this is Stupid
 			e.ApplyDefaults();
+			UpdateSize(e, area);
+			var mpos = (Editor.Mouse.World / 8).Round() * 8;
+			if(lastPress != null)
+				e.SetPosition(new Vector2(e.Width > 0 ? (area.Left / 8) * 8 : mpos.X, e.Height > 0 ? (area.Top / 8) * 8 : mpos.Y));
+			else
+				e.SetPosition(mpos);
+			e.ApplyDefaults();
+			UpdateSize(e, area);
+		}
+
+		private void UpdateSize(Entity e, Rectangle area) {
 			if(MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
 				if(e.Width > 0)
 					e.SetWidth(Math.Max((int)Math.Ceiling(area.Width / 8f) * 8, e.Width));
