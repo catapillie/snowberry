@@ -49,8 +49,8 @@ namespace LevelEditorMod.Editor {
         private readonly VirtualMap<char> bgTileMap;
         private VirtualMap<MTexture> fgTiles, bgTiles;
 
-        private readonly List<Decal> fgDecals = new List<Decal>();
-        private readonly List<Decal> bgDecals = new List<Decal>();
+        public readonly List<Decal> FgDecals = new List<Decal>();
+        public readonly List<Decal> BgDecals = new List<Decal>();
 
         public readonly List<Entity> Entities = new List<Entity>();
         public readonly List<Entity> Triggers = new List<Entity>();
@@ -123,12 +123,12 @@ namespace LevelEditorMod.Editor {
 
             // BgDecals
             foreach (DecalData decal in data.BgDecals) {
-                bgDecals.Add(new Decal(this, decal));
+                BgDecals.Add(new Decal(this, decal));
             }
 
             // FgDecals
             foreach (DecalData decal in data.FgDecals) {
-                fgDecals.Add(new Decal(this, decal));
+                FgDecals.Add(new Decal(this, decal));
             }
 
             // Entities
@@ -236,7 +236,7 @@ namespace LevelEditorMod.Editor {
                         bgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
             // BgDecals
-            foreach (Decal decal in bgDecals)
+            foreach (Decal decal in BgDecals)
                 decal.Render(offset);
 
             // Entities
@@ -253,7 +253,7 @@ namespace LevelEditorMod.Editor {
                         fgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
             // FgDecals
-            foreach (Decal decal in fgDecals)
+            foreach (Decal decal in FgDecals)
                 decal.Render(offset);
 
             // Triggers
@@ -372,13 +372,13 @@ namespace LevelEditorMod.Editor {
             fgDecalsElem.Name = "fgdecals";
             fgDecalsElem.Children = new List<Element>();
             ret.Children.Add(fgDecalsElem);
-			foreach(var decal in fgDecals) {
+			foreach(var decal in FgDecals) {
                 Element decalElem = new Element();
                 decalElem.Attributes = new Dictionary<string, object>();
-                decalElem.Attributes["x"] = decal.position.X;
-                decalElem.Attributes["y"] = decal.position.Y;
-                decalElem.Attributes["scaleX"] = decal.scale.X;
-                decalElem.Attributes["scaleY"] = decal.scale.Y;
+                decalElem.Attributes["x"] = decal.Position.X;
+                decalElem.Attributes["y"] = decal.Position.Y;
+                decalElem.Attributes["scaleX"] = decal.Scale.X;
+                decalElem.Attributes["scaleY"] = decal.Scale.Y;
                 decalElem.Attributes["texture"] = decal.Texture;
                 fgDecalsElem.Children.Add(decalElem);
             }
@@ -387,13 +387,13 @@ namespace LevelEditorMod.Editor {
             bgDecalsElem.Name = "bgdecals";
             bgDecalsElem.Children = new List<Element>();
             ret.Children.Add(bgDecalsElem);
-            foreach(var decal in bgDecals) {
+            foreach(var decal in BgDecals) {
                 Element decalElem = new Element();
                 decalElem.Attributes = new Dictionary<string, object>();
-                decalElem.Attributes["x"] = decal.position.X;
-                decalElem.Attributes["y"] = decal.position.Y;
-                decalElem.Attributes["scaleX"] = decal.scale.X;
-                decalElem.Attributes["scaleY"] = decal.scale.Y;
+                decalElem.Attributes["x"] = decal.Position.X;
+                decalElem.Attributes["y"] = decal.Position.Y;
+                decalElem.Attributes["scaleX"] = decal.Scale.X;
+                decalElem.Attributes["scaleY"] = decal.Scale.Y;
                 decalElem.Attributes["texture"] = decal.Texture;
                 bgDecalsElem.Children.Add(decalElem);
             }

@@ -15,7 +15,7 @@ namespace LevelEditorMod.Editor {
 	// selection filters (entity/trigger/decal, layers/tags??) can be handled in the panel
 	public abstract class Tool {
 
-		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new TileBrushTool(), new RoomTool(), new PlacementTool() };
+		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new DecalSelectionTool(), new TileBrushTool(), new RoomTool(), new PlacementTool() };
 
 		public abstract string GetName();
 
@@ -33,7 +33,7 @@ namespace LevelEditorMod.Editor {
 		static bool canSelect;
 
 		public override string GetName() {
-			return "Object Select";
+			return "Entity Select";
 		}
 
 		public override UIElement CreatePanel() {
@@ -93,6 +93,89 @@ namespace LevelEditorMod.Editor {
 				if(canSelect && editor.ToolPanel is UISelectionPanel selectionPanel)
 					selectionPanel.Display(Editor.SelectedEntities);
 			}
+		}
+	}
+
+	public class DecalSelectionTool : Tool {
+
+		static List<Decal> SelectedDecals = new List<Decal>();
+		static bool fg = false;
+		static bool bg = true;
+		static bool canSelect;
+
+		public override string GetName() {
+			return "Decal Select";
+		}
+
+		public override UIElement CreatePanel() {
+			var panel = new UIElement() {
+				Width = 80
+			};
+			panel.AddBelow(new UISelectionPanel.UIOption("foreground", new UICheckBox(-1, fg) {
+				OnPress = val => fg = val
+			}), Vector2.UnitY * 4);
+			panel.AddBelow(new UISelectionPanel.UIOption("background", new UICheckBox(-1, bg) {
+				OnPress = val => bg = val
+			}), Vector2.UnitY * 4);
+			return panel;
+		}
+
+		public override void Update(bool canClick) {
+			var editor = Editor.GetCurrent();
+
+			if(MInput.Mouse.CheckLeftButton && canClick) {
+				if(MInput.Mouse.PressedLeftButton) {
+					Point mouse = new Point((int)Editor.Mouse.World.X, (int)Editor.Mouse.World.Y);
+
+					canSelect = true;
+					if(SelectedDecals != null) {
+						foreach(var s in SelectedDecals) {
+							if(s.Bounds.Contains(mouse)) {
+								canSelect = false;
+								break;
+							}
+						}
+					}
+				}
+
+				if(canSelect && Editor.SelectedRoom != null) {
+					int ax = (int)Math.Min(Editor.Mouse.World.X, editor.worldClick.X);
+					int ay = (int)Math.Min(Editor.Mouse.World.Y, editor.worldClick.Y);
+					int bx = (int)Math.Max(Editor.Mouse.World.X, editor.worldClick.X);
+					int by = (int)Math.Max(Editor.Mouse.World.Y, editor.worldClick.Y);
+					Editor.Selection = new Rectangle(ax, ay, bx - ax, by - ay);
+
+					SelectedDecals = new List<Decal>();
+					var selectFrom = new List<Decal>();
+					if(fg) selectFrom.AddRange(Editor.SelectedRoom.FgDecals);
+					if(bg) selectFrom.AddRange(Editor.SelectedRoom.BgDecals);
+					foreach(var item in selectFrom) {
+						if(item.Bounds.Intersects(Editor.Selection.Value))
+							SelectedDecals.Add(item);
+					}
+				} else if(SelectedDecals != null) {
+					Vector2 worldSnapped = (Editor.Mouse.World / 8).Floor() * 8;
+					Vector2 worldLastSnapped = (Editor.Mouse.WorldLast / 8).Floor() * 8;
+					Vector2 move = worldSnapped - worldLastSnapped;
+					foreach(Decal s in SelectedDecals)
+						s.Position += move;
+				}
+			} else
+				Editor.Selection = null;
+
+			if(MInput.Keyboard.Check(Keys.Delete)) {
+				foreach(var item in SelectedDecals) {
+					item.Room.FgDecals.Remove(item);
+					item.Room.BgDecals.Remove(item);
+				}
+				SelectedDecals.Clear();
+			}
+		}
+
+		public override void RenderWorldSpace() {
+			base.RenderWorldSpace();
+			foreach(var item in SelectedDecals)
+				Draw.Rect(item.Bounds, Color.Blue * 0.25f);
 		}
 	}
 
