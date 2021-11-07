@@ -340,6 +340,7 @@ namespace LevelEditorMod.Editor {
 		string curLeftSelection = null, curRightSelection = null;
 		Dictionary<string, UIButton> placementButtons = new Dictionary<string, UIButton>();
 		Entity preview = null;
+		Vector2? lastPress = null;
 
 		private static readonly Color LeftPlacementBtnBg = Calc.HexToColor("274292");
 		private static readonly Color RightPlacementBtnBg = Calc.HexToColor("922727");
@@ -365,23 +366,38 @@ namespace LevelEditorMod.Editor {
 		}
 
 		public override void Update(bool canClick) {
-			string selection = MInput.Mouse.PressedLeftButton ? curLeftSelection : curRightSelection;
-			if((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
-				Entity toAdd = Entity.Create(selection, Editor.SelectedRoom);
-				toAdd.SetPosition((Editor.Mouse.World / 8).Round() * 8);
-				toAdd.ApplyDefaults(); // do it again for nodes, since we change position after
+			Editor editor = Editor.GetCurrent();
+			Rectangle area;
+			if(lastPress != null) {
+				int ax = (int)Math.Min(Editor.Mouse.World.X, lastPress.Value.X);
+				int ay = (int)Math.Min(Editor.Mouse.World.Y, lastPress.Value.Y);
+				int bx = (int)Math.Max(Editor.Mouse.World.X, lastPress.Value.X);
+				int by = (int)Math.Max(Editor.Mouse.World.Y, lastPress.Value.Y);
+				area = new Rectangle(ax, ay, bx - ax, by - ay);
+			} else
+				area = Rectangle.Empty;
+
+			string selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
+			if((MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
+				Entity toAdd = BuildEntity(selection);
+				UpdateEntity(toAdd, area);
 				Editor.SelectedRoom.AllEntities.Add(toAdd);
 				if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
 				else Editor.SelectedRoom.Entities.Add(toAdd);
 			}
 
-			if((preview == null && curLeftSelection != null) || (preview != null && curLeftSelection != null && !preview.Name.Equals(curLeftSelection))) {
-				preview = Entity.Create(curLeftSelection, Editor.SelectedRoom);
-			} else if(curLeftSelection == null)
+			if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)
+				lastPress = Editor.Mouse.World;
+			else if(!MInput.Mouse.CheckLeftButton && !MInput.Mouse.CheckRightButton)
+				lastPress = null;
+
+			if((preview == null && selection != null) || (preview != null && selection != null && !preview.Name.Equals(selection))) {
+				preview = BuildEntity(selection);
+			} else if(selection == null)
 				preview = null;
-			preview?.SetPosition((Editor.Mouse.World / 8).Round() * 8);
-			// this is Stupid
-			preview?.ApplyDefaults();
+			if(preview != null) {
+				UpdateEntity(preview, area);
+			}
 
 			foreach(var item in placementButtons) {
 				var button = item.Value;
@@ -396,6 +412,25 @@ namespace LevelEditorMod.Editor {
 					button.HoveredBG = UIButton.DefaultHoveredBG;
 					button.PressedBG = UIButton.DefaultPressedBG;
 				}
+			}
+		}
+
+		private Entity BuildEntity(string entity) {
+			return Entity.Create(entity, Editor.SelectedRoom);
+		}
+
+		private void UpdateEntity(Entity e, Rectangle area) {
+			if(lastPress != null && e.Width > 0 && e.Height > 0)
+				e.SetPosition(new Vector2((area.Left / 8) * 8, (area.Top / 8) * 8));
+			else
+				e.SetPosition((Editor.Mouse.World / 8).Round() * 8);
+			// this is Stupid
+			e.ApplyDefaults();
+			if(MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+				if(e.Width > 0)
+					e.SetWidth(Math.Max((int)Math.Ceiling(area.Width / 8f) * 8, e.Width));
+				if(e.Height > 0)
+					e.SetHeight(Math.Max((int)Math.Ceiling(area.Height / 8f) * 8, e.Height));
 			}
 		}
 

@@ -63,32 +63,32 @@ namespace LevelEditorMod.Editor {
 
         public PluginInfo Plugin { get; private set; }
 
-        internal Entity SetPosition(Vector2 position) {
+        public Entity SetPosition(Vector2 position) {
             Position = position;
             updateSelection = true;
             return this;
         }
 
-        internal void Move(Vector2 amount) {
+        public void Move(Vector2 amount) {
             Position += amount;
             updateSelection = true;
         }
 
-        internal void SetNode(int i, Vector2 position) {
+        public void SetNode(int i, Vector2 position) {
             if (i >= 0 && i < Nodes.Length) {
                 Nodes[i] = position;
                 updateSelection = true;
             }
         }
 
-        internal void MoveNode(int i, Vector2 amount) {
+        public void MoveNode(int i, Vector2 amount) {
             if (i >= 0 && i < Nodes.Length) {
                 Nodes[i] += amount;
                 updateSelection = true;
             }
         }
 
-        internal void AddNode(Vector2 position) {
+        public void AddNode(Vector2 position) {
             nodes.Add(position);
             nodesChanged = true;
         }
@@ -98,12 +98,12 @@ namespace LevelEditorMod.Editor {
             nodesChanged = true;
         }
 
-        internal void SetWidth(int width) {
+        public void SetWidth(int width) {
             Width = width;
             updateSelection = true;
         }
 
-        internal void SetHeight(int heigth) {
+        public void SetHeight(int heigth) {
             Height = heigth;
             updateSelection = true;
         }
