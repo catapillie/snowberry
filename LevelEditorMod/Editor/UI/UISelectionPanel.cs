@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace LevelEditorMod.Editor.UI {
-    public class UISelectionPanel : UIElement {
+    public class UISelectionPanel : UIScrollPane {
         public class UIOption : UIElement {
             private readonly UIElement input;
 
@@ -39,7 +39,8 @@ namespace LevelEditorMod.Editor.UI {
                 int spacing = Fonts.Regular.LineHeight + 2;
 
                 Add(label = new UILabel(entity.Name) {
-                    FG = Color.DarkKhaki
+                    FG = Color.DarkKhaki,
+                    Underline = true
                 });
                 label.Position = Vector2.UnitX * (width / 2 - label.Width / 2);
 
@@ -117,14 +118,12 @@ namespace LevelEditorMod.Editor.UI {
                     Position = new Vector2(0, y)
                 };
             }
-
-            public override void Render(Vector2 position = default) {
-                base.Render(position);
-                Draw.Rect(position + label.Position + Vector2.UnitY * label.Height, label.Width, 1, label.FG);
-            }
         }
 
-        public Color BG = Calc.HexToColor("09090a");
+        public UISelectionPanel() {
+            GrabsClick = true;
+            TopPadding = 10;
+        }
 
         public void Display(List<EntitySelection> selection) {
             if (selection != null) {
@@ -143,28 +142,6 @@ namespace LevelEditorMod.Editor.UI {
                 Position = offset
             });
             return entry;
-        }
-
-        public override void Render(Vector2 position = default) {
-            Draw.SpriteBatch.End();
-
-            Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
-
-            Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = rect;
-
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-            Draw.Rect(rect, BG);
-
-            base.Render(position);
-
-            Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
         }
     }
 }

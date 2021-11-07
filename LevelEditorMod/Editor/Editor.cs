@@ -91,10 +91,11 @@ namespace LevelEditorMod.Editor {
         private static readonly Color bg = Calc.HexToColor("060607");
 
         private Camera camera;
-        private Vector2 mousePos, lastMousePos;
-        private Vector2 worldClick;
 
-        private Map map;
+        public Vector2 mousePos, lastMousePos;
+        public Vector2 worldClick;
+
+        public Map Map { get; private set; }
 
         private readonly UIElement ui = new UIElement();
         private RenderTarget2D uiBuffer;
@@ -102,8 +103,9 @@ namespace LevelEditorMod.Editor {
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
         internal static List<EntitySelection> SelectedEntities;
-        private UISelectionPanel selectionPanel;
-        private bool canSelect;
+
+        public UIToolbar Toolbar;
+        public UIElement ToolPanel;
 
         private static bool generatePlaytestMapData = false;
         private static Session playtestSession;
@@ -112,7 +114,7 @@ namespace LevelEditorMod.Editor {
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
 
-            this.map = map;
+            Map = map;
         }
 
         internal static void Open(MapData data) {
@@ -131,7 +133,11 @@ namespace LevelEditorMod.Editor {
             camera = new Camera();
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
 
-            var nameLabel = new UILabel($"Map: {map.From.SID} ({map.From.Mode})");
+            Toolbar = new UIToolbar(this);
+            ui.Add(Toolbar);
+            Toolbar.Width = uiBuffer.Width;
+
+            var nameLabel = new UILabel($"Map: {Map.From.SID} ({Map.From.Mode})");
             ui.AddBelow(nameLabel);
             nameLabel.Position += new Vector2(10, 0);
 
@@ -144,7 +150,7 @@ namespace LevelEditorMod.Editor {
                     Audio.SetMusic(null);
                     Audio.SetAmbience(null);
 
-                    LevelEnter.Go(new Session(map.From), true);
+                    LevelEnter.Go(new Session(Map.From), true);
 				}
 			};
 			ui.AddBelow(rtm);
@@ -155,20 +161,15 @@ namespace LevelEditorMod.Editor {
                     Audio.SetAmbience(null);
 
                     generatePlaytestMapData = true;
-                    playtestMapData = new MapData(map.From);
-                    playtestSession = new Session(map.From);
+                    playtestMapData = new MapData(Map.From);
+                    playtestSession = new Session(Map.From);
                     LevelEnter.Go(playtestSession, true);
                     generatePlaytestMapData = false;
                 },
             };
             ui.AddBelow(test);
 
-            int w = 160;
-            ui.Add(selectionPanel = new UISelectionPanel() {
-                Position = Vector2.UnitX * (uiBuffer.Width - w),
-                Width = w,
-                Height = uiBuffer.Height,
-            });
+            SwitchTool(0);
         }
 
         public override void End() {
@@ -186,14 +187,17 @@ namespace LevelEditorMod.Editor {
 
             lastMousePos = mousePos;
             mousePos = MInput.Mouse.Position;
-            
+
             // zooming
+            bool canZoom = ui.CanScrollThrough();
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
             float scale = camera.Zoom;
-            if (wheel > 0)
-                scale = scale >= 1 ? scale + 1 : scale * 2f;
-            else if (wheel < 0)
-                scale = scale > 1 ? scale - 1 : scale / 2f;
+            if(canZoom) {
+                if(wheel > 0)
+                    scale = scale >= 1 ? scale + 1 : scale * 2f;
+                else if(wheel < 0)
+                    scale = scale > 1 ? scale - 1 : scale / 2f;
+            }
             scale = Calc.Clamp(scale, 0.0625f, 24f);
             if (scale != camera.Zoom)
                 camera.Zoom = scale;
@@ -201,13 +205,16 @@ namespace LevelEditorMod.Editor {
             if (camera.Buffer != null)
                 mousePos /= camera.Zoom;
 
+			// controls
+			bool canClick = ui.CanClickThrough();
+
             // panning
-            if (MInput.Mouse.CheckRightButton) {
+            if(MInput.Mouse.CheckMiddleButton && canClick) {
                 Vector2 move = lastMousePos - mousePos;
-                if (move != Vector2.Zero)
+                if(move != Vector2.Zero)
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
             }
-
+            
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
@@ -215,51 +222,44 @@ namespace LevelEditorMod.Editor {
 
             ui.Update();
 
-            // control
-            bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
-            if (MInput.Mouse.CheckLeftButton && shift) {
-                if (MInput.Mouse.PressedLeftButton) {
+            // room select
+            if(MInput.Mouse.CheckLeftButton && canClick) {
+                if(MInput.Mouse.PressedLeftButton) {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
-
+                    
                     worldClick = Mouse.World;
-                    SelectedRoom = map.GetRoomAt(mouse);
-
-                    canSelect = true;
-                    if (SelectedEntities != null) {
-                        foreach (EntitySelection s in SelectedEntities) {
-                            if (s.Contains(mouse)) {
-                                canSelect = false;
-                                break;
-                            }
-                        }
-                    }
+                    SelectedRoom = Map.GetRoomAt(mouse);
                 }
-
-                if (canSelect && SelectedRoom != null) {
-                    int ax = (int)Math.Min(Mouse.World.X, worldClick.X);
-                    int ay = (int)Math.Min(Mouse.World.Y, worldClick.Y);
-                    int bx = (int)Math.Max(Mouse.World.X, worldClick.X);
-                    int by = (int)Math.Max(Mouse.World.Y, worldClick.Y);
-                    Selection = new Rectangle(ax, ay, bx - ax, by - ay);
-
-                    SelectedEntities = SelectedRoom.GetSelectedEntities(Selection.Value);
-                } else if (SelectedEntities != null) {
-                    Vector2 worldSnapped = (Mouse.World / 8).Floor() * 8;
-                    Vector2 worldLastSnapped = (Mouse.WorldLast / 8).Floor() * 8;
-                    Vector2 move = worldSnapped - worldLastSnapped;
-                    foreach (EntitySelection s in SelectedEntities)
-                        s.Move(move);
-                }
-            } else
-                Selection = null;
-
-            if (MInput.Mouse.ReleasedLeftButton && shift) {
-                if (canSelect)
-                    selectionPanel.Display(SelectedEntities);
             }
+
+			// tool updating
+			var tool = Tool.Tools[Toolbar.CurrentTool];
+            tool.Update(canClick);
+        }
+
+        public void SwitchTool(int toolIdx) {
+            ToolPanel?.Destroy();
+            ui.Remove(ToolPanel);
+
+            Toolbar.CurrentTool = toolIdx;
+            var tool = Tool.Tools[toolIdx];
+            ToolPanel = tool.CreatePanel();
+            ToolPanel.Position = new Vector2(uiBuffer.Width - ToolPanel.Width, Toolbar.Height);
+            ToolPanel.Height = uiBuffer.Height - Toolbar.Height;
+            ui.Add(ToolPanel);
+
+            SelectedEntities = null;
+        }
+
+        public static Editor GetCurrent() {
+            if(Engine.Scene is Editor editor)
+                return editor;
+            return null;
         }
 
         public override void Render() {
+            var tool = Tool.Tools[Toolbar.CurrentTool];
+
             #region UI Rendering
 
             Engine.Instance.GraphicsDevice.SetRenderTarget(uiBuffer);
@@ -272,15 +272,26 @@ namespace LevelEditorMod.Editor {
 
             #endregion
 
-			#region Map Rendering
+            #region Tool Rendering
 
-			if(camera.Buffer != null)
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+            tool.RenderScreenSpace();
+            Draw.SpriteBatch.End();
+
+            #endregion
+
+            #region Map Rendering
+
+            if(camera.Buffer != null)
                 Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
             else
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Engine.Instance.GraphicsDevice.Clear(bg);
-            map.Render(camera);
+            Map.Render(camera);
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+            tool.RenderWorldSpace();
+            Draw.SpriteBatch.End();
 
             #endregion
 
@@ -306,7 +317,7 @@ namespace LevelEditorMod.Editor {
             else {
                 //CreatePlaytestMapData(self);
                 if(Engine.Scene is Editor editor) {
-                    editor.map.GenerateMapData(self);
+                    editor.Map.GenerateMapData(self);
                 } else orig_Load(self);
             }
 		}

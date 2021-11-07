@@ -39,6 +39,8 @@ namespace LevelEditorMod.Editor.UI {
             Height = font.LineHeight;
 
             TextInput.OnInput += OnInput;
+
+            GrabsClick = true;
         }
 
         private void OnInput(char c) {

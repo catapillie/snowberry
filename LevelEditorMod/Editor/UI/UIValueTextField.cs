@@ -25,6 +25,8 @@ namespace LevelEditorMod.Editor.UI {
                 TypeCode.Single => floatChars,
                 _ => null
             };
+
+            GrabsClick = true;
         }
 
         protected override void Initialize() {
