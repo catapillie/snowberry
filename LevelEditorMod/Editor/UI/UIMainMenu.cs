@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Celeste;
 using System;
+using System.Linq;
 
 namespace LevelEditorMod.Editor.UI {
     public class UIMainMenu : UIElement {
@@ -23,6 +24,8 @@ namespace LevelEditorMod.Editor.UI {
                 private readonly UILevelSelector selector;
 
                 private readonly string raw;
+                public readonly string Name;
+
                 private readonly int w;
                 public readonly int W;
 
@@ -35,6 +38,8 @@ namespace LevelEditorMod.Editor.UI {
                     this.n = n;
 
                     raw = Dialog.Has(area.Name) ? $"» {area.Name}" : "...";
+                    Name = area.Name;
+
                     w = (int)Fonts.Regular.Measure(raw).X;
                     W = Width + w + 5;
                 }
@@ -63,35 +68,27 @@ namespace LevelEditorMod.Editor.UI {
             private float anim;
             private int lvlCount;
 
-            public override void Update(Vector2 position = default) {
-                base.Update(position);
-                anim = Calc.Approach(anim, lvlCount, Engine.DeltaTime * 60f);
-            }
+            private UISearchBar<UILevelRibbon> searchBar;
+            private UILevelRibbon[] levels;
 
             public void Reload() {
                 Clear();
 
                 anim = 0f;
 
-                // search bar
-                //Add(new UILabel("\u22C4 all maps :") {
-                //    Position = Vector2.UnitY * 8,
-                //    Underline = true,
-                //});
-
-                UIScrollPane levels = new UIScrollPane() {
+                UIScrollPane levelScrollPane = new UIScrollPane() {
                     Height = Parent.Height - 30,
                     Position = new Vector2(-16, 22),
                     BG = Color.Transparent,
                 };
 
+                levels = new UILevelRibbon[lvlCount = AreaData.Areas.Count];
                 int y = 0;
                 Width = 0;
-                lvlCount = AreaData.Areas.Count;
                 for (int i = 0; i < lvlCount; i++) {
                     AreaData area = AreaData.Areas[i];
                     UILevelRibbon lvl;
-                    levels.Add(lvl = new UILevelRibbon(this, area, i) {
+                    levelScrollPane.Add(lvl = new UILevelRibbon(this, area, i) {
                         Position = new Vector2(-8, y),
                         FG = area.TitleTextColor,
                         BG = area.TitleBaseColor,
@@ -101,9 +98,38 @@ namespace LevelEditorMod.Editor.UI {
                     if (lvl.W > Width)
                         Width = lvl.W;
                     y += 15;
+
+                    levels[i] = lvl;
                 }
-                levels.Width = Width;
-                Add(levels);
+                Add(levelScrollPane);
+                levelScrollPane.Width = Width;
+
+                static bool lvlMatcher(UILevelRibbon entry, string term)
+                    => entry.Text.ToLower().Contains(term.ToLower());
+
+                static bool lvlMatcherByMod(UILevelRibbon entry, string term)
+                    => entry.Name.ToLower().Contains(term.ToLower());
+
+                Add(searchBar = new UISearchBar<UILevelRibbon>(Width / 2, lvlMatcher) {
+                    Position = Vector2.UnitY * 8,
+                    Entries = levels,
+                });
+                searchBar.AddSpecialMatcher('@', lvlMatcherByMod);
+            }
+
+            public override void Update(Vector2 position = default) {
+                base.Update(position);
+                anim = Calc.Approach(anim, lvlCount, Engine.DeltaTime * 60f);
+                if (levels != null && searchBar != null) {
+                    int y = 0;
+                    foreach (UILevelRibbon level in levels) {
+                        level.Visible = searchBar.Found == null || searchBar.Found.Contains(level);
+                        if (level.Visible) {
+                            level.Position.Y = y;
+                            y += 15;
+                        }
+                    }
+                }
             }
         }
 

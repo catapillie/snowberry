@@ -4,7 +4,7 @@ using Monocle;
 namespace LevelEditorMod.Editor.UI {
     public class UIRibbon : UIElement {
         private readonly Font font;
-        private readonly string text;
+        public readonly string Text;
 
         public Color FG = Util.Colors.White;
         public Color BG = Calc.HexToColor("f25c54");
@@ -18,7 +18,7 @@ namespace LevelEditorMod.Editor.UI {
             : this(text, Fonts.Regular, leftSpace, rightSpace, leftEdge, rightEdge) { }
 
         public UIRibbon(string text, Font font, int leftSpace = 8, int rightSpace = 8, bool leftEdge = false, bool rightEdge = true) {
-            this.text = text;
+            this.Text = text;
             this.font = font;
             this.leftSpace = leftSpace;
             this.leftEdge = leftEdge; this.rightEdge = rightEdge;
@@ -43,7 +43,7 @@ namespace LevelEditorMod.Editor.UI {
                     Fonts.Regular.Draw("\uE0B0", new Vector2(position.X + length + offset + Accent, position.Y), Vector2.One, BGAccent);
                 Fonts.Regular.Draw("\uE0B0", new Vector2(position.X + length + offset, position.Y), Vector2.One, BG);
             }
-            font.Draw(text, new Vector2(position.X + offset + leftSpace, position.Y), Vector2.One, FG);
+            font.Draw(Text, new Vector2(position.X + offset + leftSpace, position.Y), Vector2.One, FG);
         }
     }
 }
