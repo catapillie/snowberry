@@ -452,10 +452,11 @@ namespace LevelEditorMod.Editor {
 			Editor editor = Editor.GetCurrent();
 			Rectangle area;
 			if(lastPress != null) {
-				int ax = (int)Math.Min(Editor.Mouse.World.X, lastPress.Value.X);
-				int ay = (int)Math.Min(Editor.Mouse.World.Y, lastPress.Value.Y);
-				int bx = (int)Math.Max(Editor.Mouse.World.X, lastPress.Value.X);
-				int by = (int)Math.Max(Editor.Mouse.World.Y, lastPress.Value.Y);
+				var mpos = (Editor.Mouse.World / 8).Round() * 8;
+				int ax = (int)Math.Min(mpos.X, lastPress.Value.X);
+				int ay = (int)Math.Min(mpos.Y, lastPress.Value.Y);
+				int bx = (int)Math.Max(mpos.X, lastPress.Value.X);
+				int by = (int)Math.Max(mpos.Y, lastPress.Value.Y);
 				area = new Rectangle(ax, ay, bx - ax, by - ay);
 			} else
 				area = Rectangle.Empty;
