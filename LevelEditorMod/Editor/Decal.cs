@@ -14,7 +14,7 @@ namespace LevelEditorMod.Editor {
 
         public string Texture { get; private set; }
 
-        public Rectangle Bounds => new Rectangle((int)(Position.X - Math.Abs(texture.Width * Scale.X) / 2), (int)(Position.Y - Math.Abs(texture.Height * Scale.Y) / 2), (int)Math.Abs(texture.Width * Scale.X), (int)Math.Abs(texture.Height * Scale.Y));
+        public Rectangle Bounds => new Rectangle((int)(Position.X - Math.Abs(texture.Width * Scale.X) / 2 + Room.X * 8), (int)(Position.Y - Math.Abs(texture.Height * Scale.Y) / 2 + Room.Y * 8), (int)Math.Abs(texture.Width * Scale.X), (int)Math.Abs(texture.Height * Scale.Y));
 
         internal Decal(Room room, string texture) {
             this.Room = room;
