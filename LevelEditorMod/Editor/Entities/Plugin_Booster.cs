@@ -1,4 +1,5 @@
 ﻿using Celeste;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("booster")]
@@ -10,6 +11,11 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
 
             GFX.Game[$"objects/booster/{(Red ? "boosterRed" : "booster")}00"].DrawOutlineCentered(Position);
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Booster (Green)", "booster", new Dictionary<string, object>() { { "red", false } });
+            Placements.Create("Booster (Red)", "booster", new Dictionary<string, object>() { { "red", true } });
         }
     }
 }

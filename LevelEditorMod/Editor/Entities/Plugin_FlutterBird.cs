@@ -17,5 +17,9 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
             GFX.Game["scenery/flutterbird/idle00"].DrawJustified(Position, new Vector2(0.5f, 1.0f), Calc.Random.Choose(colors));
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Flutterbird", "flutterbird");
+        }
     }
 }

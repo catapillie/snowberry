@@ -36,6 +36,11 @@ namespace LevelEditorMod.Editor {
         public Vector2 Origin { get; private set; }
         public Rectangle Bounds => new Rectangle(X, Y, Width, Height);
 
+        public virtual int MinWidth => -1;
+        public virtual int MinHeight => -1;
+        public virtual int MinNodes => 0;
+        public virtual int MaxNodes => 0;
+
         private bool nodesChanged;
         private readonly List<Vector2> nodes = new List<Vector2>();
         private Vector2[] nodeArray;

@@ -9,6 +9,9 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("index")] public int Index = 0;
         [Option("tempo")] public float Tempo = 1.0f;
 
+        public override int MinWidth => 16;
+        public override int MinHeight => 16;
+
         private static readonly Color[] colors = new Color[4] {
             Calc.HexToColor("49aaf0"),
             Calc.HexToColor("f049be"),
@@ -30,12 +33,6 @@ namespace LevelEditorMod.Editor.Entities {
                 }
             }
         }
-
-		public override void ApplyDefaults() {
-			base.ChangeDefault();
-            SetWidth(16);
-            SetHeight(16);
-		}
 
         public static void AddPlacements() {
             Placements.Create("Cassette Block (Blue)", "cassetteBlock", new Dictionary<string, object>() { { "index", 0 } });

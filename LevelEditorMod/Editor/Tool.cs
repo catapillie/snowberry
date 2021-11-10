@@ -424,6 +424,7 @@ namespace LevelEditorMod.Editor {
 		Dictionary<Placements.Placement, UIButton> placementButtons = new Dictionary<Placements.Placement, UIButton>();
 		Entity preview = null;
 		Vector2? lastPress = null;
+		Placements.Placement lastPlacement = null;
 
 		private static readonly Color LeftPlacementBtnBg = Calc.HexToColor("274292");
 		private static readonly Color RightPlacementBtnBg = Calc.HexToColor("922727");
@@ -433,13 +434,11 @@ namespace LevelEditorMod.Editor {
 			placementButtons.Clear();
 			var ret = new UIScrollPane();
 			ret.Width = 180;
+			ret.TopPadding = 10;
 			foreach(var item in Placements.All) {
 				UIButton b;
 				ret.AddBelow(b = new UIButton(item.Name, Fonts.Regular, 4, 4) {
-					OnPress = () => {
-						curLeftSelection = curLeftSelection != item ? item : null;
-						RefreshPreview(true);
-					},
+					OnPress = () => curLeftSelection = curLeftSelection != item ? item : null,
 					OnRightPress = () => curRightSelection = curRightSelection != item ? item : null
 				});
 				placementButtons[item] = b;
@@ -452,7 +451,6 @@ namespace LevelEditorMod.Editor {
 		}
 
 		public override void Update(bool canClick) {
-			Editor editor = Editor.GetCurrent();
 			Rectangle area;
 			if(lastPress != null) {
 				var mpos = (Editor.Mouse.World / 8).Round() * 8;
@@ -473,10 +471,10 @@ namespace LevelEditorMod.Editor {
 				else Editor.SelectedRoom.Entities.Add(toAdd);
 			}
 
-			RefreshPreview(false);
-			if(preview != null) {
+			RefreshPreview(lastPlacement != selection);
+			lastPlacement = selection;
+			if(preview != null)
 				UpdateEntity(preview, area);
-			}
 
 			if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)
 				lastPress = Editor.Mouse.World;
@@ -501,32 +499,34 @@ namespace LevelEditorMod.Editor {
 
 		private void RefreshPreview(bool changedPlacement) {
 			Placements.Placement selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
-			if((preview == null && selection != null) || changedPlacement) {
+			if((preview == null || changedPlacement) && selection != null) {
 				preview = selection.Build(Editor.SelectedRoom);
 			} else if(selection == null)
 				preview = null;
 		}
 
 		private void UpdateEntity(Entity e, Rectangle area) {
-			// need to apply its defaults, to update its size, to set its position, to apply its (node and size) defaults, and update size again
-			// this is Stupid
-			e.ApplyDefaults();
 			UpdateSize(e, area);
 			var mpos = (Editor.Mouse.World / 8).Round() * 8;
 			if(lastPress != null)
 				e.SetPosition(new Vector2(e.Width > 0 ? (area.Left / 8) * 8 : mpos.X, e.Height > 0 ? (area.Top / 8) * 8 : mpos.Y));
 			else
 				e.SetPosition(mpos);
+			e.ResetNodes();
+			while(e.Nodes.Length < e.MinNodes)
+				e.AddNode((e.Nodes.Length > 0 ? e.Nodes.Last() : e.Position) + Vector2.UnitX * 20);
 			e.ApplyDefaults();
-			UpdateSize(e, area);
 		}
 
 		private void UpdateSize(Entity e, Rectangle area) {
 			if(MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
-				if(e.Width > 0)
-					e.SetWidth(Math.Max((int)Math.Ceiling(area.Width / 8f) * 8, e.Width));
-				if(e.Height > 0)
-					e.SetHeight(Math.Max((int)Math.Ceiling(area.Height / 8f) * 8, e.Height));
+				if(e.MinWidth > -1)
+					e.SetWidth(Math.Max((int)Math.Ceiling(area.Width / 8f) * 8, e.MinWidth));
+				if(e.MinHeight > -1)
+					e.SetHeight(Math.Max((int)Math.Ceiling(area.Height / 8f) * 8, e.MinHeight));
+			} else {
+				e.SetWidth(e.MinWidth != -1 ? e.MinWidth : 0);
+				e.SetHeight(e.MinWidth != -1 ? e.MinWidth : 0);
 			}
 		}
 
