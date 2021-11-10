@@ -48,7 +48,7 @@ namespace LevelEditorMod.Editor.UI {
                     base.Update(position);
                     int mouseX = (int)Editor.Mouse.Screen.X;
                     int mouseY = (int)Editor.Mouse.Screen.Y;
-                    bool hover = new Rectangle((int)position.X + 16, (int)position.Y - 2, Width + w, Height + 4).Contains(mouseX, mouseY);
+                    bool hover = Visible && new Rectangle((int)position.X + 16, (int)position.Y - 2, Width + w, Height + 4).Contains(mouseX, mouseY);
                     lerp = Calc.Approach(lerp, hover.Bit(), Engine.DeltaTime * 5f);
                     listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
                 }
@@ -80,6 +80,7 @@ namespace LevelEditorMod.Editor.UI {
                     Height = Parent.Height - 30,
                     Position = new Vector2(-16, 22),
                     BG = Color.Transparent,
+                    ShowScrollBar = false,
                 };
 
                 levels = new UILevelRibbon[lvlCount = AreaData.Areas.Count];
@@ -113,23 +114,28 @@ namespace LevelEditorMod.Editor.UI {
                 Add(searchBar = new UISearchBar<UILevelRibbon>(Width / 2, lvlMatcher) {
                     Position = Vector2.UnitY * 8,
                     Entries = levels,
+                    OnInputChange = input => {
+                        if (levels != null && searchBar != null) {
+                            int y = 0;
+                            foreach (UILevelRibbon level in levels) {
+                                level.Visible = searchBar.Found == null || searchBar.Found.Contains(level);
+                                if (level.Visible) {
+                                    level.Position.Y = y;
+                                    y += 15;
+                                } else {
+                                    level.Position.Y = 0;
+                                }
+                            }
+                        }
+                    },
+                    InfoText = "search map or @mod..."
                 });
-                searchBar.AddSpecialMatcher('@', lvlMatcherByMod);
+                searchBar.AddSpecialMatcher('@', lvlMatcherByMod, Calc.HexToColor("1b6dcc"));
             }
 
             public override void Update(Vector2 position = default) {
                 base.Update(position);
                 anim = Calc.Approach(anim, lvlCount, Engine.DeltaTime * 60f);
-                if (levels != null && searchBar != null) {
-                    int y = 0;
-                    foreach (UILevelRibbon level in levels) {
-                        level.Visible = searchBar.Found == null || searchBar.Found.Contains(level);
-                        if (level.Visible) {
-                            level.Position.Y = y;
-                            y += 15;
-                        }
-                    }
-                }
             }
         }
 

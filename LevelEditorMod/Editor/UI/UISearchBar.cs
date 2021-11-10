@@ -1,37 +1,66 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace LevelEditorMod.Editor.UI {
     public class UISearchBar<T> : UITextField {
         public T[] Entries;
         public T[] Found { get; private set; }
+        private Color[] highlighting;
+
+        public string InfoText = "...";
 
         public delegate bool TermMatcher(T entry, string term);
         private readonly TermMatcher termMatcher;
-        private readonly Dictionary<char, TermMatcher> specialChars = new Dictionary<char, TermMatcher>();
+        private readonly Dictionary<char, Tuple<TermMatcher, Color, Regex>> specialChars = new();
 
         public UISearchBar(int width, TermMatcher termMatcher)
             : base(Fonts.Regular, width) {
             Line = Color.Transparent;
             this.termMatcher = termMatcher;
         }
+        
+        protected override void DrawText(Vector2 position) {
+            if (highlighting != null && Value.Length > 0)
+                Font.Draw(Value, position, Vector2.One, Vector2.Zero, highlighting);
+            else
+                Font.Draw(InfoText, position, Vector2.One, Util.Colors.White * 0.65f);
+        }
 
-        public void AddSpecialMatcher(char mode, TermMatcher specialMatcher) {
-            specialChars.Add(mode, specialMatcher);
+        public void AddSpecialMatcher(char mode, TermMatcher specialMatcher, Color displayColor) {
+            specialChars.Add(mode, Tuple.Create(specialMatcher, displayColor, new Regex($"\\{mode}[^\\s,]+")));
         }
 
         protected override void OnInputUpdate(string input) {
-            base.OnInputUpdate(input);
-
-            if (Entries == null || input.Length == 0) {
+            if (input.Length > 0) {
+                // highlighting
+                highlighting = new Color[input.Length];
+                for (int i = 0; i < highlighting.Length; i++)
+                    highlighting[i] = input[i] == ',' || input[i] == ';' ? Color.DarkGray : FG;
+                foreach (var pair in specialChars) {
+                    foreach (Match match in pair.Value.Item3.Matches(input)) {
+                        if (match.Success)
+                            for (int i = match.Index; i < match.Index + match.Length; i++)
+                                highlighting[i] = pair.Value.Item2;
+                    }
+                }
+            } else {
                 Found = null;
+                highlighting = null;
+                base.OnInputUpdate(input);
                 return;
             }
 
+            if (Entries == null) {
+                Found = null;
+                base.OnInputUpdate(input);
+                return;
+            }
+            
             // search pattern
             List<List<Tuple<char?, string>>> search = new();
-            foreach (string termList in input.Split(',')) {
+            foreach (string termList in input.Split(',', ';')) {
                 if (termList.Length != 0) {
                     List<Tuple<char?, string>> l = new();
 
@@ -61,7 +90,7 @@ namespace LevelEditorMod.Editor.UI {
                     foreach (var term in terms) {
                         bool check = term.Item1 == null ?
                             termMatcher(entry, term.Item2) :
-                            specialChars[term.Item1.Value](entry, term.Item2);
+                            specialChars[term.Item1.Value].Item1(entry, term.Item2);
                         if (!check) {
                             m = false;
                             break;
@@ -78,6 +107,8 @@ namespace LevelEditorMod.Editor.UI {
                     found.Add(entry); // the search matched this entry
             }
             Found = found.ToArray();
+
+            base.OnInputUpdate(input);
         }
     }
 }
