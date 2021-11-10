@@ -110,6 +110,7 @@
     <Compile Include="Editor\Entities\Plugin_Strawberry.cs" />
     <Compile Include="Editor\Editor.cs" />
     <Compile Include="Editor\Map.cs" />
+    <Compile Include="Editor\Placements.cs" />
     <Compile Include="Editor\Room.cs" />
     <Compile Include="Editor\EntitySelection.cs" />
     <Compile Include="Editor\Tool.cs" />

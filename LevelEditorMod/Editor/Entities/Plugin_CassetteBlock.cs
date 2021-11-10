@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("cassetteBlock")]
@@ -35,5 +36,12 @@ namespace LevelEditorMod.Editor.Entities {
             SetWidth(16);
             SetHeight(16);
 		}
-	}
+
+        public static void AddPlacements() {
+            Placements.Create("Cassette Block (Blue)", "cassetteBlock", new Dictionary<string, object>() { { "index", 0 } });
+            Placements.Create("Cassette Block (Pink)", "cassetteBlock", new Dictionary<string, object>() { { "index", 1 } });
+            Placements.Create("Cassette Block (Yellow)", "cassetteBlock", new Dictionary<string, object>() { { "index", 2 } });
+            Placements.Create("Cassette Block (Green)", "cassetteBlock", new Dictionary<string, object>() { { "index", 3 } });
+        }
+    }
 }

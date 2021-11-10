@@ -420,8 +420,8 @@ namespace LevelEditorMod.Editor {
 
 	public class PlacementTool : Tool {
 
-		string curLeftSelection = null, curRightSelection = null;
-		Dictionary<string, UIButton> placementButtons = new Dictionary<string, UIButton>();
+		Placements.Placement curLeftSelection = null, curRightSelection = null;
+		Dictionary<Placements.Placement, UIButton> placementButtons = new Dictionary<Placements.Placement, UIButton>();
 		Entity preview = null;
 		Vector2? lastPress = null;
 
@@ -433,13 +433,16 @@ namespace LevelEditorMod.Editor {
 			placementButtons.Clear();
 			var ret = new UIScrollPane();
 			ret.Width = 180;
-			foreach(var item in PluginInfo.All) {
+			foreach(var item in Placements.All) {
 				UIButton b;
-				ret.AddBelow(b = new UIButton(item.Key, Fonts.Regular, 4, 4) {
-					OnPress = () => curLeftSelection = curLeftSelection != item.Key ? item.Key : null,
-					OnRightPress = () => curRightSelection = curRightSelection != item.Key ? item.Key : null
+				ret.AddBelow(b = new UIButton(item.Name, Fonts.Regular, 4, 4) {
+					OnPress = () => {
+						curLeftSelection = curLeftSelection != item ? item : null;
+						RefreshPreview(true);
+					},
+					OnRightPress = () => curRightSelection = curRightSelection != item ? item : null
 				});
-				placementButtons[item.Key] = b;
+				placementButtons[item] = b;
 			}
 			return ret;
 		}
@@ -461,19 +464,16 @@ namespace LevelEditorMod.Editor {
 			} else
 				area = Rectangle.Empty;
 
-			string selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
+			Placements.Placement selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
 			if((MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
-				Entity toAdd = BuildEntity(selection);
+				Entity toAdd = selection.Build(Editor.SelectedRoom);
 				UpdateEntity(toAdd, area);
 				Editor.SelectedRoom.AllEntities.Add(toAdd);
 				if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
 				else Editor.SelectedRoom.Entities.Add(toAdd);
 			}
 
-			if((preview == null && selection != null) || (preview != null && selection != null && !preview.Name.Equals(selection))) {
-				preview = BuildEntity(selection);
-			} else if(selection == null)
-				preview = null;
+			RefreshPreview(false);
 			if(preview != null) {
 				UpdateEntity(preview, area);
 			}
@@ -499,8 +499,12 @@ namespace LevelEditorMod.Editor {
 			}
 		}
 
-		private Entity BuildEntity(string entity) {
-			return Entity.Create(entity, Editor.SelectedRoom);
+		private void RefreshPreview(bool changedPlacement) {
+			Placements.Placement selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
+			if((preview == null && selection != null) || changedPlacement) {
+				preview = selection.Build(Editor.SelectedRoom);
+			} else if(selection == null)
+				preview = null;
 		}
 
 		private void UpdateEntity(Entity e, Rectangle area) {

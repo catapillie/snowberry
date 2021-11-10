@@ -66,5 +66,11 @@ namespace LevelEditorMod.Editor.Entities {
             SetWidth(16);
             SetHeight(16);
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Clutter Blocks (Towels)", "redBlocks");
+            Placements.Create("Clutter Blocks (Books)", "greenBlocks");
+            Placements.Create("Clutter Blocks (Boxes)", "yellowBlocks");
+        }
     }
 }

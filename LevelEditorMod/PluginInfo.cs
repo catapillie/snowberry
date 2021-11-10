@@ -48,6 +48,7 @@ namespace LevelEditorMod {
             => (Entity)ctor.Invoke(new object[] { });
 
         public static void GenerateFromAssembly(Assembly assembly) {
+            Placements.All.Clear();
             foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Entity).IsAssignableFrom(t))) {
                 foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>(inherit: false)) {
                     if (pl.Name == null || pl.Name == string.Empty) {
@@ -61,9 +62,20 @@ namespace LevelEditorMod {
                         continue;
                     }
 
-                    All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor));
+					All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor));
 
                     Module.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' entity plugin");
+                }
+
+                MethodInfo addPlacements = t.GetMethod("AddPlacements");
+                if(addPlacements != null) {
+                    if(addPlacements.GetParameters().Length == 0) {
+                        addPlacements.Invoke(null, new object[0]);
+                    } else {
+                        Module.Log(LogLevel.Warn, $"Found entity plugin with invalid AddPlacements (has parameters)! skipping... (Type: {t})");
+                    }
+                } else {
+                    Module.Log(LogLevel.Info, $"Found entity plugin without placements. (Type: {t})");
                 }
             }
         }
