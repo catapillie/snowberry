@@ -7,13 +7,15 @@ using System.Linq;
 namespace LevelEditorMod.Editor.UI {
     public class UIMainMenu : UIElement {
         private class UIMainButtons : UIElement {
+            public Color Color = Util.Colors.White;
+
             public override void Render(Vector2 position = default) {
                 UIMainMenu parent = (UIMainMenu)Parent;
                 int right = (int)position.X + Width + 16;
                 float ease = Ease.CubeInOut(parent.stateLerp[2]);
 
                 Draw.Rect(0, 0, right, parent.Height, Util.Colors.DarkGray);
-                Draw.Rect(right, 8 + parent.Height / 2 * (1 - ease), 1, ease * (parent.Height - 16), Color.LimeGreen * ease);
+                Draw.Rect(right, 8 + parent.Height / 2 * (1 - ease), 1, ease * (parent.Height - 16), Color * ease);
 
                 base.Render(position);
             }
@@ -32,10 +34,13 @@ namespace LevelEditorMod.Editor.UI {
                 private float lerp, listLerp = 1f;
                 private readonly int n;
 
+                private readonly ModeProperties[] modes;
+
                 public UILevelRibbon(UILevelSelector selector, AreaData area, int n)
                     : base($" • {Dialog.Clean(area.Name)}", 24) {
                     this.selector = selector;
                     this.n = n;
+                    modes = area.Mode;
 
                     raw = Dialog.Has(area.Name) ? $"» {area.Name}" : "...";
                     Name = area.Name;
@@ -51,6 +56,14 @@ namespace LevelEditorMod.Editor.UI {
                     bool hover = Visible && new Rectangle((int)position.X + 16, (int)position.Y - 2, Width + w, Height + 4).Contains(mouseX, mouseY);
                     lerp = Calc.Approach(lerp, hover.Bit(), Engine.DeltaTime * 5f);
                     listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
+
+                    if (hover && MInput.Mouse.PressedLeftButton) {
+                        selector.mainButtons.Color = BG;
+                        Console.WriteLine("-----");
+                        for (int i = 0; i < modes.Length; i++) {
+                            Console.WriteLine(((AreaMode)i).ToString() + " : " + modes[i]?.MapData.Filename ?? "-");
+                        }
+                    }
                 }
 
                 public override void Render(Vector2 position = default) {
@@ -70,6 +83,12 @@ namespace LevelEditorMod.Editor.UI {
 
             private UISearchBar<UILevelRibbon> searchBar;
             private UILevelRibbon[] levels;
+
+            private readonly UIMainButtons mainButtons;
+
+            public UILevelSelector(UIMainButtons uIMainButtons) {
+                mainButtons = uIMainButtons;
+            }
 
             public void Reload() {
                 Clear();
@@ -111,6 +130,9 @@ namespace LevelEditorMod.Editor.UI {
                 static bool lvlMatcherByMod(UILevelRibbon entry, string term)
                     => entry.Name.ToLower().Contains(term.ToLower());
 
+                string infonone = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_NONE");
+                string infoone = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_ONE");
+                string infomore = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_MORE");
                 Add(searchBar = new UISearchBar<UILevelRibbon>(Width / 2, lvlMatcher) {
                     Position = Vector2.UnitY * 8,
                     Entries = levels,
@@ -128,7 +150,14 @@ namespace LevelEditorMod.Editor.UI {
                             }
                         }
                     },
-                    InfoText = "search map or @mod..."
+                    InfoText = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOADSEARCH"),
+                    SearchInfo = count => {
+                        return count switch {
+                            0 => $"{infonone}",
+                            1 => $"{infoone}",
+                            _ => $"{count} {infomore}",
+                        };
+                    }
                 });
                 searchBar.AddSpecialMatcher('@', lvlMatcherByMod, Calc.HexToColor("1b6dcc"));
             }
@@ -156,12 +185,11 @@ namespace LevelEditorMod.Editor.UI {
             Width = width;
             Height = height;
 
-            Add(levelSelector = new UILevelSelector());
+            UIMainButtons buttons = new UIMainButtons();
+            Add(levelSelector = new UILevelSelector(buttons));
 
-            //UILabel title = new UILabel("Level Editor") {
-            //    Underline = true,
-            //    FG = Util.Colors.White,
-            //};
+            string mainmenucancel = Dialog.Clean("LEVELEDITORMOD_MAINMENU_CANCEL");
+
             UIButton create = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_CREATE"), Fonts.Regular, 16, 24) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Cyan,
@@ -169,10 +197,18 @@ namespace LevelEditorMod.Editor.UI {
                 PressedFG = Util.Colors.Cyan,
                 HoveredBG = Util.Colors.DarkCyan,
             };
-            UIButton load = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD"), Fonts.Regular, 5, 4) {
+            string mainmenuload = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD");
+            UIButton load = null;
+            load = new UIButton(mainmenuload, Fonts.Regular, 5, 4) {
                 OnPress = () => {
-                    state = States.Load;
-                    levelSelector.Reload();
+                    if (state == States.Load) {
+                        state = States.Start;
+                        load.SetText(mainmenuload, stayCentered: true);
+                    } else {
+                        state = States.Load;
+                        levelSelector.Reload();
+                        load.SetText(mainmenucancel, stayCentered: true);
+                    }
                 },
             };
             UIButton exit = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_EXIT"), Fonts.Regular, 10, 4) {
@@ -188,7 +224,7 @@ namespace LevelEditorMod.Editor.UI {
             load.Position = new Vector2(-load.Width / 2, create.Position.Y + create.Height + 4);
             exit.Position = new Vector2(-exit.Width / 2, load.Position.Y + load.Height + 4);
 
-            Add(buttons = new UIMainButtons());
+            Add(this.buttons = buttons);
             RegroupIn(buttons, create, load, exit);
             buttons.Position = new Vector2(width - buttons.Width, height - buttons.Height) / 2;
 
@@ -234,6 +270,7 @@ namespace LevelEditorMod.Editor.UI {
             float loadEase = Ease.CubeInOut(stateLerp[2]);
             buttons.Position.X = (int)Math.Round((Width - buttons.Width) / 2 - Width / 3 * loadEase);
             levelSelector.Position.X = (int)Math.Round(buttons.Position.X + buttons.Width + 24 - levelSelector.Width * (1 - loadEase));
+            levelSelector.Visible = stateLerp[2] != 0f; 
         }
 
         public override void Render(Vector2 position = default) {

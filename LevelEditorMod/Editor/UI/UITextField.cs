@@ -13,6 +13,7 @@ namespace LevelEditorMod.Editor.UI {
 
         public Action<string> OnInputChange;
         public string Value { get; private set; }
+        public int ValueWidth => widthAtIndex[widthAtIndex.Length - 1];
         private int[] widthAtIndex;
         public readonly Font Font;
 

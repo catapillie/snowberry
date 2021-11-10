@@ -68,12 +68,16 @@ namespace LevelEditorMod.Editor.UI {
             Height = (int)Math.Max(height + space.Y * 2, Math.Max(8, minSize.Y));
         }
 
-        public void SetText(string text, Font font = null) {
+        public void SetText(string text, Font font = null, bool stayCentered = false) {
+            Vector2 mid = Position + new Vector2(Width, Height) / 2f;
             icon = null;
             this.text = text;
             this.font = font ?? this.font;
             Vector2 size = this.font.Measure(this.text);
             SetSize((int)size.X + 6, (int)size.Y + 3);
+
+            if (stayCentered)
+                Position = Calc.Round(mid - new Vector2(Width, Height) / 2f);
         }
 
         public void SetIcon(MTexture icon) {

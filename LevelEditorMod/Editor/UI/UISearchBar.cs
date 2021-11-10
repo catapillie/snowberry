@@ -10,6 +10,8 @@ namespace LevelEditorMod.Editor.UI {
         private Color[] highlighting;
 
         public string InfoText = "...";
+        private string searchInfo;
+        public Func<int, string> SearchInfo;
 
         public delegate bool TermMatcher(T entry, string term);
         private readonly TermMatcher termMatcher;
@@ -22,9 +24,11 @@ namespace LevelEditorMod.Editor.UI {
         }
         
         protected override void DrawText(Vector2 position) {
-            if (highlighting != null && Value.Length > 0)
+            if (highlighting != null && Value.Length > 0) {
                 Font.Draw(Value, position, Vector2.One, Vector2.Zero, highlighting);
-            else
+                if (searchInfo != null)
+                    Font.Draw(searchInfo, position + Vector2.UnitX * (ValueWidth + 10), Vector2.One, Util.Colors.White * 0.5f);
+            } else
                 Font.Draw(InfoText, position, Vector2.One, Util.Colors.White * 0.65f);
         }
 
@@ -107,6 +111,7 @@ namespace LevelEditorMod.Editor.UI {
                     found.Add(entry); // the search matched this entry
             }
             Found = found.ToArray();
+            searchInfo = SearchInfo?.Invoke(Found.Length);
 
             base.OnInputUpdate(input);
         }
