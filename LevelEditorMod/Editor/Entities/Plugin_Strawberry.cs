@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("strawberry")]
@@ -9,7 +10,9 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("order")] public int Order = -1;
         [Option("checkpointID")] public int CheckpointID = -1;
 
-        public override void Render() {
+		public override int MaxNodes => -1;
+
+		public override void Render() {
             base.Render();
 
             bool seeded = Nodes.Length != 0;
@@ -25,6 +28,12 @@ namespace LevelEditorMod.Editor.Entities {
             if (seeded)
                 foreach (Vector2 node in Nodes)
                     GFX.Game["collectables/strawberry/seed00"].DrawCentered(node);
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Strawberry", "strawberry");
+            Placements.Create("Strawberry (Winged)", "strawberry", new Dictionary<string, object>() { { "winged", true } });
+            Placements.Create("Moon Berry", "strawberry", new Dictionary<string, object>() { { "moon", true } });
         }
     }
 }

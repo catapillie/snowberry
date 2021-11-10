@@ -5,7 +5,10 @@ using Monocle;
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("seeker")]
     public class Plugin_Seeker : Entity {
-        public override void Render() {
+
+		public override int MaxNodes => -1;
+
+		public override void Render() {
             base.Render();
 
             MTexture seeker = GFX.Game["characters/monsters/predator73"];
@@ -18,6 +21,10 @@ namespace LevelEditorMod.Editor.Entities {
                 prev = node;
             }
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Seeker", "seeker");
+        }
     }
 
     [Plugin("playerSeeker")]
@@ -25,6 +32,10 @@ namespace LevelEditorMod.Editor.Entities {
         public override void Render() {
             base.Render();
             GFX.Game["decals/5-temple/statue_e"].DrawCentered(Position);
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Player Seeker", "playerSeeker");
         }
     }
 }

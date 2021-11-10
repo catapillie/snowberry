@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("jumpThru")]
@@ -8,7 +9,9 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("texture")] public string Texture = "default";
         [Option("surfaceIndex")] public int SurfaceIndex = -1;
 
-        public override void Render() {
+		public override int MinWidth => 8;
+
+		public override void Render() {
             base.Render();
 
             string name = Texture == "default" ? "wood" : Texture;
@@ -30,10 +33,12 @@ namespace LevelEditorMod.Editor.Entities {
             }
         }
 
-        public override void ApplyDefaults() {
-            base.ChangeDefault();
-            SetWidth(16);
-            SetHeight(8);
+        public static void AddPlacements() {
+            string[] types = new string[] { "Wood", "Cliffside", "Core", "Dream", "Moon", "Reflection", "Temple" };
+            foreach(var type in types)
+                Placements.Create($"Jump-thru ({type})", "jumpThru", new Dictionary<string, object>() { { "texture", type.ToLower() } });
+            // they all follow a nice pattern except this one
+            Placements.Create($"Jump-thru (Temple B)", "jumpThru", new Dictionary<string, object>() { { "texture", "templeB" } });
         }
     }
 }

@@ -36,9 +36,13 @@ namespace LevelEditorMod.Editor {
         public Vector2 Origin { get; private set; }
         public Rectangle Bounds => new Rectangle(X, Y, Width, Height);
 
+        // -1 = not resizable in that direction
         public virtual int MinWidth => -1;
         public virtual int MinHeight => -1;
+
         public virtual int MinNodes => 0;
+
+        // -1 = unlimited nodes
         public virtual int MaxNodes => 0;
 
         private bool nodesChanged;

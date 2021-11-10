@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 using static Celeste.ZipMover;
 
 namespace LevelEditorMod.Editor.Entities {
@@ -10,7 +11,12 @@ namespace LevelEditorMod.Editor.Entities {
 
         [Option("theme")] public Themes Theme = Themes.Normal;
 
-        public override void Render() {
+		public override int MinWidth => 16;
+		public override int MinHeight => 16;
+		public override int MinNodes => 1;
+		public override int MaxNodes => 1;
+
+		public override void Render() {
             base.Render();
 
             MTexture block, light, cog;
@@ -64,12 +70,9 @@ namespace LevelEditorMod.Editor.Entities {
             light.DrawJustified(Position + Vector2.UnitX * Width / 2f, new Vector2(0.5f, 0.0f));
         }
 
-        public override void ApplyDefaults() {
-            base.ChangeDefault();
-            SetWidth(16);
-            SetHeight(16);
-            ResetNodes();
-            AddNode(Position + new Vector2(24, 0));
+        public static void AddPlacements() {
+            Placements.Create("Zip Mover (Normal)", "zipMover");
+            Placements.Create("Zip Mover (Moon)", "zipMover", new Dictionary<string, object>() { { "theme", "Moon" } });
         }
     }
 }

@@ -6,7 +6,10 @@ namespace LevelEditorMod.Editor.Entities {
     public class Plugin_Cobweb : Entity {
         [Option("color")] public Color Color = Calc.HexToColor("696A6A");
 
-        public override void Render() {
+		public override int MinNodes => 1;
+		public override int MaxNodes => 1;
+
+		public override void Render() {
             base.Render();
 
             Vector2 mid = new SimpleCurve(Position, Nodes[0], (Position + Nodes[0]) / 2f + Vector2.UnitY * 4).GetPoint(0.5f);
@@ -16,10 +19,8 @@ namespace LevelEditorMod.Editor.Entities {
                 new SimpleCurve(mid, node, (mid + node) / 2f + Vector2.UnitY * 4).Render(Color, 20);
         }
 
-        public override void ApplyDefaults() {
-            base.ChangeDefault();
-            ResetNodes();
-            AddNode(Position + new Vector2(16, 0));
+        public static void AddPlacements() {
+            Placements.Create("Cobweb", "cobweb");
         }
     }
 }

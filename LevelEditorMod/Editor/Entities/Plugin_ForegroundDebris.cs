@@ -26,5 +26,9 @@ namespace LevelEditorMod.Editor.Entities {
             foreach (MTexture t in debris)
                 t.DrawCentered(Position);
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Foreground Debris", "foregroundDebris");
+        }
     }
 }

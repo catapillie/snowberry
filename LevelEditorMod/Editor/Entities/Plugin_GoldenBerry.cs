@@ -9,7 +9,9 @@ namespace LevelEditorMod.Editor.Entities {
 
         private bool noDash;
 
-        public override void Initialize() {
+		public override int MaxNodes => -1;
+
+		public override void Initialize() {
             base.Initialize();
             noDash = Name == "memorialTextController";
         }
@@ -25,6 +27,11 @@ namespace LevelEditorMod.Editor.Entities {
             if (seeded)
                 foreach (Vector2 node in Nodes)
                     GFX.Game["collectables/strawberry/seed00"].DrawCentered(node);
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Golden Berry", "goldenBerry");
+            Placements.Create("Dashless Golden Berry", "memorialTextController");
         }
     }
 }

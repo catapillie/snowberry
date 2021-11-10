@@ -10,7 +10,10 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("speed")] public float Speed = 1.0f;
         [Option("notCoreMode")] public bool NotCoreMode = false;
 
-        public override void Render() {
+		public override int MinNodes => 1;
+		public override int MaxNodes => -1;
+
+		public override void Render() {
             base.Render();
 
             Vector2 start = Position;
@@ -29,10 +32,8 @@ namespace LevelEditorMod.Editor.Entities {
             }
         }
 
-        public override void ApplyDefaults() {
-            base.ChangeDefault();
-            ResetNodes();
-            AddNode(Position + new Vector2(16, 0));
+        public static void AddPlacements() {
+            Placements.Create("Fireball", "fireBall");
         }
     }
 }

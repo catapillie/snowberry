@@ -28,5 +28,9 @@ namespace LevelEditorMod.Editor.Entities {
                 }
             }
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Temple Mirror", "templeMirror");
+        }
     }
 }

@@ -8,5 +8,9 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
             GFX.Game["scenery/payphone"].DrawJustified(Position, new Vector2(0.5f, 1.0f));
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Payphone", "payphone");
+        }
     }
 }

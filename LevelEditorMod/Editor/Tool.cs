@@ -365,7 +365,7 @@ namespace LevelEditorMod.Editor {
 			base.RenderWorldSpace();
 			TileGrid tile = LeftFg ? FgTilesets[CurLeftTileset].Tile : BgTilesets[CurLeftTileset].Tile;
 			var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8) * 8, (float)Math.Floor(Editor.Mouse.World.Y / 8) * 8);
-			RenderTileGrid(tilePos, tile);
+			RenderTileGrid(tilePos, tile, Color.White * 0.5f);
 		}
 
 		private static void RenderTileGrid(Vector2 position, TileGrid tile) {
@@ -516,6 +516,7 @@ namespace LevelEditorMod.Editor {
 			while(e.Nodes.Length < e.MinNodes)
 				e.AddNode((e.Nodes.Length > 0 ? e.Nodes.Last() : e.Position) + Vector2.UnitX * 20);
 			e.ApplyDefaults();
+			e.Initialize();
 		}
 
 		private void UpdateSize(Entity e, Rectangle area) {

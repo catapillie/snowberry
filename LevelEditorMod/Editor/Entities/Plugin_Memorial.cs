@@ -21,5 +21,10 @@ namespace LevelEditorMod.Editor.Entities {
                 y += 5;
             }
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Memorial", "memorial");
+            Placements.Create("Memorial (Everest)", "memorial");
+        }
     }
 }

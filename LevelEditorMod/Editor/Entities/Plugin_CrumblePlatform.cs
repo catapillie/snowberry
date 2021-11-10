@@ -7,7 +7,9 @@ namespace LevelEditorMod.Editor.Entities {
     [Plugin("crumbleBlock")]
     public class Plugin_CrumblePlatform : Entity {
 
-        public override void Render() {
+		public override int MinWidth => 8;
+
+		public override void Render() {
             base.Render();
 
 			// TODO: custom textures
@@ -20,9 +22,8 @@ namespace LevelEditorMod.Editor.Entities {
 			}
 		}
 
-		public override void ApplyDefaults() {
-			base.ChangeDefault();
-			SetWidth(16);
+		public static void AddPlacements() {
+			Placements.Create("Crumble Blocks", "crumbleBlock");
 		}
 	}
 }

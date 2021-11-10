@@ -15,5 +15,9 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
             debris.DrawCentered(Position);
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Floating Debris", "floatingDebris");
+        }
     }
 }

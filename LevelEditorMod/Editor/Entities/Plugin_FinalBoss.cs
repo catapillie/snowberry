@@ -11,7 +11,9 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("cameraLockY")] public bool CameraLockY = true;
         [Option("canChangeMusic")] public bool CanChangeMusic = true;
 
-        public override void Render() {
+		public override int MaxNodes => -1;
+
+		public override void Render() {
             base.Render();
 
             MTexture baddy = GFX.Game["characters/badelineBoss/charge00"];
@@ -23,6 +25,10 @@ namespace LevelEditorMod.Editor.Entities {
                 DrawUtil.DottedLine(prev, node, Color.Red * 0.5f, 8, 4);
                 prev = node;
             }
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Badeline Boss", "finalBoss");
         }
     }
 }
