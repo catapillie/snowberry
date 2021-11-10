@@ -389,6 +389,8 @@ namespace LevelEditorMod.Editor {
 		private Room lastSelected = null;
 		public static bool ScheduledRefresh = false;
 
+		private Vector2? lastRoomOffset = null;
+
 		public override UIElement CreatePanel() {
 			// room selection panel containing room metadata
 			var ret = new UIRoomSelectionPanel() {
@@ -403,10 +405,7 @@ namespace LevelEditorMod.Editor {
 		}
 
 		public override void Update(bool canClick) {
-			// move, resize, add rooms
-			if(canClick) {
-
-			}
+			
 
 			// refresh the display
 			if(lastSelected != Editor.SelectedRoom || ScheduledRefresh) {
@@ -414,6 +413,31 @@ namespace LevelEditorMod.Editor {
 				lastSelected = Editor.SelectedRoom;
 				if(Editor.GetCurrent().ToolPanel is UIRoomSelectionPanel selectionPanel)
 					selectionPanel.Refresh();
+				if(Editor.SelectedRoom != null)
+					lastRoomOffset = Editor.SelectedRoom.Position - (Editor.Mouse.World / 8);
+			}
+
+			// move, resize, add rooms
+			if(canClick && Editor.SelectedRoom != null) {
+				if(MInput.Mouse.PressedLeftButton)
+					lastRoomOffset = Editor.SelectedRoom.Position - (Editor.Mouse.World / 8);
+				else if(MInput.Mouse.CheckLeftButton) {
+					Vector2 world = Editor.Mouse.World / 8;
+					var offset = lastRoomOffset ?? Vector2.Zero;
+					var newX = (int)(world + offset).X;
+					var newY = (int)(world + offset).Y;
+					var diff = new Vector2(newX - Editor.SelectedRoom.Bounds.X, newY - Editor.SelectedRoom.Bounds.Y);
+					Editor.SelectedRoom.Bounds.X = (int)(world + offset).X;
+					Editor.SelectedRoom.Bounds.Y = (int)(world + offset).Y;
+					foreach(var e in Editor.SelectedRoom.AllEntities) {
+						e.Move(diff * 8);
+						for(int i = 0; i < e.Nodes.Length; i++) {
+							e.MoveNode(i, diff * 8);
+						}
+					}
+				} else {
+					lastRoomOffset = null;
+				}
 			}
 		}
 	}
