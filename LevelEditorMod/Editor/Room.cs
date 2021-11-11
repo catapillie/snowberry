@@ -45,8 +45,8 @@ namespace LevelEditorMod.Editor {
         public WindController.Patterns WindPattern;
 
         // Tiles
-        private readonly VirtualMap<char> fgTileMap;
-        private readonly VirtualMap<char> bgTileMap;
+        private VirtualMap<char> fgTileMap;
+        private VirtualMap<char> bgTileMap;
         private VirtualMap<MTexture> fgTiles, bgTiles;
 
         public readonly List<Decal> FgDecals = new List<Decal>();
@@ -272,6 +272,22 @@ namespace LevelEditorMod.Editor {
                 }
             } else
                 Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.5f);
+        }
+
+        public void UpdateBounds() {
+            var newFgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
+			for(int x = 0; x < fgTileMap.Columns; x++)
+				for(int y = 0; y < fgTileMap.Rows; y++)
+                    newFgTiles[x, y] = fgTileMap[x, y];
+            fgTileMap = newFgTiles;
+
+            var newBgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
+            for(int x = 0; x < bgTileMap.Columns; x++)
+                for(int y = 0; y < bgTileMap.Rows; y++)
+                    newBgTiles[x, y] = bgTileMap[x, y];
+            bgTileMap = newBgTiles;
+
+            Autotile();
         }
 
         public Element CreateLevelData() {
