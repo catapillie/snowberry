@@ -121,7 +121,7 @@ namespace LevelEditorMod.Editor.UI {
             };
 
 
-            AddBelow(new UILabel("music options :"), new Vector2(12, 6));
+            AddBelow(new UILabel("music options :"), new Vector2(12, 12));
 
             AddBelow(new UIOption("music", new UITextField(Fonts.Regular, 90, room.Music) {
                 OnInputChange = text => room.Music = text
@@ -171,6 +171,17 @@ namespace LevelEditorMod.Editor.UI {
             AddBelow(new UIOption("wind pattern", new UITextField(Fonts.Regular, 60, room.WindPattern.ToString()) {
                 OnInputChange = text => room.WindPattern = Enum.TryParse(text, out WindController.Patterns pattern) ? pattern : room.WindPattern
             }), new Vector2(4, 3));
+
+            AddBelow(new UIButton("delete", Fonts.Regular, 4, 4) {
+                FG = Color.Red,
+                HoveredFG = Color.Crimson,
+                PressedFG = Color.DarkRed,
+                OnPress = () => {
+                    Editor.GetCurrent().Map.Rooms.Remove(room);
+                    Editor.SelectedRoom = null;
+                    RoomTool.ScheduledRefresh = true;
+                }
+            }, new Vector2(4, 12));
         }
 
 		public override void Update(Vector2 position = default) {
