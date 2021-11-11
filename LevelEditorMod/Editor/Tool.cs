@@ -390,7 +390,7 @@ namespace LevelEditorMod.Editor {
 		public static bool ScheduledRefresh = false;
 
 		private Vector2? lastRoomOffset = null;
-		private static int resizingX, resizingY;
+		private static bool resizingX, resizingY;
 		private static int newWidth, newHeight;
 		private static Rectangle oldRoomBounds;
 		private static bool justSwitched = false;
@@ -427,11 +427,11 @@ namespace LevelEditorMod.Editor {
 				if(MInput.Mouse.PressedLeftButton) {
 					lastRoomOffset = Editor.SelectedRoom.Position - (Editor.Mouse.World / 8);
 					// check if the mouse is 8 pixels from the room's borders
-					resizingX = resizingY = 0;
+					resizingX = resizingY = false;
 					if(Math.Abs(Editor.Mouse.World.X / 8f - (Editor.SelectedRoom.Position.X + Editor.SelectedRoom.Width)) < 1)
-						resizingX = 1;
+						resizingX = true;
 					if(Math.Abs(Editor.Mouse.World.Y / 8f - (Editor.SelectedRoom.Position.Y + Editor.SelectedRoom.Height)) < 1)
-						resizingY = 1;
+						resizingY = true;
 					oldRoomBounds = Editor.SelectedRoom.Bounds;
 				} else if(MInput.Mouse.CheckLeftButton) {
 					Vector2 world = Editor.Mouse.World / 8;
@@ -439,7 +439,7 @@ namespace LevelEditorMod.Editor {
 					var newX = (int)(world + offset).X;
 					var newY = (int)(world + offset).Y;
 					var diff = new Vector2(newX - Editor.SelectedRoom.Bounds.X, newY - Editor.SelectedRoom.Bounds.Y);
-					if(resizingX == 0 && resizingY == 0) {
+					if(!resizingX && !resizingY) {
 						Editor.SelectedRoom.Bounds.X = (int)(world + offset).X;
 						Editor.SelectedRoom.Bounds.Y = (int)(world + offset).Y;
 						foreach(var e in Editor.SelectedRoom.AllEntities) {
@@ -449,26 +449,22 @@ namespace LevelEditorMod.Editor {
 							}
 						}
 					} else {
-						if(resizingX > 0)
+						if(resizingX) {
 							newWidth = (int)Math.Ceiling(world.X - Editor.SelectedRoom.Bounds.X);
-						if(resizingY > 0)
-							newHeight = (int)Math.Ceiling(world.Y - Editor.SelectedRoom.Bounds.Y);
-						if(resizingX != 0)
 							Editor.SelectedRoom.Bounds.Width = Math.Max(newWidth, 1);
-						if(resizingY != 0)
+						}
+						if(resizingY) {
+							newHeight = (int)Math.Ceiling(world.Y - Editor.SelectedRoom.Bounds.Y);
 							Editor.SelectedRoom.Bounds.Height = Math.Max(newHeight, 1);
+						}
 					}
 				} else {
 					lastRoomOffset = null;
-					if(resizingX != 0)
-						Editor.SelectedRoom.Bounds.Width = Math.Max(newWidth, 1);
-					if(resizingY != 0)
-						Editor.SelectedRoom.Bounds.Height = Math.Max(newHeight, 1);
 					if(!oldRoomBounds.Equals(Editor.SelectedRoom.Bounds)) {
 						oldRoomBounds = Editor.SelectedRoom.Bounds;
 						Editor.SelectedRoom.UpdateBounds();
 					}
-					resizingX = resizingY = 0;
+					resizingX = resizingY = false;
 					newWidth = newHeight = 0;
 				}
 			}
