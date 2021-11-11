@@ -92,8 +92,8 @@ namespace LevelEditorMod.Editor {
 
         public void MoveNode(int i, Vector2 amount) {
             if (i >= 0 && i < Nodes.Length) {
-                Nodes[i] += amount;
-                updateSelection = true;
+                nodes[i] += amount;
+                updateSelection = nodesChanged = true;
             }
         }
 
