@@ -325,7 +325,7 @@ namespace LevelEditorMod.Editor {
 			int tileset = MInput.Mouse.CheckLeftButton ? CurLeftTileset : CurRightTileset;
 			if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick)
 				if(Editor.SelectedRoom != null)
-					if(Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8))
+					if(Editor.SelectedRoom.Bounds.Contains((int)Math.Floor(Editor.Mouse.World.X / 8), (int)Math.Floor(Editor.Mouse.World.Y / 8)))
 						if(fg)
 							Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[tileset].Key);
 						else
