@@ -40,6 +40,7 @@ namespace LevelEditorMod.Editor.Triggers {
             Placements.Create("Stop Boost Trigger", "stopBoostTrigger");
             Placements.Create("Wind Attack Trigger", "windAttackTrigger");
             Placements.Create("Bird Path Trigger", "birdPathTrigger");
+            Placements.Create("Change Respawn Trigger", "changeRespawnTrigger");
             Placements.Create("Complete Area Trigger (Everest)", "everest/completeAreaTrigger");
         }
     }

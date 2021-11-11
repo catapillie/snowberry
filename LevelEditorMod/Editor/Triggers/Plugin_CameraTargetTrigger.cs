@@ -8,5 +8,12 @@ namespace LevelEditorMod.Editor.Triggers {
         [Option("positionMode")] public Trigger.PositionModes PositionMode = Trigger.PositionModes.NoEffect;
         [Option("xOnly")] public bool XOnly = false;
         [Option("yOnly")] public bool YOnly = false;
+
+		public override int MinNodes => 1;
+		public override int MaxNodes => 1;
+
+		public static new void AddPlacements() {
+            Placements.Create("Camera Target Trigger", "cameraTargetTrigger");
+        }
     }
 }
