@@ -395,6 +395,8 @@ namespace LevelEditorMod.Editor {
 		private static Rectangle oldRoomBounds;
 		private static bool justSwitched = false;
 
+		public static Rectangle? PendingRoom = null;
+
 		public override UIElement CreatePanel() {
 			// room selection panel containing room metadata
 			var ret = new UIRoomSelectionPanel() {
@@ -472,6 +474,42 @@ namespace LevelEditorMod.Editor {
 			if(MInput.Mouse.ReleasedLeftButton) {
 				justSwitched = false;
 			}
+
+			// room creation
+			if(canClick) {
+				if(Editor.SelectedRoom == null) {
+					if(MInput.Mouse.CheckLeftButton) {
+						var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling() * 8;
+						var mpos = (Editor.Mouse.World / 8).Ceiling() * 8;
+						int ax = (int)Math.Min(mpos.X, lastPress.X);
+						int ay = (int)Math.Min(mpos.Y, lastPress.Y);
+						int bx = (int)Math.Max(mpos.X, lastPress.X);
+						int by = (int)Math.Max(mpos.Y, lastPress.Y);
+						var newRoom = new Rectangle(ax, ay, bx - ax, by - ay);
+						if(newRoom.Width > 0 || newRoom.Height > 0) {
+							newRoom.Width = Math.Max(newRoom.Width, 8);
+							newRoom.Height = Math.Max(newRoom.Height, 8);
+							if(!PendingRoom.HasValue)
+								ScheduledRefresh = true;
+							PendingRoom = newRoom;
+						} else {
+							ScheduledRefresh = true;
+							PendingRoom = null;
+						}
+					}
+				} else {
+					if(PendingRoom.HasValue) {
+						PendingRoom = null;
+						ScheduledRefresh = true;
+					}
+				}
+			}
+		}
+
+		public override void RenderWorldSpace() {
+			base.RenderWorldSpace();
+			if(PendingRoom.HasValue)
+				Draw.Rect(PendingRoom.Value, Color.Lerp(Color.White, Color.Cyan, (float)Math.Abs(Math.Sin(Engine.Scene.TimeActive * 3))) * 0.6f);
 		}
 	}
 

@@ -26,12 +26,59 @@ namespace LevelEditorMod.Editor.UI {
             UIElement label;
 
             if(Editor.SelectedRoom == null) {
-				Add(label = new UILabel("No room is selected") {
-                    FG = Color.DarkKhaki,
-                    Underline = true
-                });
-                label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
-                return;
+                if(!RoomTool.PendingRoom.HasValue) {
+                    Add(label = new UILabel("No room is selected") {
+                        FG = Color.DarkKhaki,
+                        Underline = true
+                    });
+                    label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
+                    return;
+                } else {
+                    Add(label = new UILabel("Create room") {
+                        FG = Color.DarkKhaki,
+                        Underline = true
+                    });
+                    label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
+
+                    string newName = "";
+                    UILabel newNameInvalid, newNameTaken;
+                    UIButton newRoom;
+
+                    AddBelow(new UIOption("name", new UITextField(Fonts.Regular, 90, newName) {
+                        OnInputChange = text => newName = text
+                    }), new Vector2(4, 3));
+
+                    AddBelow(newRoom = new UIButton("create room", Fonts.Regular, 2, 2) {
+                        Position = new Vector2(4, 4),
+                    });
+                    Add(newNameInvalid = new UILabel("invalid name") {
+                        Position = new Vector2(newRoom.Position.X + newRoom.Width + 5, newRoom.Position.Y + 3),
+                        FG = Color.Transparent
+                    });
+                    Add(newNameTaken = new UILabel("name already used") {
+                        Position = new Vector2(newRoom.Position.X + newRoom.Width + 5, newRoom.Position.Y + 3),
+                        FG = Color.Transparent
+                    });
+                    newRoom.OnPress = () => {
+                        newNameInvalid.FG = newNameTaken.FG = Color.Transparent;
+                        // validate room name
+                        if(newName.Length <= 0 || Regex.Match(newName, "[0-9a-zA-Z\\-_ ]+").Length != newName.Length)
+                            newNameInvalid.FG = Color.Red;
+                        else if(Editor.GetCurrent().Map.Rooms.Exists(it => it.Name.Equals(newName)))
+                            newNameTaken.FG = Color.Red;
+                        else {
+                            // add room
+                            var b = RoomTool.PendingRoom.Value;
+                            var newRoom = new Room(newName, new Rectangle(b.X / 8, b.Y / 8, b.Width / 8, b.Height / 8)/*RoomTool.PendingRoom.Value*/);
+                            Editor.GetCurrent().Map.Rooms.Add(newRoom);
+                            Editor.SelectedRoom = newRoom;
+                            RoomTool.PendingRoom = null;
+                            RoomTool.ScheduledRefresh = true;
+                        }
+                    };
+
+                    return;
+                }
             }
 
 			int spacing = Fonts.Regular.LineHeight + 2;

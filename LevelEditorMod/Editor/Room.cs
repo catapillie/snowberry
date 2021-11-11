@@ -27,10 +27,10 @@ namespace LevelEditorMod.Editor {
         public Vector2 Size => new Vector2(Width, Height);
 
         // Music data
-        public string Music;
-        public string AltMusic;
-        public string Ambience;
-        public bool[] MusicLayers;
+        public string Music = "";
+        public string AltMusic = "";
+        public string Ambience = "";
+        public bool[] MusicLayers = new bool[4];
 
         public int MusicProgress;
         public int AmbienceProgress;
@@ -42,7 +42,7 @@ namespace LevelEditorMod.Editor {
         public bool Dark;
         public bool Underwater;
         public bool Space;
-        public WindController.Patterns WindPattern;
+        public WindController.Patterns WindPattern = WindController.Patterns.None;
 
         // Tiles
         private VirtualMap<char> fgTileMap;
@@ -74,6 +74,7 @@ namespace LevelEditorMod.Editor {
             Bounds = bounds;
             fgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
             bgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
+            Autotile();
         }
 
         internal Room(LevelData data, Map map)
