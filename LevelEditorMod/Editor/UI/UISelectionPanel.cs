@@ -67,7 +67,7 @@ namespace LevelEditorMod.Editor.UI {
                         Add(ColorOption(option.Key, (Color)value, entity, option.Value, l));
                         l += 90;
                     } else if (option.Value.FieldType == typeof(string)) {
-                        Add(StringOption(option.Key, value.ToString(), entity, option.Value, l));
+                        Add(StringOption(option.Key, value?.ToString() ?? "", entity, option.Value, l));
                         l += spacing;
                     } else if (option.Value.FieldType == typeof(int)) {
                         Add(LiteralValueOption<int>(option.Key, value.ToString(), entity, option.Value, l));
