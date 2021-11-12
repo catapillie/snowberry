@@ -29,44 +29,115 @@ namespace LevelEditorMod.Editor.UI {
                 public readonly string Name;
 
                 private readonly int w;
-                public readonly int W;
+                public int W { get; private set; }
 
                 private float lerp, listLerp = 1f;
                 private readonly int n;
 
-                private readonly ModeProperties[] modes;
+                private bool hover;
 
-                public UILevelRibbon(UILevelSelector selector, AreaData area, int n)
-                    : base($" • {Dialog.Clean(area.Name)}", 24) {
+                private readonly bool dropdown;
+                private bool open;
+                private float openLerp;
+                private readonly int h;
+                public int H { get; private set; }
+
+                private readonly ModeProperties mode;
+
+                private UILevelRibbon(UILevelSelector selector, ModeProperties mode, int n)
+                    : base("", 39) {
                     this.selector = selector;
                     this.n = n;
-                    modes = area.Mode;
 
-                    raw = Dialog.Has(area.Name) ? $"» {area.Name}" : "...";
-                    Name = area.Name;
+                    Name = mode.MapData.Area.Mode switch {
+                        AreaMode.Normal => "A",
+                        AreaMode.BSide => "B",
+                        AreaMode.CSide => "C",
+                        _ => "X",
+                    };
+                    raw = mode.MapData.Filename;
+                    SetText(Name);
 
                     w = (int)Fonts.Regular.Measure(raw).X;
                     W = Width + w + 5;
+
+                    this.mode = mode;
                 }
 
-                public override void Update(Vector2 position = default) {
-                    base.Update(position);
-                    int mouseX = (int)Editor.Mouse.Screen.X;
-                    int mouseY = (int)Editor.Mouse.Screen.Y;
-                    bool hover = Visible && new Rectangle((int)position.X + 16, (int)position.Y - 2, Width + w, Height + 4).Contains(mouseX, mouseY);
-                    lerp = Calc.Approach(lerp, hover.Bit(), Engine.DeltaTime * 5f);
-                    listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
+                public UILevelRibbon(UILevelSelector selector, AreaData area, int n)
+                    : base("", 24) {
+                    this.selector = selector;
+                    this.n = n;
 
-                    if (hover && MInput.Mouse.PressedLeftButton) {
-                        selector.mainButtons.Color = BG;
-                        Console.WriteLine("-----");
+                    Name = area.Name;
+                    raw = Dialog.Has(Name) ? $"» {Name}" : "...";
+
+                    ModeProperties[] modes = area.Mode.Where(m => m != null).ToArray();
+                    if (dropdown = modes.Length > 1) {
+                        h = modes.Length * 13 + 1;
                         for (int i = 0; i < modes.Length; i++) {
-                            Console.WriteLine(((AreaMode)i).ToString() + " : " + modes[i]?.MapData.Filename ?? "-");
+                            ModeProperties m = modes[i];
+                            Add(new UILevelRibbon(selector, m, i + 1) {
+                                Position = new Vector2(-5, 13 * (i + 1)),
+                            });
+                        }
+                    } else
+                        mode = modes[0];
+
+                    SetText($"{(dropdown ? "\uF034" : " ")} {Dialog.Clean(Name)}");
+
+                    w = (int)Fonts.Regular.Measure(raw).X;
+                    W = Width + w + 5;
+
+                    RenderChildren = false;
+                }
+
+                protected override void Initialize() {
+                    base.Initialize();
+                    foreach (UIElement child in children) {
+                        if (child is UILevelRibbon lvl) {
+                            lvl.FG = FG;
+                            lvl.BG = BG;
+                            lvl.BGAccent = BGAccent;
                         }
                     }
                 }
 
+                private bool HoveringChildren() {
+                    foreach (UIElement child in children)
+                        if (child is UILevelRibbon lvl && lvl.hover)
+                            return true;
+                    return false;
+                }
+
+                public override void Update(Vector2 position = default) {
+                    base.Update(position);
+
+                    int mouseX = (int)Editor.Mouse.Screen.X;
+                    int mouseY = (int)Editor.Mouse.Screen.Y;
+                    hover = Visible &&
+                        new Rectangle((int)position.X + 16, (int)position.Y - 1, Width + w, Height + H + 2).Contains(mouseX, mouseY);
+                    
+                    lerp = Calc.Approach(lerp, hover.Bit(), Engine.DeltaTime * 6f);
+
+                    listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
+
+                    if (dropdown) {
+                        if (Visible && hover && MInput.Mouse.PressedLeftButton && !HoveringChildren()) {
+                            openLerp = open.Bit();
+                            open = !open;
+                            SetText((open ? '\uF036' : '\uF034') + Text.Substring(1));
+                        }
+
+                        openLerp = Calc.Approach(openLerp, open.Bit(), Engine.DeltaTime * 2f);
+                        float openEase = (open ? Ease.ExpoOut : Ease.ExpoIn)(openLerp);
+                        H = (int)(openEase * h);
+                    }
+                }
+
                 public override void Render(Vector2 position = default) {
+                    Vector2 from = position;
+
                     float ease = Ease.CubeOut(lerp);
                     float listEase = Ease.ExpoIn(listLerp);
                     position.X += (int)(ease * 16 - Width * listEase);
@@ -75,6 +146,15 @@ namespace LevelEditorMod.Editor.UI {
                     Fonts.Regular.Draw(raw, position + Vector2.UnitX * (Width + 5), Vector2.One, Color.Lerp(Util.Colors.CloudGray, Util.Colors.White, ease * (0.9f + sin)) * (1 - listEase));
 
                     base.Render(position);
+
+                    if (dropdown) {
+                        foreach (UIElement child in children)
+                            if (child is UILevelRibbon lvl)
+                                lvl.Render(from + lvl.Position);
+                        Draw.Rect(new Vector2(from.X, position.Y + Height + H + 2), Parent.Width, h - H, Util.Colors.DarkGray);
+                        Draw.Rect(new Vector2(from.X, position.Y + Height), 24, H + 2, Util.Colors.DarkGray);
+                        Draw.Rect(new Vector2(from.X + 24, position.Y + Height), 1, H + 2, BG);
+                    }
                 }
             }
 
@@ -117,7 +197,7 @@ namespace LevelEditorMod.Editor.UI {
 
                     if (lvl.W > Width)
                         Width = lvl.W;
-                    y += 15;
+                    y += 13;
 
                     levels[i] = lvl;
                 }
@@ -136,20 +216,6 @@ namespace LevelEditorMod.Editor.UI {
                 Add(searchBar = new UISearchBar<UILevelRibbon>(Width / 2, lvlMatcher) {
                     Position = Vector2.UnitY * 8,
                     Entries = levels,
-                    OnInputChange = input => {
-                        if (levels != null && searchBar != null) {
-                            int y = 0;
-                            foreach (UILevelRibbon level in levels) {
-                                level.Visible = searchBar.Found == null || searchBar.Found.Contains(level);
-                                if (level.Visible) {
-                                    level.Position.Y = y;
-                                    y += 15;
-                                } else {
-                                    level.Position.Y = 0;
-                                }
-                            }
-                        }
-                    },
                     InfoText = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOADSEARCH"),
                     SearchInfo = count => {
                         return count switch {
@@ -157,6 +223,10 @@ namespace LevelEditorMod.Editor.UI {
                             1 => $"{infoone}",
                             _ => $"{count} {infomore}",
                         };
+                    },
+                    OnInputChange = s => {
+                        if (levels != null)
+                            levels[0].Position.Y = 0;
                     }
                 });
                 searchBar.AddSpecialMatcher('@', lvlMatcherByMod, Calc.HexToColor("1b6dcc"));
@@ -164,7 +234,19 @@ namespace LevelEditorMod.Editor.UI {
 
             public override void Update(Vector2 position = default) {
                 base.Update(position);
+
                 anim = Calc.Approach(anim, lvlCount, Engine.DeltaTime * 60f);
+
+                if (levels != null) {
+                    int y = (int)levels[0].Position.Y;
+                    foreach (UILevelRibbon lvl in levels) {
+                        lvl.Visible = searchBar.Found == null || searchBar.Found.Contains(lvl);
+                        if (lvl.Visible) {
+                            lvl.Position.Y = y;
+                            y += 13 + lvl.H;
+                        }
+                    }
+                }
             }
         }
 
@@ -188,8 +270,6 @@ namespace LevelEditorMod.Editor.UI {
             UIMainButtons buttons = new UIMainButtons();
             Add(levelSelector = new UILevelSelector(buttons));
 
-            string mainmenucancel = Dialog.Clean("LEVELEDITORMOD_MAINMENU_CANCEL");
-
             UIButton create = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_CREATE"), Fonts.Regular, 16, 24) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Cyan,
@@ -197,7 +277,9 @@ namespace LevelEditorMod.Editor.UI {
                 PressedFG = Util.Colors.Cyan,
                 HoveredBG = Util.Colors.DarkCyan,
             };
+            
             string mainmenuload = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD");
+            string mainmenuloadcancel = Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD_CANCEL");
             UIButton load = null;
             load = new UIButton(mainmenuload, Fonts.Regular, 5, 4) {
                 OnPress = () => {
@@ -207,10 +289,11 @@ namespace LevelEditorMod.Editor.UI {
                     } else {
                         state = States.Load;
                         levelSelector.Reload();
-                        load.SetText(mainmenucancel, stayCentered: true);
+                        load.SetText(mainmenuloadcancel, stayCentered: true);
                     }
                 },
             };
+            
             UIButton exit = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_EXIT"), Fonts.Regular, 10, 4) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Red,

@@ -10,6 +10,7 @@ namespace LevelEditorMod.Editor.UI {
         protected UIElement Parent;
 
         public bool Visible = true;
+        public bool RenderChildren = true;
 
         public Vector2 Position;
         public int Width, Height;
@@ -32,9 +33,10 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         public virtual void Render(Vector2 position = default) {
-            foreach (UIElement element in children)
-                if (element.Visible)
-                    element.Render(position + element.Position);
+            if (RenderChildren)
+                foreach (UIElement element in children)
+                    if (element.Visible)
+                        element.Render(position + element.Position);
         }
 
         protected virtual void Initialize() { }

@@ -3,14 +3,14 @@ using Monocle;
 
 namespace LevelEditorMod.Editor.UI {
     public class UIRibbon : UIElement {
-        private readonly Font font;
-        public readonly string Text;
+        private Font font;
+        public string Text { get; private set; }
 
         public Color FG = Util.Colors.White;
         public Color BG = Calc.HexToColor("f25c54");
         public Color BGAccent = Calc.HexToColor("f7b267");
 
-        private readonly int leftSpace;
+        private readonly int leftSpace, rightSpace;
         private readonly bool leftEdge, rightEdge;
         public int Accent = 1;
 
@@ -18,12 +18,19 @@ namespace LevelEditorMod.Editor.UI {
             : this(text, Fonts.Regular, leftSpace, rightSpace, leftEdge, rightEdge) { }
 
         public UIRibbon(string text, Font font, int leftSpace = 8, int rightSpace = 8, bool leftEdge = false, bool rightEdge = true) {
-            this.Text = text;
+            Text = text;
             this.font = font;
-            this.leftSpace = leftSpace;
+            this.leftSpace = leftSpace; this.rightSpace = rightSpace;
             this.leftEdge = leftEdge; this.rightEdge = rightEdge;
 
             Vector2 size = font.Measure(text);
+            Width = (int)size.X + leftSpace + rightSpace + (leftEdge ? 5 : 0) + (rightEdge ? 5 : 0);
+            Height = (int)size.Y;
+        }
+
+        public void SetText(string text, Font font = null) {
+            this.font = font ?? this.font;
+            Vector2 size = this.font.Measure(Text = text);
             Width = (int)size.X + leftSpace + rightSpace + (leftEdge ? 5 : 0) + (rightEdge ? 5 : 0);
             Height = (int)size.Y;
         }
