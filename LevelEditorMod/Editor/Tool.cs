@@ -517,8 +517,11 @@ namespace LevelEditorMod.Editor {
 
 		public override void RenderWorldSpace() {
 			base.RenderWorldSpace();
-			if(PendingRoom.HasValue)
-				Draw.Rect(PendingRoom.Value, Color.Lerp(Color.White, Color.Cyan, (float)Math.Abs(Math.Sin(Engine.Scene.TimeActive * 3))) * 0.6f);
+			if(PendingRoom.HasValue) {
+				var prog = (float)Math.Abs(Math.Sin(Engine.Scene.TimeActive * 3));
+				Draw.Rect(PendingRoom.Value, Color.Lerp(Color.White, Color.Cyan, prog) * 0.6f);
+				Draw.HollowRect(PendingRoom.Value.X, PendingRoom.Value.Y, 40 * 8, 23 * 8, Color.Lerp(Color.Orange, Color.White, prog) * 0.6f);
+			}
 		}
 	}
 
