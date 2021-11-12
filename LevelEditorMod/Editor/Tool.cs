@@ -94,6 +94,15 @@ namespace LevelEditorMod.Editor {
 					selectionPanel.Display(Editor.SelectedEntities);
 			}
 		}
+
+		public override void RenderWorldSpace() {
+			base.RenderWorldSpace();
+			if(Editor.SelectedRoom != null)
+				foreach(var item in Editor.SelectedRoom.GetSelectedEntities(new Rectangle((int)Editor.Mouse.World.X, (int)Editor.Mouse.World.Y, 0, 0)))
+					if(Editor.SelectedEntities == null || !Editor.SelectedEntities.Contains(item))
+						foreach(var s in item.Selections)
+							Draw.Rect(s.Rect, Color.Blue * 0.15f);
+		}
 	}
 
 	public class DecalSelectionTool : Tool {
