@@ -208,16 +208,31 @@ namespace LevelEditorMod.Editor {
 			}
 		}
 
+		public enum TileBrushMode {
+			Brush, Rect, HollowRect, Fill, Line, Circle
+		}
+
 		public static int CurLeftTileset = 2;
 		public static bool LeftFg = true;
 		public static int CurRightTileset = 0;
 		public static bool RightFg = true;
+
+		public static TileBrushMode LeftMode, RightMode;
+		// tile, hasTile
+		private static VirtualMap<char> holoFgTileMap;
+		private static VirtualMap<char> holoBgTileMap;
+		private static VirtualMap<bool> holoSetTiles;
+		private static TileGrid holoGrid;
+		private static bool holoRetile = false;
 
 		public List<TilesetData> FgTilesets = new List<TilesetData>();
 		public List<TilesetData> BgTilesets = new List<TilesetData>();
 
 		private List<UIButton> fgTilesetButtons = new List<UIButton>();
 		private List<UIButton> bgTilesetButtons = new List<UIButton>();
+		private List<UIButton> modeButtons = new List<UIButton>();
+
+		private static bool isPainting;
 
 		private static readonly Color LeftTilesetBtnBg = Calc.HexToColor("274292");
 		private static readonly Color RightTilesetBtnBg = Calc.HexToColor("922727");
@@ -263,14 +278,21 @@ namespace LevelEditorMod.Editor {
 		public override UIElement CreatePanel() {
 			bgTilesetButtons.Clear();
 			fgTilesetButtons.Clear();
-			UIScrollPane panel = new UIScrollPane() {
-				Width = 130
+			UIElement panel = new UIElement() {
+				Width = 160,
+				Background = Calc.HexToColor("202929") * (185 / 255f),
+				GrabsClick = true,
+				GrabsScroll = true
+			};
+			UIScrollPane tilesetsPanel = new UIScrollPane() {
+				Width = 130,
+				TopPadding = 10
 			};
 			var fgLabel = new UILabel("Foreground");
-			fgLabel.Position = new Vector2((panel.Width - fgLabel.Width) / 2, 0);
+			fgLabel.Position = new Vector2((tilesetsPanel.Width - fgLabel.Width) / 2, 0);
 			fgLabel.FG = Color.DarkKhaki;
 			fgLabel.Underline = true;
-			panel.AddBelow(fgLabel);
+			tilesetsPanel.AddBelow(fgLabel);
 			int i = 0;
 			foreach(var item in FgTilesets) {
 				int copy = i;
@@ -290,17 +312,17 @@ namespace LevelEditorMod.Editor {
 				};
 				button.Height += 10;
 				var label = new UILabel(item.Name.Split('/').Last(), Fonts.Pico8);
-				panel.Add(button);
+				tilesetsPanel.Add(button);
 				label.Position += new Vector2(button.Position.X + (button.Width - Fonts.Pico8.Measure(label.Value()).X) / 2, 8 * 3 + 13 + button.Position.Y);
-				panel.Add(label);
+				tilesetsPanel.Add(label);
 				i++;
 				fgTilesetButtons.Add(button);
 			}
 			var bgLabel = new UILabel("Background");
-			bgLabel.Position = new Vector2((panel.Width - bgLabel.Width) / 2, (int)Math.Ceiling(FgTilesets.Count / 2f) * (8 * 3 + 30) + fgLabel.Height + 40);
+			bgLabel.Position = new Vector2((tilesetsPanel.Width - bgLabel.Width) / 2, (int)Math.Ceiling(FgTilesets.Count / 2f) * (8 * 3 + 30) + fgLabel.Height + 40);
 			bgLabel.FG = Color.DarkKhaki;
 			bgLabel.Underline = true;
-			panel.Add(bgLabel);
+			tilesetsPanel.Add(bgLabel);
 			i = 0;
 			foreach(var item in BgTilesets) {
 				int copy = i;
@@ -320,26 +342,102 @@ namespace LevelEditorMod.Editor {
 				};
 				button.Height += 10;
 				var label = new UILabel(item.Name.Split('/').Last(), Fonts.Pico8);
-				panel.Add(button);
+				tilesetsPanel.Add(button);
 				label.Position += new Vector2(button.Position.X + (button.Width - Fonts.Pico8.Measure(label.Value()).X) / 2, 8 * 3 + 13 + button.Position.Y);
-				panel.Add(label);
+				tilesetsPanel.Add(label);
 				i++;
 				bgTilesetButtons.Add(button);
 			}
+			UIElement brushTypes = new UIElement() {
+				Width = 30
+			};
+			foreach(var mode in Enum.GetValues(typeof(TileBrushMode))) {
+				var t = mode.ToString();
+				var button = new UIButton(t.Substring(0, 1), Fonts.Regular, 6, 6) {
+					OnPress = () => LeftMode = (TileBrushMode)mode,
+					OnRightPress = () => RightMode = (TileBrushMode)mode
+				};
+				brushTypes.AddBelow(button, Vector2.One * 5);
+				modeButtons.Add(button);
+			}
+			panel.Add(brushTypes);
+			tilesetsPanel.Position.X = brushTypes.Width + 5;
+			tilesetsPanel.Background = null;
+			panel.Add(tilesetsPanel);
 			return panel;
 		}
 
 		public override void Update(bool canClick) {
-			bool fg = MInput.Mouse.CheckLeftButton ? LeftFg : RightFg;
-			int tileset = MInput.Mouse.CheckLeftButton ? CurLeftTileset : CurRightTileset;
-			if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick)
-				if(Editor.SelectedRoom != null)
-					if(Editor.SelectedRoom.Bounds.Contains((int)Math.Floor(Editor.Mouse.World.X / 8), (int)Math.Floor(Editor.Mouse.World.Y / 8)))
-						if(fg)
-							Editor.SelectedRoom.SetFgTile(Editor.Mouse.World, FgTilesets[tileset].Key);
-						else
-							Editor.SelectedRoom.SetBgTile(Editor.Mouse.World, BgTilesets[tileset].Key);
+			bool clear = MInput.Keyboard.Check(Keys.X);
 
+			if(Editor.SelectedRoom == null)
+				holoFgTileMap = holoBgTileMap = null;
+			else if(holoFgTileMap == null || holoFgTileMap.Columns != Editor.SelectedRoom.Width || holoFgTileMap.Rows != Editor.SelectedRoom.Height || clear) {
+				holoFgTileMap = new VirtualMap<char>(Editor.SelectedRoom.Width, Editor.SelectedRoom.Height, '0');
+				holoBgTileMap = new VirtualMap<char>(Editor.SelectedRoom.Width, Editor.SelectedRoom.Height, '0');
+				holoSetTiles = new VirtualMap<bool>(Editor.SelectedRoom.Width, Editor.SelectedRoom.Height, false);
+				isPainting = false;
+			}
+
+			bool left = MInput.Mouse.CheckLeftButton || MInput.Mouse.ReleasedLeftButton;
+			bool fg = left ? LeftFg : RightFg;
+			int tileset = left ? CurLeftTileset : CurRightTileset;
+			
+			if(canClick && (MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)) {
+				isPainting = true;
+			} else if(MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+				if(Editor.SelectedRoom != null && canClick && isPainting)
+					for(int x = 0; x < holoFgTileMap.Columns; x++)
+						for(int y = 0; y < holoFgTileMap.Rows; y++)
+							if(fg) {
+								if(holoSetTiles[x, y])
+									Editor.SelectedRoom.SetFgTile(x, y, holoFgTileMap[x, y]);
+							} else
+								if(holoSetTiles[x, y])
+									Editor.SelectedRoom.SetBgTile(x, y, holoBgTileMap[x, y]);
+				isPainting = false;
+				holoFgTileMap = null;
+				holoBgTileMap = null;
+				holoGrid = null;
+			} else if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && Editor.SelectedRoom != null) {
+				var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8 - Editor.SelectedRoom.Position.X), (float)Math.Floor(Editor.Mouse.World.Y / 8 - Editor.SelectedRoom.Position.Y));
+				int x = (int)tilePos.X; int y = (int)tilePos.Y;
+				if(Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
+					switch(left ? LeftMode : RightMode) {
+						case TileBrushMode.Brush:
+							SetHoloTile(fg, tileset, x, y);
+							break;
+						case TileBrushMode.Rect:
+						case TileBrushMode.HollowRect:
+							var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling();
+							int ax = (int)Math.Min(x, lastPress.X - Editor.SelectedRoom.Position.X);
+							int ay = (int)Math.Min(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
+							int bx = (int)Math.Max(x, lastPress.X - Editor.SelectedRoom.Position.X);
+							int by = (int)Math.Max(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
+							var rect = new Rectangle(ax, ay, bx - ax, by - ay);
+							for(int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
+								for(int y2 = 0; y2 < holoFgTileMap.Rows; y2++) {
+									bool set = rect.Contains(x2, y2);
+									SetHoloTile(fg, set ? tileset : 0, x2, y2, !set);
+								}
+							break;
+						case TileBrushMode.Fill:
+							break;
+						case TileBrushMode.Line:
+							break;
+						case TileBrushMode.Circle:
+							break;
+						default:
+							break;
+					}
+					if(holoRetile) {
+						holoRetile = false;
+						holoGrid = (fg ? GFX.FGAutotiler : GFX.BGAutotiler).GenerateMap(fg ? holoFgTileMap : holoBgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid;
+					}
+				}
+			}
+
+			// TODO: cleanup a bit
 			for(int i = 0; i < fgTilesetButtons.Count; i++) {
 				UIButton button = fgTilesetButtons[i];
 				if(LeftFg && RightFg && CurLeftTileset == CurRightTileset && CurLeftTileset == i)
@@ -368,28 +466,59 @@ namespace LevelEditorMod.Editor {
 					button.HoveredBG = UIButton.DefaultHoveredBG;
 				}
 			}
+			for(int i = 0; i < modeButtons.Count; i++) {
+				UIButton button = modeButtons[i];
+				if(LeftMode == RightMode && RightMode == (TileBrushMode)i)
+					button.BG = button.PressedBG = button.HoveredBG = BothTilesetBtnBg;
+				else if(LeftMode == (TileBrushMode)i)
+					button.BG = button.PressedBG = button.HoveredBG = LeftTilesetBtnBg;
+				else if(RightMode == (TileBrushMode)i)
+					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
+				else {
+					button.BG = UIButton.DefaultBG;
+					button.PressedBG = UIButton.DefaultPressedBG;
+					button.HoveredBG = UIButton.DefaultHoveredBG;
+				}
+			}
+		}
+
+		public void SetHoloTile(bool fg, int tileset, int x, int y, bool unset = false) {
+			char tile = fg ? FgTilesets[tileset].Key : BgTilesets[tileset].Key;
+			VirtualMap<char> tiles = fg ? holoFgTileMap : holoBgTileMap;
+			char prev = tiles[x, y];
+			bool reset = !holoSetTiles[x, y] || (holoSetTiles[x, y] && unset);
+			if(prev != tile || reset) {
+				tiles[x, y] = tile;
+				holoSetTiles[x, y] = !unset;
+				holoRetile = holoRetile || prev != tile;
+			}
 		}
 
 		public override void RenderWorldSpace() {
 			base.RenderWorldSpace();
 			TileGrid tile = LeftFg ? FgTilesets[CurLeftTileset].Tile : BgTilesets[CurLeftTileset].Tile;
 			var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8) * 8, (float)Math.Floor(Editor.Mouse.World.Y / 8) * 8);
-			RenderTileGrid(tilePos, tile, Color.White * 0.5f);
+			if(isPainting && Editor.SelectedRoom != null) {
+				var fg = MInput.Mouse.CheckLeftButton ? LeftFg : RightFg;
+				var map = fg ? holoFgTileMap : holoBgTileMap;
+				Vector2 p = Editor.SelectedRoom.Position * 8;
+				RenderTileGrid(p, holoGrid, Color.White * 0.75f);
+				var prog = (float)Math.Abs(Math.Sin(Engine.Scene.TimeActive * 3));
+				for(int x = 0; x < map.Columns; x++)
+					for(int y = 0; y < map.Rows; y++)
+						if(holoSetTiles[x, y] && map[x, y] == '0')
+							Draw.Rect(p.X + x * 8, p.Y + y * 8, 8, 8, Color.Red * (prog / 3f + 0.35f));
+			} else
+				RenderTileGrid(tilePos, tile, Color.White * 0.5f);
 		}
 
-		private static void RenderTileGrid(Vector2 position, TileGrid tile) {
-			RenderTileGrid(position, tile, Color.White);
-		}
-
-		private static void RenderTileGrid(Vector2 position, TileGrid tile, Color color) {
+		public static void RenderTileGrid(Vector2 position, TileGrid tile, Color color) {
 			if(tile == null)
 				return;
-			for(int x = 0; x < tile.Tiles.Columns; x++) {
-				for(int y = 0; y < tile.Tiles.Rows; y++) {
+			for(int x = 0; x < tile.Tiles.Columns; x++)
+				for(int y = 0; y < tile.Tiles.Rows; y++)
 					if(tile.Tiles[x, y] != null)
 						tile.Tiles[x, y].Draw(position + new Vector2(x, y) * 8, Vector2.Zero, color);
-				}
-			}
 		}
 	}
 

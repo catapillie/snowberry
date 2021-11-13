@@ -168,20 +168,18 @@ namespace LevelEditorMod.Editor {
             return bgTileMap[(int)p.X, (int)p.Y];
         }
 
-        public void SetFgTile(Vector2 at, char tile) {
-            Vector2 p = (at - Position * 8) / 8;
-            char orig = fgTileMap[(int)p.X, (int)p.Y];
+        public void SetFgTile(int x, int y, char tile) {
+            char orig = fgTileMap[x, y];
             if(orig != tile) {
-                fgTileMap[(int)p.X, (int)p.Y] = tile;
+                fgTileMap[x, y] = tile;
                 Autotile();
             }
         }
 
-        public void SetBgTile(Vector2 at, char tile) {
-            Vector2 p = (at - Position * 8) / 8;
-            char orig = bgTileMap[(int)p.X, (int)p.Y];
+        public void SetBgTile(int x, int y, char tile) {
+            char orig = bgTileMap[x, y];
             if(orig != tile) {
-                bgTileMap[(int)p.X, (int)p.Y] = tile;
+                bgTileMap[x, y] = tile;
                 Autotile();
             }
         }

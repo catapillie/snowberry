@@ -223,8 +223,8 @@ namespace LevelEditorMod.Editor {
             ui.Update();
 
             // room select
-            if(MInput.Mouse.CheckLeftButton && canClick) {
-                if(MInput.Mouse.PressedLeftButton) {
+            if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
+                if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
                     
                     worldClick = Mouse.World;
