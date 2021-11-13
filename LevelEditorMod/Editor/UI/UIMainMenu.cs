@@ -117,22 +117,24 @@ namespace LevelEditorMod.Editor.UI {
                     int mouseY = (int)Editor.Mouse.Screen.Y;
                     hover = Visible &&
                         new Rectangle((int)position.X + 16, (int)position.Y - 1, Width + w, Height + H + 2).Contains(mouseX, mouseY);
-                    
+
                     lerp = Calc.Approach(lerp, hover.Bit(), Engine.DeltaTime * 6f);
 
                     listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
 
-                    if (dropdown) {
-                        if (Visible && hover && MInput.Mouse.PressedLeftButton && !HoveringChildren()) {
+                    if (Visible && hover && MInput.Mouse.PressedLeftButton && !HoveringChildren()) {
+                        if (dropdown) {
                             openLerp = open.Bit();
                             open = !open;
                             SetText((open ? '\uF036' : '\uF034') + Text.Substring(1));
+                        } else if (Parent is not UILevelRibbon lvl || lvl.open) {
+                            Editor.Open(mode.MapData);
                         }
-
-                        openLerp = Calc.Approach(openLerp, open.Bit(), Engine.DeltaTime * 2f);
-                        float openEase = (open ? Ease.ExpoOut : Ease.ExpoIn)(openLerp);
-                        H = (int)(openEase * h);
                     }
+
+                    openLerp = Calc.Approach(openLerp, open.Bit(), Engine.DeltaTime * 2f);
+                    float openEase = (open ? Ease.ExpoOut : Ease.ExpoIn)(openLerp);
+                    H = (int)(openEase * h);
                 }
 
                 public override void Render(Vector2 position = default) {
