@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Celeste;
 using System;
 using System.Linq;
+using Microsoft.Xna.Framework.Input;
 
 namespace LevelEditorMod.Editor.UI {
     public class UIMainMenu : UIElement {
@@ -42,6 +43,8 @@ namespace LevelEditorMod.Editor.UI {
                 private readonly int h;
                 public int H { get; private set; }
 
+                private bool pressing;
+
                 private readonly ModeProperties mode;
 
                 private UILevelRibbon(UILevelSelector selector, ModeProperties mode, int n)
@@ -65,7 +68,7 @@ namespace LevelEditorMod.Editor.UI {
                 }
 
                 public UILevelRibbon(UILevelSelector selector, AreaData area, int n)
-                    : base("", 24) {
+                    : base("", 26) {
                     this.selector = selector;
                     this.n = n;
 
@@ -115,20 +118,33 @@ namespace LevelEditorMod.Editor.UI {
 
                     int mouseX = (int)Editor.Mouse.Screen.X;
                     int mouseY = (int)Editor.Mouse.Screen.Y;
-                    hover = Visible &&
+                    hover = !Instance.confirm.Shown && Visible &&
                         new Rectangle((int)position.X + 16, (int)position.Y - 1, Width + w, Height + H + 2).Contains(mouseX, mouseY);
 
-                    lerp = Calc.Approach(lerp, hover.Bit(), Engine.DeltaTime * 6f);
+                    lerp = Calc.Approach(lerp, (hover || pressing).Bit(), Engine.DeltaTime * 6f);
 
                     listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
 
-                    if (Visible && hover && MInput.Mouse.PressedLeftButton && !HoveringChildren()) {
-                        if (dropdown) {
-                            openLerp = open.Bit();
-                            open = !open;
-                            SetText((open ? '\uF036' : '\uF034') + Text.Substring(1));
-                        } else if (Parent is not UILevelRibbon lvl || lvl.open) {
-                            Editor.Open(mode.MapData);
+                    if (Visible) {
+                        if (!Instance.confirm.Shown && MInput.Mouse.PressedLeftButton && hover) {
+                            if (dropdown) {
+                                if (!HoveringChildren()) {
+                                    openLerp = open.Bit();
+                                    open = !open;
+                                    SetText((open ? '\uF036' : '\uF034') + Text.Substring(1));
+                                }
+                            } else if (Parent is not UILevelRibbon lvl || lvl.open) {
+                                pressing = true;
+                            }
+                        }
+                        if (MInput.Mouse.ReleasedLeftButton && pressing || Instance.confirm.Shown) {
+                            pressing = false;
+                            if (hover) {
+                                if (MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down)
+                                    Editor.Open(mode.MapData);
+                                else
+                                    Instance.confirm.Show(ConfirmLoadMessage(), () => Editor.Open(mode.MapData));
+                            }
                         }
                     }
 
@@ -142,7 +158,7 @@ namespace LevelEditorMod.Editor.UI {
 
                     float ease = Ease.CubeOut(lerp);
                     float listEase = Ease.ExpoIn(listLerp);
-                    position.X += (int)(ease * 16 - Width * listEase);
+                    position.X += (int)(ease * 16 - Width * listEase + (pressing ? 4 : 0));
 
                     float sin = Settings.Instance.DisableFlashes || lerp == 0f ? 0f : ((float)Math.Sin(Engine.Scene.TimeActive * 12f) * 0.1f);
                     Fonts.Regular.Draw(raw, position + Vector2.UnitX * (Width + 5), Vector2.One, Color.Lerp(Util.Colors.CloudGray, Util.Colors.White, ease * (0.9f + sin)) * (1 - listEase));
@@ -158,6 +174,28 @@ namespace LevelEditorMod.Editor.UI {
                         Draw.Rect(new Vector2(from.X + 24, position.Y + Height), 1, H + 2, BG);
                     }
                 }
+
+                private UIElement ConfirmLoadMessage() {
+                    UIRibbon ribbon = new UIRibbon(Dialog.Clean(mode.MapData.Data.Name), 8, 8, true, true) {
+                        FG = FG,
+                        BG = BG,
+                        BGAccent = BGAccent,
+                    };
+                    ribbon.Position = new Vector2(-ribbon.Width / 2, 0);
+
+                    UILabel msg = new UILabel(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD_CONFIRM"));
+                    msg.Position = new Vector2(-msg.Width / 2, ribbon.Position.Y + ribbon.Height + 4);
+
+                    UILabel warn = new UILabel(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD_UNSAVED")) {
+                        FG = Util.Colors.CloudLightGray,
+                    };
+                    warn.Position = new Vector2(-warn.Width / 2, msg.Position.Y + msg.Height);
+
+                    UILabel tip = new UILabel(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD_TIP"));
+                    tip.Position = new Vector2(-tip.Width / 2, warn.Position.Y + warn.Height);
+
+                    return Regroup(ribbon, msg, warn, tip);
+                }
             }
 
             private float anim;
@@ -165,12 +203,6 @@ namespace LevelEditorMod.Editor.UI {
 
             private UISearchBar<UILevelRibbon> searchBar;
             private UILevelRibbon[] levels;
-
-            private readonly UIMainButtons mainButtons;
-
-            public UILevelSelector(UIMainButtons uIMainButtons) {
-                mainButtons = uIMainButtons;
-            }
 
             public void Reload() {
                 Clear();
@@ -191,7 +223,7 @@ namespace LevelEditorMod.Editor.UI {
                     AreaData area = AreaData.Areas[i];
                     UILevelRibbon lvl;
                     levelScrollPane.Add(lvl = new UILevelRibbon(this, area, i) {
-                        Position = new Vector2(-8, y),
+                        Position = new Vector2(-10, y),
                         FG = area.TitleTextColor,
                         BG = area.TitleBaseColor,
                         BGAccent = area.TitleAccentColor,
@@ -252,25 +284,112 @@ namespace LevelEditorMod.Editor.UI {
             }
         }
 
+        public class UIConfirmMessage : UIElement {
+            private UIElement display;
+            private readonly UIElement buttons;
+
+            private Action confirm;
+
+            private float lerp;
+            public bool Shown { get; private set; }
+
+            public UIConfirmMessage() {
+                UIButton yes = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_YES"), Fonts.Regular, 4, 6) {
+                    FG = Util.Colors.White,
+                    BG = Util.Colors.Blue,
+                    PressedBG = Util.Colors.White,
+                    PressedFG = Util.Colors.Blue,
+                    HoveredBG = Util.Colors.DarkBlue,
+                    OnPress = () => confirm?.Invoke(),
+                };
+                UIButton no = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_NO"), Fonts.Regular, 4, 6) {
+                    FG = Util.Colors.White,
+                    BG = Util.Colors.Red,
+                    PressedBG = Util.Colors.White,
+                    PressedFG = Util.Colors.Red,
+                    HoveredBG = Util.Colors.DarkRed,
+                    Position = new Vector2(yes.Position.X + yes.Width + 4, yes.Position.Y),
+                    OnPress = Hide,
+                };
+
+                Add(buttons = Regroup(yes, no));
+                buttons.Visible = false;
+            }
+
+            protected override void Initialize() {
+                base.Initialize();
+                buttons.Position.X = (Width - buttons.Width) / 2;
+            }
+
+            public void Show(UIElement display, Action onConfirm = null) {
+                if (this.display != null)
+                    Remove(this.display);
+
+                confirm = onConfirm;
+                Add(this.display = display);
+                display.Position.X = (Width - display.Width) / 2;
+
+                if (!Shown) {
+                    lerp = 0f;
+                    Shown = true;
+                }
+            }
+
+            public void Hide() {
+                if (Shown) {
+                    lerp = 1f;
+                    Shown = false;
+                }
+            }
+
+            public override void Update(Vector2 position = default) {
+                base.Update(position);
+
+                lerp = Calc.Approach(lerp, Shown.Bit(), Engine.DeltaTime * 2f);
+                float ease = (Shown ? Ease.ExpoOut : Ease.ExpoIn)(lerp);
+
+                int h = 0;
+                buttons.Visible = lerp > 0;
+                if (display != null) {
+                    display.Visible = buttons.Visible;
+                    h = display.Height;
+                    display.Position.Y = (int)(((Height - display.Height) / 2 + h * 2) * ease - h * 2);
+                }
+
+                buttons.Position.Y = (int)(Height + buttons.Height - ((Height - h - 4) / 2 + buttons.Height) * ease);
+            }
+
+            public override void Render(Vector2 position = default) {
+                Draw.Rect(position, Width, Height, Color.Black * lerp * 0.75f);
+                base.Render(position);
+            }
+        }
+
+        public static UIMainMenu Instance { get; private set; }
+
         public enum States {
             Start, Create, Load, Exiting,
         }
         private States state = States.Start;
-        private readonly float[] stateLerp = new float[4] { 1f, 0f, 0f, 0f };
+        private readonly float[] stateLerp = new float[] { 1f, 0f, 0f, 0f };
 
         private readonly UIRibbon authors, version;
         private readonly UIButton settings;
         private readonly UIMainButtons buttons;
         private readonly UILevelSelector levelSelector;
 
+        private readonly UIConfirmMessage confirm;
+
         private float fade;
 
         public UIMainMenu(int width, int height) {
+            Instance = this;
+
             Width = width;
             Height = height;
 
             UIMainButtons buttons = new UIMainButtons();
-            Add(levelSelector = new UILevelSelector(buttons));
+            Add(levelSelector = new UILevelSelector());
 
             UIButton create = new UIButton(Dialog.Clean("LEVELEDITORMOD_MAINMENU_CREATE"), Fonts.Regular, 16, 24) {
                 FG = Util.Colors.White,
@@ -322,6 +441,10 @@ namespace LevelEditorMod.Editor.UI {
             });
             Add(version = new UIRibbon($"ver{Module.Instance.Metadata.VersionString}") {
                 Position = new Vector2(0, 23),
+            });
+
+            Add(confirm = new UIConfirmMessage() {
+                Width = width, Height = height,
             });
         }
 

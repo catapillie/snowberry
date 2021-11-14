@@ -38,13 +38,20 @@ namespace LevelEditorMod.Editor.UI {
         public override void Render(Vector2 position = default) {
             base.Render(position);
 
-            float length = Width - (leftEdge ? 5 : 0) - (rightEdge ? 5 : 0);
-            float offset = leftEdge ? 5 : 0;
-            if (Accent > 0)
-                Draw.Rect(position + Vector2.UnitX * length, Accent, Height, BGAccent);
+            int length = Width - (leftEdge ? 5 : 0) - (rightEdge ? 5 : 0);
+            int offset = leftEdge ? 5 : 0;
+            if (Accent > 0) {
+                if (rightEdge)
+                    Draw.Rect(position + Vector2.UnitX * (length + offset), Accent, Height, BGAccent);
+                if (leftEdge)
+                    Draw.Rect(position + Vector2.UnitX * (offset - Accent), Accent, Height, BGAccent);
+            }
             Draw.Rect(position + Vector2.UnitX * offset, length, Height, BG);
-            if (leftEdge)
+            if (leftEdge) {
+                if (Accent > 0)
+                    Fonts.Regular.Draw("\uE0B2", position - Vector2.UnitX * Accent, Vector2.One, BGAccent);
                 Fonts.Regular.Draw("\uE0B2", position, Vector2.One, BG);
+            }
             if (rightEdge) {
                 if (Accent > 0)
                     Fonts.Regular.Draw("\uE0B0", new Vector2(position.X + length + offset + Accent, position.Y), Vector2.One, BGAccent);
