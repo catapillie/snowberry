@@ -383,7 +383,8 @@ namespace LevelEditorMod.Editor {
 			bool left = MInput.Mouse.CheckLeftButton || MInput.Mouse.ReleasedLeftButton;
 			bool fg = left ? LeftFg : RightFg;
 			int tileset = left ? CurLeftTileset : CurRightTileset;
-			
+			bool retile = false;
+
 			if(canClick && (MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)) {
 				isPainting = true;
 			} else if(MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
@@ -392,10 +393,14 @@ namespace LevelEditorMod.Editor {
 						for(int y = 0; y < holoFgTileMap.Rows; y++)
 							if(fg) {
 								if(holoSetTiles[x, y])
-									Editor.SelectedRoom.SetFgTile(x, y, holoFgTileMap[x, y]);
+									retile |= Editor.SelectedRoom.SetFgTile(x, y, holoFgTileMap[x, y]);
 							} else
 								if(holoSetTiles[x, y])
-									Editor.SelectedRoom.SetBgTile(x, y, holoBgTileMap[x, y]);
+								retile |= Editor.SelectedRoom.SetBgTile(x, y, holoBgTileMap[x, y]);
+				if(retile) {
+					Editor.SelectedRoom.Autotile();
+				}
+
 				isPainting = false;
 				holoFgTileMap = null;
 				holoBgTileMap = null;

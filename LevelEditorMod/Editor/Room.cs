@@ -172,23 +172,25 @@ namespace LevelEditorMod.Editor {
             return bgTileMap[(int)p.X, (int)p.Y];
         }
 
-        public void SetFgTile(int x, int y, char tile) {
+        public bool SetFgTile(int x, int y, char tile) {
             char orig = fgTileMap[x, y];
             if(orig != tile) {
                 fgTileMap[x, y] = tile;
-                Autotile();
+                return true;
             }
+            return false;
         }
 
-        public void SetBgTile(int x, int y, char tile) {
+        public bool SetBgTile(int x, int y, char tile) {
             char orig = bgTileMap[x, y];
             if(orig != tile) {
                 bgTileMap[x, y] = tile;
-                Autotile();
+                return true;
             }
+            return false;
         }
 
-        private void Autotile() {
+        public void Autotile() {
             fgTiles = GFX.FGAutotiler.GenerateMap(fgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
