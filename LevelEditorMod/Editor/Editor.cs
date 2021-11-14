@@ -109,8 +109,8 @@ namespace LevelEditorMod.Editor {
         public UIElement ToolPanel;
 
         private static bool generatePlaytestMapData = false;
-        private static Session playtestSession;
-        private static MapData playtestMapData;
+        internal static Session PlaytestSession;
+        internal static MapData PlaytestMapData;
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -162,9 +162,9 @@ namespace LevelEditorMod.Editor {
                     Audio.SetAmbience(null);
 
                     generatePlaytestMapData = true;
-                    playtestMapData = new MapData(Map.From);
-                    playtestSession = new Session(Map.From);
-                    LevelEnter.Go(playtestSession, true);
+                    PlaytestMapData = new MapData(Map.From);
+                    PlaytestSession = new Session(Map.From);
+                    LevelEnter.Go(PlaytestSession, true);
                     generatePlaytestMapData = false;
                 },
             };
@@ -329,8 +329,8 @@ namespace LevelEditorMod.Editor {
 		}
 
         private static MapData HookSessionGetAreaData(Func<Session, MapData> orig, Session self) {
-            if(self == playtestSession) {
-                return playtestMapData;
+            if(self == PlaytestSession) {
+                return PlaytestMapData;
 			}
 
 			return orig(self);

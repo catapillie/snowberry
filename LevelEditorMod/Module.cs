@@ -2,7 +2,9 @@
 using Celeste.Mod;
 using LevelEditorMod.Editor;
 using MonoMod.RuntimeDetour;
+using MonoMod.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -29,9 +31,11 @@ namespace LevelEditorMod {
                 typeof(Session).GetProperty("MapData", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(Editor.Editor).GetMethod("HookSessionGetAreaData", BindingFlags.Static | BindingFlags.NonPublic)
             );
+
+			On.Celeste.Editor.MapEditor.ctor += UsePlaytestMap;
         }
 
-        public override void LoadContent(bool firstLoad) {
+		public override void LoadContent(bool firstLoad) {
             base.LoadContent(firstLoad);
 
             LoadModules();
@@ -60,9 +64,25 @@ namespace LevelEditorMod {
         public override void Unload() {
             hook_MapData_orig_Load?.Dispose();
             hook_Session_get_MapData?.Dispose();
+            On.Celeste.Editor.MapEditor.ctor -= UsePlaytestMap;
         }
 
         public static void Log(LogLevel level, string message)
             => Logger.Log(level, "Level Editor Mod", message);
+
+        private void UsePlaytestMap(On.Celeste.Editor.MapEditor.orig_ctor orig, Celeste.Editor.MapEditor self, AreaKey area, bool reloadMapData) {
+            orig(self, area, reloadMapData);
+            var selfData = new DynamicData(self);
+            if(selfData.Get<Session>("CurrentSession") == Editor.Editor.PlaytestSession) {
+                var templates = selfData.Get<List<Celeste.Editor.LevelTemplate>>("levels");
+                templates.Clear();
+                foreach(LevelData level in Editor.Editor.PlaytestMapData.Levels) {
+                    templates.Add(new Celeste.Editor.LevelTemplate(level));
+                }
+                foreach(Microsoft.Xna.Framework.Rectangle item in Editor.Editor.PlaytestMapData.Filler) {
+                    templates.Add(new Celeste.Editor.LevelTemplate(item.X, item.Y, item.Width, item.Height));
+                }
+            }
+        }
     }
 }
