@@ -403,21 +403,25 @@ namespace LevelEditorMod.Editor {
 				var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8 - Editor.SelectedRoom.Position.X), (float)Math.Floor(Editor.Mouse.World.Y / 8 - Editor.SelectedRoom.Position.Y));
 				int x = (int)tilePos.X; int y = (int)tilePos.Y;
 				if(Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
-					switch(left ? LeftMode : RightMode) {
+					var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling();
+					int ax = (int)Math.Min(x, lastPress.X - Editor.SelectedRoom.Position.X);
+					int ay = (int)Math.Min(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
+					int bx = (int)Math.Max(x, lastPress.X - Editor.SelectedRoom.Position.X);
+					int by = (int)Math.Max(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
+					var rect = new Rectangle(ax, ay, bx - ax, by - ay);
+					TileBrushMode mode = left ? LeftMode : RightMode;
+					switch(mode) {
 						case TileBrushMode.Brush:
 							SetHoloTile(fg, tileset, x, y);
 							break;
-						case TileBrushMode.Rect:
 						case TileBrushMode.HollowRect:
-							var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling();
-							int ax = (int)Math.Min(x, lastPress.X - Editor.SelectedRoom.Position.X);
-							int ay = (int)Math.Min(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
-							int bx = (int)Math.Max(x, lastPress.X - Editor.SelectedRoom.Position.X);
-							int by = (int)Math.Max(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
-							var rect = new Rectangle(ax, ay, bx - ax, by - ay);
+						case TileBrushMode.Rect:
 							for(int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
 								for(int y2 = 0; y2 < holoFgTileMap.Rows; y2++) {
 									bool set = rect.Contains(x2, y2);
+									if(mode == TileBrushMode.HollowRect) {
+										set &= !new Rectangle(rect.X + 1, rect.Y + 1, rect.Width - 2, rect.Height - 2).Contains(x2, y2);
+									}
 									SetHoloTile(fg, set ? tileset : 0, x2, y2, !set);
 								}
 							break;
