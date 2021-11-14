@@ -27,11 +27,30 @@ namespace LevelEditorMod.Editor.UI {
 
             if(Editor.SelectedRoom == null) {
                 if(!RoomTool.PendingRoom.HasValue) {
-                    Add(label = new UILabel("No room is selected") {
-                        FG = Color.DarkKhaki,
-                        Underline = true
-                    });
-                    label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
+                    if(Editor.SelectedFillerIndex != -1) {
+                        Add(label = new UILabel("Selected filler: " + Editor.SelectedFillerIndex) {
+                            FG = Color.DarkKhaki,
+                            Underline = true
+                        });
+                        label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
+
+                        AddBelow(new UIButton("delete", Fonts.Regular, 4, 4) {
+                            FG = Color.Red,
+                            HoveredFG = Color.Crimson,
+                            PressedFG = Color.DarkRed,
+                            OnPress = () => {
+                                Editor.GetCurrent().Map.Fillers.RemoveAt(Editor.SelectedFillerIndex);
+                                Editor.SelectedFillerIndex = -1;
+                                RoomTool.ScheduledRefresh = true;
+                            }
+                        }, new Vector2(4, 12));
+                    } else {
+                        Add(label = new UILabel("No room is selected") {
+                            FG = Color.DarkKhaki,
+                            Underline = true
+                        });
+                        label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
+                    }
                     return;
                 } else {
                     Add(label = new UILabel("Create room") {
@@ -69,13 +88,25 @@ namespace LevelEditorMod.Editor.UI {
                         else {
                             // add room
                             var b = RoomTool.PendingRoom.Value;
-                            var newRoom = new Room(newName, new Rectangle(b.X / 8, b.Y / 8, b.Width / 8, b.Height / 8)/*RoomTool.PendingRoom.Value*/);
+                            var newRoom = new Room(newName, new Rectangle(b.X / 8, b.Y / 8, b.Width / 8, b.Height / 8));
                             Editor.GetCurrent().Map.Rooms.Add(newRoom);
                             Editor.SelectedRoom = newRoom;
                             RoomTool.PendingRoom = null;
                             RoomTool.ScheduledRefresh = true;
                         }
                     };
+
+                    AddBelow(new UIButton("create filler", Fonts.Regular, 2, 2) {
+                        Position = new Vector2(4, 4),
+                        OnPress = () => {
+                            var b = RoomTool.PendingRoom.Value;
+                            var newFiller = new Rectangle(b.X / 8, b.Y / 8, b.Width / 8, b.Height / 8);
+                            Editor.GetCurrent().Map.Fillers.Add(newFiller);
+                            Editor.SelectedFillerIndex = Editor.GetCurrent().Map.Fillers.Count - 1;
+                            RoomTool.PendingRoom = null;
+                            RoomTool.ScheduledRefresh = true;
+                        }
+                    });
 
                     return;
                 }

@@ -102,6 +102,7 @@ namespace LevelEditorMod.Editor {
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
+        internal static int SelectedFillerIndex = -1;
         internal static List<EntitySelection> SelectedEntities;
 
         public UIToolbar Toolbar;
@@ -141,7 +142,7 @@ namespace LevelEditorMod.Editor {
             ui.AddBelow(nameLabel);
             nameLabel.Position += new Vector2(10, 10);
 
-            var roomLabel = new UILabel(() => $"Room: {SelectedRoom?.Name ?? "none"}");
+            var roomLabel = new UILabel(() => $"Room: {SelectedRoom?.Name ?? (SelectedFillerIndex > -1 ? $"(filler: {SelectedFillerIndex})" : "(none)")}");
             ui.AddBelow(roomLabel);
             roomLabel.Position += new Vector2(10, 10);
 
@@ -222,7 +223,7 @@ namespace LevelEditorMod.Editor {
 
             ui.Update();
 
-            // room select
+            // room & filler select
             if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
                 if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
@@ -230,6 +231,7 @@ namespace LevelEditorMod.Editor {
                     worldClick = Mouse.World;
                     var before = SelectedRoom;
                     SelectedRoom = Map.GetRoomAt(mouse);
+                    SelectedFillerIndex = Map.GetFillerIndexAt(mouse);
                     // don't let tools click when clicking onto new rooms
                     if(SelectedRoom != before)
                         canClick = false;

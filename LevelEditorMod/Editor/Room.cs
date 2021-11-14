@@ -343,8 +343,11 @@ namespace LevelEditorMod.Editor {
                 entityElem.Attributes["originX"] = entity.Origin.X;
                 entityElem.Attributes["originY"] = entity.Origin.Y;
 
-				foreach(var opt in entity.Plugin.GetOptions())
-                    entityElem.Attributes[opt] = entity.Plugin[entity, opt];
+				foreach(var opt in entity.Plugin.GetOptions()) {
+                    var val = entity.Plugin[entity, opt];
+                    if(val != null)
+                        entityElem.Attributes[opt] = val;
+				}
 
 				foreach(var node in entity.Nodes) {
 					Element n = new Element();
@@ -375,8 +378,11 @@ namespace LevelEditorMod.Editor {
                 triggersElem.Attributes["originX"] = tigger.Origin.X;
                 triggersElem.Attributes["originY"] = tigger.Origin.Y;
 
-                foreach(var opt in tigger.Plugin.GetOptions())
-                    triggersElem.Attributes[opt] = tigger.Plugin[tigger, opt];
+                foreach(var opt in tigger.Plugin.GetOptions()) {
+                    var val = tigger.Plugin[tigger, opt];
+                    if(val != null)
+                        triggersElem.Attributes[opt] = val;
+                }
 
                 foreach(var node in tigger.Nodes) {
 					Element n = new Element();

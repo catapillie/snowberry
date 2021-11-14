@@ -8,7 +8,6 @@ using System.Collections.Generic;
 namespace LevelEditorMod.Editor {
     public class Map {
 
-        private readonly List<Rectangle> fillers = new List<Rectangle>();
         // TODO: represent stylegrounds in-editor
         private readonly BinaryPacker.Element bgStylegounds, fgStylegrounds;
 
@@ -16,6 +15,7 @@ namespace LevelEditorMod.Editor {
         public readonly AreaKey From;
 
         public readonly List<Room> Rooms = new List<Room>();
+        public readonly List<Rectangle> Fillers = new List<Rectangle>();
 
         internal Map(string name) {
             Name = name;
@@ -26,7 +26,7 @@ namespace LevelEditorMod.Editor {
             foreach (LevelData roomData in data.Levels)
                 Rooms.Add(new Room(roomData, this));
             foreach (Rectangle filler in data.Filler)
-                fillers.Add(filler);
+                Fillers.Add(filler);
             From = data.Area;
             bgStylegounds = data.Background;
             fgStylegrounds = data.Foreground;
@@ -37,6 +37,16 @@ namespace LevelEditorMod.Editor {
                 if (new Rectangle(room.X * 8, room.Y * 8, room.Width * 8, room.Height * 8).Contains(at))
                     return room;
             return null;
+        }
+
+        internal int GetFillerIndexAt(Point at) {
+			for(int i = 0; i < Fillers.Count; i++) {
+				Rectangle filler = Fillers[i];
+				if(new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8).Contains(at))
+                    return i;
+			}
+
+			return -1;
         }
 
         internal void Render(Editor.Camera camera) {
@@ -59,9 +69,10 @@ namespace LevelEditorMod.Editor {
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
             
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-            foreach (Rectangle filler in fillers) {
-            	Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
-            	Draw.Rect(rect, Color.White * 0.08f);
+			for(int i = 0; i < Fillers.Count; i++) {
+				Rectangle filler = Fillers[i];
+				Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
+            	Draw.Rect(rect, Color.White * (Editor.SelectedFillerIndex == i ? 0.14f : 0.1f));
             }
             Draw.SpriteBatch.End();
         }
@@ -69,6 +80,8 @@ namespace LevelEditorMod.Editor {
         public void GenerateMapData(MapData data){
 			foreach(var room in Rooms)
                 data.Levels.Add(new LevelData(room.CreateLevelData()));
+			foreach(var filler in Fillers)
+                data.Filler.Add(filler);
             Module.Log(LogLevel.Info, "meta: " + data.Meta);
             // ...
             data.Foreground = fgStylegrounds;
@@ -82,7 +95,7 @@ namespace LevelEditorMod.Editor {
                 if(level2.Bounds.Left < num) {
                     num = level2.Bounds.Left;
                 }
-
+                
                 if(level2.Bounds.Top < num2) {
                     num2 = level2.Bounds.Top;
                 }
@@ -96,7 +109,7 @@ namespace LevelEditorMod.Editor {
                 }
             }
 
-            /*foreach(Rectangle item in Filler) {
+            foreach(Rectangle item in data.Filler) {
                 if(item.Left < num) {
                     num = item.Left;
                 }
@@ -112,7 +125,7 @@ namespace LevelEditorMod.Editor {
                 if(item.Bottom > num4) {
                     num4 = item.Bottom;
                 }
-            }*/
+            }
 
             int num5 = 64;
             data.Bounds = new Rectangle(num - num5, num2 - num5, num3 - num + num5 * 2, num4 - num2 + num5 * 2);

@@ -596,6 +596,7 @@ namespace LevelEditorMod.Editor {
 	public class RoomTool : Tool {
 
 		private Room lastSelected = null;
+		private int lastFillerSelected = -1;
 		public static bool ScheduledRefresh = false;
 
 		private Vector2? lastRoomOffset = null;
@@ -621,10 +622,11 @@ namespace LevelEditorMod.Editor {
 
 		public override void Update(bool canClick) {
 			// refresh the display
-			if(lastSelected != Editor.SelectedRoom || ScheduledRefresh) {
+			if(lastSelected != Editor.SelectedRoom || lastFillerSelected != Editor.SelectedFillerIndex || ScheduledRefresh) {
 				justSwitched = true;
 				ScheduledRefresh = false;
 				lastSelected = Editor.SelectedRoom;
+				lastFillerSelected = Editor.SelectedFillerIndex;
 				if(Editor.GetCurrent().ToolPanel is UIRoomSelectionPanel selectionPanel)
 					selectionPanel.Refresh();
 				if(Editor.SelectedRoom != null) {
