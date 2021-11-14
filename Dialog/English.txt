@@ -9,7 +9,7 @@
 	LEVELEDITORMOD_MAINMENU_LOAD_CANCEL=				← main menu
 	LEVELEDITORMOD_MAINMENU_LOAD_CONFIRM=				are you sure you want to open this map?
 	LEVELEDITORMOD_MAINMENU_LOAD_UNSAVED=				(all unsaved changes will be lost)
-	LEVELEDITORMOD_MAINMENU_LOAD_TIP=					to discard this message, hold CTRL while clicking on the map
+	LEVELEDITORMOD_MAINMENU_LOAD_TIP=					to skip this message, hold CTRL while clicking on the map
 
 	LEVELEDITORMOD_MAINMENU_LOADSEARCH=					search map or @mod...
 	LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_NONE=			no results!

@@ -191,7 +191,9 @@ namespace LevelEditorMod.Editor.UI {
                     };
                     warn.Position = new Vector2(-warn.Width / 2, msg.Position.Y + msg.Height);
 
-                    UILabel tip = new UILabel(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD_TIP"));
+                    UILabel tip = new UILabel(Dialog.Clean("LEVELEDITORMOD_MAINMENU_LOAD_TIP")) {
+                        FG = Util.Colors.CloudLightGray,
+                    };
                     tip.Position = new Vector2(-tip.Width / 2, warn.Position.Y + warn.Height);
 
                     return Regroup(ribbon, msg, warn, tip);
@@ -356,7 +358,7 @@ namespace LevelEditorMod.Editor.UI {
                     display.Position.Y = (int)(((Height - display.Height) / 2 + h * 2) * ease - h * 2);
                 }
 
-                buttons.Position.Y = (int)(Height + buttons.Height - ((Height - h - 4) / 2 + buttons.Height) * ease);
+                buttons.Position.Y = (int)(Height + buttons.Height - ((Height - h - 6) / 2 + buttons.Height) * ease);
             }
 
             public override void Render(Vector2 position = default) {
