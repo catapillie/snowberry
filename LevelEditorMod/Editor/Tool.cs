@@ -278,6 +278,7 @@ namespace LevelEditorMod.Editor {
 		public override UIElement CreatePanel() {
 			bgTilesetButtons.Clear();
 			fgTilesetButtons.Clear();
+			modeButtons.Clear();
 			UIElement panel = new UIElement() {
 				Width = 160,
 				Background = Calc.HexToColor("202929") * (185 / 255f),
@@ -430,6 +431,11 @@ namespace LevelEditorMod.Editor {
 						case TileBrushMode.Line:
 							break;
 						case TileBrushMode.Circle:
+							for(int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
+								for(int y2 = 0; y2 < holoFgTileMap.Rows; y2++) {
+									bool set = ((lastPress.X - x2) * (lastPress.X - x2) + (lastPress.Y - y2) * (lastPress.Y - y2)) < (rect.Width * rect.Width + rect.Height * rect.Height) / Math.Sqrt(2);
+									SetHoloTile(fg, set ? tileset : 0, x2, y2, !set);
+								}
 							break;
 						default:
 							break;
