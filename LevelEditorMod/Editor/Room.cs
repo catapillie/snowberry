@@ -158,6 +158,10 @@ namespace LevelEditorMod.Editor {
             }
         }
 
+        public char GetTile(bool fg, Vector2 at) {
+            return fg ? GetFgTile(at) : GetBgTile(at);
+        }
+
         public char GetFgTile(Vector2 at) {
             Vector2 p = (at - Position * 8) / 8;
             return fgTileMap[(int)p.X, (int)p.Y];

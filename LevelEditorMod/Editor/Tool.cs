@@ -238,6 +238,8 @@ namespace LevelEditorMod.Editor {
 		private static readonly Color RightTilesetBtnBg = Calc.HexToColor("922727");
 		private static readonly Color BothTilesetBtnBg = Calc.HexToColor("7d2792");
 
+		private static readonly Point[] neighbors8 = new Point[] { new Point(1, 0), new Point(-1, 0), new Point(0, 1), new Point(0, -1), new Point(1, 1), new Point(-1, -1), new Point(-1, 1), new Point(1, -1) };
+
 		public TileBrushTool() {
 			FgTilesets = GetTilesets(false);
 			BgTilesets = GetTilesets(true);
@@ -428,6 +430,44 @@ namespace LevelEditorMod.Editor {
 								}
 							break;
 						case TileBrushMode.Fill:
+							// start at x,y
+							// while new tiles have been found:
+							//   for each tile found:
+							//     check their neighbors
+							if(!holoSetTiles[x, y]) {
+								//SetHoloTile(fg, tileset, x, y);
+								char origTile = Editor.SelectedRoom.GetTile(fg, new Vector2((x + Editor.SelectedRoom.X) * 8, (y + Editor.SelectedRoom.Y) * 8));
+								bool inside(int cx, int cy) => (cx >= 0 && cy >= 0 && cx < Editor.SelectedRoom.Width && cy < Editor.SelectedRoom.Height) && Editor.SelectedRoom.GetTile(fg, new Vector2((cx + Editor.SelectedRoom.X) * 8, (cy + Editor.SelectedRoom.Y) * 8)) == origTile;
+								Queue<Point> toCheck = new Queue<Point>();
+								void scan(int lx, int rx, int y) {
+									bool added = false;
+									for(int i = lx; i <= rx; i++) {
+										if(!inside(i, y))
+											added = false;
+										else if(!added && !holoSetTiles[i, y]) {
+											toCheck.Enqueue(new Point(i, y));
+											added = true;
+										}
+									}
+								}
+								toCheck.Enqueue(new Point(x, y));
+								while(toCheck.Count > 0) {
+									Point checking = toCheck.Dequeue();
+									int x2 = checking.X, y2 = checking.Y;
+									var lx = x2;
+									while(inside(lx - 1, y2)) {
+										SetHoloTile(fg, tileset, lx - 1, y2);
+										lx--;
+									}
+									while(inside(x2, y2)) {
+										SetHoloTile(fg, tileset, x2, y2);
+										x2++;
+									}
+									scan(lx, x2 - 1, y2 + 1);
+									scan(lx, x2 - 1, y2 - 1);
+								}
+							}
+
 							break;
 						case TileBrushMode.Line:
 							for(int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
