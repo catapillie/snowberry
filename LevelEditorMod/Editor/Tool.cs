@@ -238,8 +238,6 @@ namespace LevelEditorMod.Editor {
 		private static readonly Color RightTilesetBtnBg = Calc.HexToColor("922727");
 		private static readonly Color BothTilesetBtnBg = Calc.HexToColor("7d2792");
 
-		private static readonly Point[] neighbors8 = new Point[] { new Point(1, 0), new Point(-1, 0), new Point(0, 1), new Point(0, -1), new Point(1, 1), new Point(-1, -1), new Point(-1, 1), new Point(1, -1) };
-
 		public TileBrushTool() {
 			FgTilesets = GetTilesets(false);
 			BgTilesets = GetTilesets(true);
@@ -435,7 +433,6 @@ namespace LevelEditorMod.Editor {
 							//   for each tile found:
 							//     check their neighbors
 							if(!holoSetTiles[x, y]) {
-								//SetHoloTile(fg, tileset, x, y);
 								char origTile = Editor.SelectedRoom.GetTile(fg, new Vector2((x + Editor.SelectedRoom.X) * 8, (y + Editor.SelectedRoom.Y) * 8));
 								bool inside(int cx, int cy) => (cx >= 0 && cy >= 0 && cx < Editor.SelectedRoom.Width && cy < Editor.SelectedRoom.Height) && Editor.SelectedRoom.GetTile(fg, new Vector2((cx + Editor.SelectedRoom.X) * 8, (cy + Editor.SelectedRoom.Y) * 8)) == origTile;
 								Queue<Point> toCheck = new Queue<Point>();
