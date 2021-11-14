@@ -405,10 +405,11 @@ namespace LevelEditorMod.Editor {
 				int x = (int)tilePos.X; int y = (int)tilePos.Y;
 				if(Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
 					var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling();
-					int ax = (int)Math.Min(x, lastPress.X - Editor.SelectedRoom.Position.X);
-					int ay = (int)Math.Min(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
-					int bx = (int)Math.Max(x, lastPress.X - Editor.SelectedRoom.Position.X);
-					int by = (int)Math.Max(y, lastPress.Y - Editor.SelectedRoom.Position.Y);
+					var roomLastPress = (Editor.GetCurrent().worldClick / 8).Ceiling() - Editor.SelectedRoom.Position;
+					int ax = (int)Math.Min(x, roomLastPress.X);
+					int ay = (int)Math.Min(y, roomLastPress.Y);
+					int bx = (int)Math.Max(x, roomLastPress.X);
+					int by = (int)Math.Max(y, roomLastPress.Y);
 					var rect = new Rectangle(ax, ay, bx - ax, by - ay);
 					TileBrushMode mode = left ? LeftMode : RightMode;
 					switch(mode) {
@@ -429,6 +430,24 @@ namespace LevelEditorMod.Editor {
 						case TileBrushMode.Fill:
 							break;
 						case TileBrushMode.Line:
+							for(int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
+								for(int y2 = 0; y2 < holoFgTileMap.Rows; y2++)
+									SetHoloTile(fg, 0, x2, y2, true);
+							if(roomLastPress.X - x == 0 && roomLastPress.Y - y == 0)
+								SetHoloTile(fg, tileset, x, y);
+							else if(Math.Abs(roomLastPress.X - x) > Math.Abs(roomLastPress.Y - y)) {
+								int sign = -Math.Sign(roomLastPress.X - x);
+								float grad = (roomLastPress.Y - y) / (roomLastPress.X - x);
+								for(int p = 0; p < rect.Width; p++) {
+									SetHoloTile(fg, tileset, (int)(sign * p + roomLastPress.X), (int)(sign * p * grad + roomLastPress.Y));
+								}
+							} else {
+								int sign = -Math.Sign(roomLastPress.Y - y);
+								float grad = (roomLastPress.X - x) / (roomLastPress.Y - y);
+								for(int p = 0; p < rect.Height; p++) {
+									SetHoloTile(fg, tileset, (int)(sign * p * grad + roomLastPress.X), (int)(sign * p + roomLastPress.Y));
+								}
+							}
 							break;
 						case TileBrushMode.Circle:
 							for(int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
