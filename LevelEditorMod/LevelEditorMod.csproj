@@ -68,6 +68,7 @@
     <Compile Include="Editor\Decal.cs" />
     <Compile Include="Editor\EditorModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
+    <Compile Include="Editor\Entities\Plugin_Lightning.cs" />
     <Compile Include="Editor\Entities\Plugin_Puffer.cs" />
     <Compile Include="Editor\Entities\Plugin_HeartGem.cs" />
     <Compile Include="Editor\Entities\Plugin_Checkpoint.cs" />
