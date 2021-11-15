@@ -7,9 +7,11 @@ using System.Linq;
 
 namespace LevelEditorMod.Editor.UI {
     public class UITextField : UIElement {
-        private bool selected, hovering;
+        public bool Selected { get; private set; }
+        private bool hovering;
         private int charIndex, selection;
 
+        public Action<string> OnInputChange;
         public string Value { get; private set; }
         private int[] widthAtIndex;
         private readonly Font font;
@@ -31,16 +33,18 @@ namespace LevelEditorMod.Editor.UI {
         public UITextField(Font font, int width, string input = "") {
             this.font = font;
             UpdateInput(input ?? "null");
-            charIndex = selection = this.Value.Length;
+            charIndex = selection = Value.Length;
 
             Width = Math.Max(1, width);
             Height = font.LineHeight;
 
             TextInput.OnInput += OnInput;
+
+            GrabsClick = true;
         }
 
         private void OnInput(char c) {
-            if (Engine.Commands.Open || !selected)
+            if (Engine.Commands.Open || !Selected)
                 return;
 
             GetSelection(out int a, out int b);
@@ -60,7 +64,7 @@ namespace LevelEditorMod.Editor.UI {
         private void InsertString(int from, int to, string str = null)
             => UpdateInput(Value.Substring(0, from) + str + Value.Substring(to));
 
-        private void UpdateInput(string str) {
+        public void UpdateInput(string str) {
             Value = str;
             widthAtIndex = new int[Value.Length + 1];
             int w = 0;
@@ -72,7 +76,9 @@ namespace LevelEditorMod.Editor.UI {
             OnInputUpdate(Value);
         }
 
-        protected virtual void OnInputUpdate(string input) { }
+        protected virtual void OnInputUpdate(string input) {
+            OnInputChange?.Invoke(input);
+        }
 
         private void GetSelection(out int a, out int b) {
             if (charIndex < selection) {
@@ -111,9 +117,9 @@ namespace LevelEditorMod.Editor.UI {
                 bool click = MInput.Mouse.PressedLeftButton;
 
                 if (click)
-                    selected = inside;
+                    Selected = inside;
 
-                if (selected) {
+                if (Selected) {
                     int i, d = mouseX - (int)position.X + 1;
 
                     for (i = 0; i < widthAtIndex.Length - 1; i++)
@@ -129,12 +135,12 @@ namespace LevelEditorMod.Editor.UI {
                 }
             }
 
-            if (selected) {
+            if (Selected) {
                 bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
                 bool ctrl = MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down;
                 
                 if (MInput.Keyboard.Pressed(Keys.Escape)) {
-                    selected = false;
+                    Selected = false;
                 } else {
                     bool moved = false;
                     if (moved |= MInput.Keyboard.Pressed(Keys.Left))
@@ -172,14 +178,14 @@ namespace LevelEditorMod.Editor.UI {
                 }
             }
 
-            lerp = Calc.Approach(lerp, selected ? 1f : 0f, Engine.DeltaTime * 4f);
+            lerp = Calc.Approach(lerp, Selected ? 1f : 0f, Engine.DeltaTime * 4f);
             hovering = inside;
         }
 
         public override void Render(Vector2 position = default) {
             base.Render(position);
 
-            Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, hovering && !selected ? 0.25f : lerp));
+            Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, hovering && !Selected ? 0.25f : lerp));
             font.Draw(Value, position, Vector2.One, FG);
 
             Draw.Rect(position + Vector2.UnitY * Height, Width, 1, Line);
@@ -189,7 +195,7 @@ namespace LevelEditorMod.Editor.UI {
                 Draw.Rect(p, (Width + 1) * ease, 1, Color.Lerp(Line, LineSelected, lerp));
             }
 
-            if (selected) {
+            if (Selected) {
                 if ((Engine.Scene.TimeActive - timeOffset) % 1f < 0.5f) {
                     Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, font.LineHeight, FG);
                 }

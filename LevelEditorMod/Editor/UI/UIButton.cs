@@ -8,7 +8,7 @@ namespace LevelEditorMod.Editor.UI {
         private readonly Vector2 space, minSize;
         private string text;
         private Font font;
-        private MTexture icon;
+        private Action<Vector2, Color> icon;
 
         public Color FG = Calc.HexToColor("f0f0f0");
         public Color BG = Calc.HexToColor("1d1d21");
@@ -25,7 +25,7 @@ namespace LevelEditorMod.Editor.UI {
             topFill, bottomFill,
             mid;
 
-        public Action OnPress;
+        public Action OnPress, OnRightPress;
 
         private UIButton(int spaceX, int spaceY, int minWidth, int minHeight) {
             MTexture full = GFX.Gui["editor/button"];
@@ -37,6 +37,8 @@ namespace LevelEditorMod.Editor.UI {
 
             minSize = new Vector2(minWidth, minHeight);
             space = new Vector2(spaceX, spaceY);
+
+            GrabsClick = true;
         }
 
         public UIButton(int width, int height, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8)
@@ -55,12 +57,18 @@ namespace LevelEditorMod.Editor.UI {
             FG = PressedFG = HoveredFG = Color.White;
         }
 
+        public UIButton(Action<Vector2, Color> action, int icoWidth, int icoHeight, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8)
+            : this(spaceX, spaceY, minWidth, minHeight) {
+            SetIconAction(action, icoWidth, icoHeight);
+            FG = PressedFG = HoveredFG = Color.White;
+        }
+
         private void SetSize(int width, int height) {
             Width = (int)Math.Max(width + space.X * 2, Math.Max(6, minSize.X));
             Height = (int)Math.Max(height + space.Y * 2, Math.Max(8, minSize.Y));
         }
 
-        protected void SetText(string text, Font font = null) {
+        public void SetText(string text, Font font = null) {
             icon = null;
             this.text = text;
             this.font = font ?? this.font;
@@ -68,9 +76,14 @@ namespace LevelEditorMod.Editor.UI {
             SetSize((int)size.X + 6, (int)size.Y + 3);
         }
 
-        protected void SetIcon(MTexture icon) {
-            this.icon = icon;
+        public void SetIcon(MTexture icon) {
+            this.icon = (at, color) => icon.Draw(at, Vector2.Zero, color);
             SetSize(icon.Width + 6, icon.Height + 3);
+        }
+
+        public void SetIconAction(Action<Vector2, Color> action, int icoWidth, int icoHeight) {
+            icon = action;
+            SetSize(icoWidth + 6, icoHeight + 3);
         }
 
         public override void Update(Vector2 position = default) {
@@ -80,12 +93,17 @@ namespace LevelEditorMod.Editor.UI {
             int mouseY = (int)Editor.Mouse.Screen.Y;
             hovering = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
 
-            if (MInput.Mouse.PressedLeftButton && hovering)
+            if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
                 pressed = true;
-            else if (MInput.Mouse.ReleasedLeftButton) {
-                if (hovering && pressed)
-                    Pressed();
-                pressed = false;
+            else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+                if(hovering && pressed) {
+					if(MInput.Mouse.ReleasedLeftButton)
+                        Pressed();
+                    else
+                        OnRightPress?.Invoke();
+				}
+
+				pressed = false;
             }
 
             lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
@@ -121,8 +139,7 @@ namespace LevelEditorMod.Editor.UI {
             Color fg = Color.Lerp(hovering ? HoveredFG : FG, PressedFG, lerp);
             if (text != null && font != null)
                 font.Draw(text, at, Vector2.One, fg);
-            else if (icon != null)
-                icon.Draw(at, Vector2.Zero, fg);
-        }
+            else icon?.Invoke(at, fg);
+		}
     }
 }

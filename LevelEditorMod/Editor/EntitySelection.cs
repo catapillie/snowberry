@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor {
-    internal class EntitySelection {
+    public class EntitySelection {
         public class Selection {
             public Rectangle Rect;
             public int Index;
@@ -13,12 +13,12 @@ namespace LevelEditorMod.Editor {
             }
         }
 
-        private readonly Entity entity;
+        public readonly Entity Entity;
         public readonly List<Selection> Selections;
 
         public EntitySelection(Entity entity, List<Selection> selection) {
-            this.entity = entity;
-            this.Selections = selection;
+            Entity = entity;
+            Selections = selection;
         }
 
         public bool Contains(Point p) {
@@ -33,10 +33,44 @@ namespace LevelEditorMod.Editor {
                 s.Rect.X += (int)amount.X;
                 s.Rect.Y += (int)amount.Y;
                 if (s.Index < 0)
-                    entity.Move(amount);
+                    Entity.Move(amount);
                 else
-                    entity.MoveNode(s.Index, amount);
+                    Entity.MoveNode(s.Index, amount);
             }
+        }
+
+        public void SetPosition(Vector2 position, int i) {
+            foreach (Selection s in Selections) {
+                if (s.Index == i) {
+                    s.Rect.X = (int)position.X;
+                    s.Rect.Y = (int)position.Y;
+                    break;
+                }
+            }
+            if (i < 0)
+                Entity.SetPosition(position);
+            else
+                Entity.SetNode(i, position);
+        }
+
+        public void SetWidth(int width) {
+            foreach (Selection s in Selections) {
+                if (s.Index == -1) {
+                    s.Rect.Width = width;
+                    break;
+                }
+            }
+            Entity.SetWidth(width);
+        }
+
+        public void SetHeight(int height) {
+            foreach (Selection s in Selections) {
+                if (s.Index == -1) {
+                    s.Rect.Height = height;
+                    break;
+                }
+            }
+            Entity.SetHeight(height);
         }
     }
 }

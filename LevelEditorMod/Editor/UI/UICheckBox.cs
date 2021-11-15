@@ -20,6 +20,7 @@ namespace LevelEditorMod.Editor.UI {
         public UICheckBox(int size, bool check = false) 
             : base("", Fonts.Regular, size, size) {
             Checked = check;
+            GrabsClick = true;
         }
 
         protected override void Initialize() {

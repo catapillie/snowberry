@@ -11,18 +11,20 @@ namespace LevelEditorMod {
         public static readonly Dictionary<string, PluginInfo> All = new Dictionary<string, PluginInfo>();
 
         private readonly Type Type;
-        private readonly Dictionary<string, FieldInfo> options = new Dictionary<string, FieldInfo>();
+        public readonly Dictionary<string, FieldInfo> OptionDict = new Dictionary<string, FieldInfo>();
         private readonly ConstructorInfo ctor;
+
+        public readonly EditorModule EditorModule;
 
         public object this[Entity entity, string option] {
             get {
-                if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
+                if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
                     return ObjectToRaw(f.GetValue(entity));
                 }
                 return null;
             }
             set {
-                if (entity.GetType() == Type && options.TryGetValue(option, out FieldInfo f)) {
+                if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
                     object val = RawToObject(f.FieldType, value);
                     if (val != null)
                         f.SetValue(entity, val);
@@ -30,16 +32,17 @@ namespace LevelEditorMod {
             }
         }
 
-        public PluginInfo(string name, Type t, ConstructorInfo ctor) {
+        public PluginInfo(string name, Type t, ConstructorInfo ctor, EditorModule module) {
             this.ctor = ctor;
             Type = t;
+            EditorModule = module;
             foreach (FieldInfo f in t.GetFields()) {
                 if (f.GetCustomAttribute<OptionAttribute>() is OptionAttribute option) {
                     if (option.Name == null || option.Name == string.Empty) {
                         Module.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{name}' was ignored because it had a null or empty option name!");
                         continue;
-                    } else if (!options.ContainsKey(option.Name))
-                        options.Add(option.Name, f);
+                    } else if (!OptionDict.ContainsKey(option.Name))
+                        OptionDict.Add(option.Name, f);
                 }
             }
         }
@@ -47,7 +50,7 @@ namespace LevelEditorMod {
         public Entity Instantiate()
             => (Entity)ctor.Invoke(new object[] { });
 
-        public static void GenerateFromAssembly(Assembly assembly) {
+        public static void GenerateFromAssembly(Assembly assembly, EditorModule module) {
             foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Entity).IsAssignableFrom(t))) {
                 foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>(inherit: false)) {
                     if (pl.Name == null || pl.Name == string.Empty) {
@@ -61,7 +64,7 @@ namespace LevelEditorMod {
                         continue;
                     }
 
-                    All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor));
+                    All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor, module));
 
                     Module.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' entity plugin");
                 }
@@ -96,7 +99,7 @@ namespace LevelEditorMod {
         }
 
         public List<string> GetOptions() {
-            return options.Keys.ToList();
+            return OptionDict.Keys.ToList();
         }
     }
 }
