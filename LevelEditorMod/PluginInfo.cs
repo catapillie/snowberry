@@ -26,8 +26,14 @@ namespace LevelEditorMod {
             set {
                 if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
                     object val = RawToObject(f.FieldType, value);
-                    if (val != null)
-                        f.SetValue(entity, val);
+                    if(val != null)
+                        try {
+                            f.SetValue(entity, val);
+                        } catch(ArgumentException e) {
+                            Module.Log(LogLevel.Warn, "Tried to set field " + option + " to an invalid value " + val);
+                            Module.Log(LogLevel.Warn, e.ToString());
+                        }
+                        
                 }
             }
         }
@@ -97,6 +103,9 @@ namespace LevelEditorMod {
             }
             if (targetType == typeof(char)) {
                 return raw.ToString()[0];
+            }
+            if(targetType == typeof(string) && raw.GetType() != typeof(string)) {
+                return raw.ToString();
             }
             return raw;
         }
