@@ -294,6 +294,8 @@ namespace LevelEditorMod.Editor {
                 entityElem.Name = entity.Name;
                 entityElem.Children = new List<Element>();
                 entityElem.Attributes = new Dictionary<string, object>();
+
+                entityElem.Attributes["id"] = entity.EntityID;
                 entityElem.Attributes["x"] = entity.X - X * 8;
                 entityElem.Attributes["y"] = entity.Y - Y * 8;
                 entityElem.Attributes["width"] = entity.Width;

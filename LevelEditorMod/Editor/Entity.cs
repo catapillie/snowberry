@@ -27,6 +27,8 @@ namespace LevelEditorMod.Editor {
 
         public string Name { get; private set; }
 
+        public int EntityID { get; private set; }
+
         public Vector2 Position { get; private set; }
         public int X => (int)Position.X;
         public int Y => (int)Position.Y;
@@ -103,6 +105,7 @@ namespace LevelEditorMod.Editor {
             Width = entityData.Width;
             Height = entityData.Height;
             Origin = entityData.Origin;
+            EntityID = entityData.ID;
 
             foreach (Vector2 node in entityData.Nodes)
                 nodes.Add(node + offset);
