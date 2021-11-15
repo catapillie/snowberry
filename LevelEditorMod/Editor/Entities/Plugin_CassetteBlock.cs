@@ -1,12 +1,16 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("cassetteBlock")]
     public class Plugin_CassetteBlock : Entity {
         [Option("index")] public int Index = 0;
         [Option("tempo")] public float Tempo = 1.0f;
+
+        public override int MinWidth => 16;
+        public override int MinHeight => 16;
 
         private static readonly Color[] colors = new Color[4] {
             Calc.HexToColor("49aaf0"),
@@ -28,6 +32,13 @@ namespace LevelEditorMod.Editor.Entities {
                     block.GetSubtexture(tx, ty, 8, 8).Draw(Position + new Vector2(x, y) * 8, Vector2.Zero, colors[Index % 4]);
                 }
             }
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Cassette Block (Blue)", "cassetteBlock", new Dictionary<string, object>() { { "index", 0 } });
+            Placements.Create("Cassette Block (Pink)", "cassetteBlock", new Dictionary<string, object>() { { "index", 1 } });
+            Placements.Create("Cassette Block (Yellow)", "cassetteBlock", new Dictionary<string, object>() { { "index", 2 } });
+            Placements.Create("Cassette Block (Green)", "cassetteBlock", new Dictionary<string, object>() { { "index", 3 } });
         }
     }
 }

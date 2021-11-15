@@ -12,7 +12,8 @@ namespace LevelEditorMod.Editor.UI {
         public bool ShowScrollBar = true;
 
 		public UIScrollPane() {
-			BG.A = 127;
+			BG.A = 185;
+            Background = BG;
 			GrabsScroll = true;
             GrabsClick = true;
 		}
@@ -27,8 +28,6 @@ namespace LevelEditorMod.Editor.UI {
             Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = rect;
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-            Draw.Rect(rect, BG);
 
             base.Render(position);
 
@@ -64,6 +63,8 @@ namespace LevelEditorMod.Editor.UI {
                 else if(wheel < 0 && points.Y > Height)
                     children.ForEach(ch => ch.Position -= Vector2.UnitY * 13);
             }
+            // TODO: hackfix to make the tile brushes show up
+            Height = Height == 0 ? Parent?.Height ?? 0 : Height;
         }
 
         // X,Y = Top, Bottom

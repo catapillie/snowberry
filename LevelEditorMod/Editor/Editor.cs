@@ -102,14 +102,15 @@ namespace LevelEditorMod.Editor {
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
+        internal static int SelectedFillerIndex = -1;
         internal static List<EntitySelection> SelectedEntities;
 
         public UIToolbar Toolbar;
         public UIElement ToolPanel;
 
         private static bool generatePlaytestMapData = false;
-        private static Session playtestSession;
-        private static MapData playtestMapData;
+        internal static Session PlaytestSession;
+        internal static MapData PlaytestMapData;
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -139,9 +140,9 @@ namespace LevelEditorMod.Editor {
 
             var nameLabel = new UILabel($"Map: {Map.From.SID} ({Map.From.Mode})");
             ui.AddBelow(nameLabel);
-            nameLabel.Position += new Vector2(10, 0);
+            nameLabel.Position += new Vector2(10, 10);
 
-            var roomLabel = new UILabel(() => $"Room: {SelectedRoom?.Name ?? "none"}");
+            var roomLabel = new UILabel(() => $"Room: {SelectedRoom?.Name ?? (SelectedFillerIndex > -1 ? $"(filler: {SelectedFillerIndex})" : "(none)")}");
             ui.AddBelow(roomLabel);
             roomLabel.Position += new Vector2(10, 10);
 
@@ -161,9 +162,9 @@ namespace LevelEditorMod.Editor {
                     Audio.SetAmbience(null);
 
                     generatePlaytestMapData = true;
-                    playtestMapData = new MapData(Map.From);
-                    playtestSession = new Session(Map.From);
-                    LevelEnter.Go(playtestSession, true);
+                    PlaytestMapData = new MapData(Map.From);
+                    PlaytestSession = new Session(Map.From);
+                    LevelEnter.Go(PlaytestSession, true);
                     generatePlaytestMapData = false;
                 },
             };
@@ -222,13 +223,18 @@ namespace LevelEditorMod.Editor {
 
             ui.Update();
 
-            // room select
-            if(MInput.Mouse.CheckLeftButton && canClick) {
-                if(MInput.Mouse.PressedLeftButton) {
+            // room & filler select
+            if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
+                if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
                     Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
                     
                     worldClick = Mouse.World;
+                    var before = SelectedRoom;
                     SelectedRoom = Map.GetRoomAt(mouse);
+                    SelectedFillerIndex = Map.GetFillerIndexAt(mouse);
+                    // don't let tools click when clicking onto new rooms
+                    if(SelectedRoom != before)
+                        canClick = false;
                 }
             }
 
@@ -323,8 +329,8 @@ namespace LevelEditorMod.Editor {
 		}
 
         private static MapData HookSessionGetAreaData(Func<Session, MapData> orig, Session self) {
-            if(self == playtestSession) {
-                return playtestMapData;
+            if(self == PlaytestSession) {
+                return PlaytestMapData;
 			}
 
 			return orig(self);

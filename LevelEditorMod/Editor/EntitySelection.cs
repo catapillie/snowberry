@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LevelEditorMod.Editor {
     public class EntitySelection {
@@ -72,5 +73,9 @@ namespace LevelEditorMod.Editor {
             }
             Entity.SetHeight(height);
         }
-    }
+
+		public override bool Equals(object obj) {
+			return obj != null && obj is EntitySelection s && s.Entity.Equals(Entity) && s.Selections.All(it => Selections.Any(x => x.Index == it.Index));
+		}
+	}
 }

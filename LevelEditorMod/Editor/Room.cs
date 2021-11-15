@@ -13,9 +13,9 @@ namespace LevelEditorMod.Editor {
     using Element = BinaryPacker.Element;
 
     public class Room {
-        public string Name { get; private set; }
+        public string Name;
 
-        public Rectangle Bounds { get; private set; }
+        public Rectangle Bounds;
 
         public Map Map { get; private set; }
 
@@ -27,34 +27,34 @@ namespace LevelEditorMod.Editor {
         public Vector2 Size => new Vector2(Width, Height);
 
         // Music data
-        public string Music { get; private set; }
-        public string AltMusic { get; private set; }
-        public string Ambience { get; private set; }
-        public bool[] MusicLayers { get; private set; }
+        public string Music = "";
+        public string AltMusic = "";
+        public string Ambience = "";
+        public bool[] MusicLayers = new bool[4];
 
-        public int MusicProgress { get; private set; }
-        public int AmbienceProgress { get; private set; }
+        public int MusicProgress;
+        public int AmbienceProgress;
 
         // Camera offset data
-        public Vector2 CameraOffset { get; private set; }
+        public Vector2 CameraOffset;
 
         // Misc data
-        public bool Dark { get; private set; }
-        public bool Underwater { get; private set; }
-        public bool Space { get; private set; }
-        public WindController.Patterns WindPattern { get; private set; }
+        public bool Dark;
+        public bool Underwater;
+        public bool Space;
+        public WindController.Patterns WindPattern = WindController.Patterns.None;
 
         // Tiles
-        private readonly VirtualMap<char> fgTileMap;
-        private readonly VirtualMap<char> bgTileMap;
+        private VirtualMap<char> fgTileMap;
+        private VirtualMap<char> bgTileMap;
         private VirtualMap<MTexture> fgTiles, bgTiles;
 
-        private readonly List<Decal> fgDecals = new List<Decal>();
-        private readonly List<Decal> bgDecals = new List<Decal>();
+        public readonly List<Decal> FgDecals = new List<Decal>();
+        public readonly List<Decal> BgDecals = new List<Decal>();
 
-        private readonly List<Entity> entities = new List<Entity>();
-        private readonly List<Entity> triggers = new List<Entity>();
-        private readonly List<Entity> allEntities = new List<Entity>();
+        public readonly List<Entity> Entities = new List<Entity>();
+        public readonly List<Entity> Triggers = new List<Entity>();
+        public readonly List<Entity> AllEntities = new List<Entity>();
 
         public int LoadSeed {
             get {
@@ -74,6 +74,7 @@ namespace LevelEditorMod.Editor {
             Bounds = bounds;
             fgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
             bgTileMap = new VirtualMap<char>(bounds.Width, bounds.Height, '0');
+            Autotile();
         }
 
         internal Room(LevelData data, Map map)
@@ -123,36 +124,42 @@ namespace LevelEditorMod.Editor {
 
             // BgDecals
             foreach (DecalData decal in data.BgDecals) {
-                bgDecals.Add(new Decal(this, decal));
+                BgDecals.Add(new Decal(this, decal));
             }
 
             // FgDecals
             foreach (DecalData decal in data.FgDecals) {
-                fgDecals.Add(new Decal(this, decal));
+                FgDecals.Add(new Decal(this, decal));
             }
 
             // Entities
             foreach (EntityData entity in data.Entities) {
                 if (Entity.TryCreate(this, entity, out Entity e)) {
-                    entities.Add(e);
-                    allEntities.Add(e);
+                    Entities.Add(e);
+                    AllEntities.Add(e);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
             }
 
             // Player Spawnpoints (excluded from LevelData.Entities)
             foreach (Vector2 spawn in data.Spawns) {
-                entities.Add(Entity.Create("player", this).SetPosition(spawn));
+                var spawnEntity = Entity.Create("player", this).SetPosition(spawn);
+                Entities.Add(spawnEntity);
+                AllEntities.Add(spawnEntity);
             }
 
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
                 if (Entity.TryCreate(this, trigger, out Entity t)) {
-                    triggers.Add(t);
-                    allEntities.Add(t);
+                    Triggers.Add(t);
+                    AllEntities.Add(t);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
+        }
+
+        public char GetTile(bool fg, Vector2 at) {
+            return fg ? GetFgTile(at) : GetBgTile(at);
         }
 
         public char GetFgTile(Vector2 at) {
@@ -165,25 +172,25 @@ namespace LevelEditorMod.Editor {
             return bgTileMap[(int)p.X, (int)p.Y];
         }
 
-        public void SetFgTile(Vector2 at, char tile) {
-            Vector2 p = (at - Position * 8) / 8;
-            char orig = fgTileMap[(int)p.X, (int)p.Y];
+        public bool SetFgTile(int x, int y, char tile) {
+            char orig = fgTileMap[x, y];
             if(orig != tile) {
-                fgTileMap[(int)p.X, (int)p.Y] = tile;
-                Autotile();
+                fgTileMap[x, y] = tile;
+                return true;
             }
+            return false;
         }
 
-        public void SetBgTile(Vector2 at, char tile) {
-            Vector2 p = (at - Position * 8) / 8;
-            char orig = bgTileMap[(int)p.X, (int)p.Y];
+        public bool SetBgTile(int x, int y, char tile) {
+            char orig = bgTileMap[x, y];
             if(orig != tile) {
-                bgTileMap[(int)p.X, (int)p.Y] = tile;
-                Autotile();
+                bgTileMap[x, y] = tile;
+                return true;
             }
+            return false;
         }
 
-        private void Autotile() {
+        public void Autotile() {
             fgTiles = GFX.FGAutotiler.GenerateMap(fgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
             bgTiles = GFX.BGAutotiler.GenerateMap(bgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid.Tiles;
         }
@@ -191,7 +198,7 @@ namespace LevelEditorMod.Editor {
         internal List<EntitySelection> GetSelectedEntities(Rectangle rect) {
             List<EntitySelection> result = new List<EntitySelection>();
 
-            foreach (Entity entity in allEntities) {
+            foreach (Entity entity in AllEntities) {
                 var rects = entity.SelectionRectangles;
                 if (rects != null && rects.Length > 0) {
                     List<EntitySelection.Selection> selection = new List<EntitySelection.Selection>();
@@ -234,11 +241,11 @@ namespace LevelEditorMod.Editor {
                         bgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
             // BgDecals
-            foreach (Decal decal in bgDecals)
+            foreach (Decal decal in BgDecals)
                 decal.Render(offset);
 
             // Entities
-            foreach (Entity entity in entities) {
+            foreach (Entity entity in Entities) {
                 Calc.PushRandom(entity.GetHashCode());
                 entity.Render();
                 Calc.PopRandom();
@@ -251,11 +258,11 @@ namespace LevelEditorMod.Editor {
                         fgTiles[x, y].Draw(offset + new Vector2(x, y) * 8);
 
             // FgDecals
-            foreach (Decal decal in fgDecals)
+            foreach (Decal decal in FgDecals)
                 decal.Render(offset);
 
             // Triggers
-            foreach (Entity trigger in triggers)
+            foreach (Entity trigger in Triggers)
                 trigger.Render();
 
             if (this == Editor.SelectedRoom) {
@@ -270,6 +277,22 @@ namespace LevelEditorMod.Editor {
                 }
             } else
                 Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.5f);
+        }
+
+        public void UpdateBounds() {
+            var newFgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
+			for(int x = 0; x < fgTileMap.Columns; x++)
+				for(int y = 0; y < fgTileMap.Rows; y++)
+                    newFgTiles[x, y] = fgTileMap[x, y];
+            fgTileMap = newFgTiles;
+
+            var newBgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
+            for(int x = 0; x < bgTileMap.Columns; x++)
+                for(int y = 0; y < bgTileMap.Rows; y++)
+                    newBgTiles[x, y] = bgTileMap[x, y];
+            bgTileMap = newBgTiles;
+
+            Autotile();
         }
 
         public Element CreateLevelData() {
@@ -308,7 +331,7 @@ namespace LevelEditorMod.Editor {
             ret.Children = new List<Element>();
             ret.Children.Add(entitiesElement);
 
-			foreach(var entity in entities) {
+			foreach(var entity in Entities) {
 				Element entityElem = new Element();
                 entityElem.Name = entity.Name;
                 entityElem.Children = new List<Element>();
@@ -322,8 +345,11 @@ namespace LevelEditorMod.Editor {
                 entityElem.Attributes["originX"] = entity.Origin.X;
                 entityElem.Attributes["originY"] = entity.Origin.Y;
 
-				foreach(var opt in entity.Plugin.GetOptions())
-                    entityElem.Attributes[opt] = entity.Plugin[entity, opt];
+				foreach(var opt in entity.Plugin.GetOptions()) {
+                    var val = entity.Plugin[entity, opt];
+                    if(val != null)
+                        entityElem.Attributes[opt] = val;
+				}
 
 				foreach(var node in entity.Nodes) {
 					Element n = new Element();
@@ -342,7 +368,7 @@ namespace LevelEditorMod.Editor {
             triggersElement.Children = new List<Element>();
             ret.Children.Add(triggersElement);
 
-            foreach(var tigger in triggers) {
+            foreach(var tigger in Triggers) {
 				Element triggersElem = new Element();
                 triggersElem.Name = tigger.Name;
                 triggersElem.Children = new List<Element>();
@@ -354,8 +380,11 @@ namespace LevelEditorMod.Editor {
                 triggersElem.Attributes["originX"] = tigger.Origin.X;
                 triggersElem.Attributes["originY"] = tigger.Origin.Y;
 
-                foreach(var opt in tigger.Plugin.GetOptions())
-                    triggersElem.Attributes[opt] = tigger.Plugin[tigger, opt];
+                foreach(var opt in tigger.Plugin.GetOptions()) {
+                    var val = tigger.Plugin[tigger, opt];
+                    if(val != null)
+                        triggersElem.Attributes[opt] = val;
+                }
 
                 foreach(var node in tigger.Nodes) {
 					Element n = new Element();
@@ -372,13 +401,13 @@ namespace LevelEditorMod.Editor {
             fgDecalsElem.Name = "fgdecals";
             fgDecalsElem.Children = new List<Element>();
             ret.Children.Add(fgDecalsElem);
-			foreach(var decal in fgDecals) {
+			foreach(var decal in FgDecals) {
                 Element decalElem = new Element();
                 decalElem.Attributes = new Dictionary<string, object>();
-                decalElem.Attributes["x"] = decal.position.X;
-                decalElem.Attributes["y"] = decal.position.Y;
-                decalElem.Attributes["scaleX"] = decal.scale.X;
-                decalElem.Attributes["scaleY"] = decal.scale.Y;
+                decalElem.Attributes["x"] = decal.Position.X;
+                decalElem.Attributes["y"] = decal.Position.Y;
+                decalElem.Attributes["scaleX"] = decal.Scale.X;
+                decalElem.Attributes["scaleY"] = decal.Scale.Y;
                 decalElem.Attributes["texture"] = decal.Texture;
                 fgDecalsElem.Children.Add(decalElem);
             }
@@ -387,13 +416,13 @@ namespace LevelEditorMod.Editor {
             bgDecalsElem.Name = "bgdecals";
             bgDecalsElem.Children = new List<Element>();
             ret.Children.Add(bgDecalsElem);
-            foreach(var decal in bgDecals) {
+            foreach(var decal in BgDecals) {
                 Element decalElem = new Element();
                 decalElem.Attributes = new Dictionary<string, object>();
-                decalElem.Attributes["x"] = decal.position.X;
-                decalElem.Attributes["y"] = decal.position.Y;
-                decalElem.Attributes["scaleX"] = decal.scale.X;
-                decalElem.Attributes["scaleY"] = decal.scale.Y;
+                decalElem.Attributes["x"] = decal.Position.X;
+                decalElem.Attributes["y"] = decal.Position.Y;
+                decalElem.Attributes["scaleX"] = decal.Scale.X;
+                decalElem.Attributes["scaleY"] = decal.Scale.Y;
                 decalElem.Attributes["texture"] = decal.Texture;
                 bgDecalsElem.Children.Add(decalElem);
             }

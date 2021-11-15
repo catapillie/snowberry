@@ -10,5 +10,9 @@ namespace LevelEditorMod.Editor.Triggers {
             base.Render();
             Fonts.Pico8.Draw($"(x: {CameraX} y: {CameraY})", Center + Vector2.UnitY * 6, Vector2.One, new Vector2(0.5f, 0.5f), Color.Black);
         }
+
+        public static new void AddPlacements() {
+            Placements.Create("Camera Offset Trigger", "cameraOffsetTrigger");
+        }
     }
 }

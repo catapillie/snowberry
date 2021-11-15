@@ -24,5 +24,9 @@ namespace LevelEditorMod.Editor.Entities {
                 prev = node;
             }
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Badeline Boost", "badelineBoost");
+        }
     }
 }

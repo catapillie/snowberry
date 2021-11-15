@@ -9,7 +9,9 @@ namespace LevelEditorMod.Editor.Entities {
 
 		[Option("texture")] public string Texture = null;
 
-        public override void Render() {
+		public override int MinWidth => 8;
+
+		public override void Render() {
             base.Render();
 
 			// TODO: custom textures
@@ -20,5 +22,9 @@ namespace LevelEditorMod.Editor.Entities {
 				mTexture2.GetSubtexture(num2 * 8, 0, 8, 8).DrawCentered(new Vector2(4 + j + X, 4f + Y));
 			}
 		}
-    }
+
+		public static void AddPlacements() {
+			Placements.Create("Crumble Blocks", "crumbleBlock");
+		}
+	}
 }

@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Monocle;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -8,10 +6,10 @@ using System.Reflection;
 namespace LevelEditorMod.Editor.UI {
     public class UISelectionPanel : UIScrollPane {
         public class UIOption : UIElement {
-            private readonly UIElement input;
+            public readonly UIElement Input;
 
             public UIOption(string name, UIElement input) {
-                this.input = input;
+                this.Input = input;
 
                 UILabel label;
                 Add(label = new UILabel($"{name} : ") {
@@ -69,7 +67,7 @@ namespace LevelEditorMod.Editor.UI {
                         Add(ColorOption(option.Key, (Color)value, entity, option.Value, l));
                         l += 90;
                     } else if (option.Value.FieldType == typeof(string)) {
-                        Add(StringOption(option.Key, value.ToString(), entity, option.Value, l));
+                        Add(StringOption(option.Key, value?.ToString() ?? "", entity, option.Value, l));
                         l += spacing;
                     } else if (option.Value.FieldType == typeof(int)) {
                         Add(LiteralValueOption<int>(option.Key, value.ToString(), entity, option.Value, l));

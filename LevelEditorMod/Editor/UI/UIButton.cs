@@ -10,6 +10,13 @@ namespace LevelEditorMod.Editor.UI {
         private Font font;
         private Action<Vector2, Color> icon;
 
+        public static readonly Color DefaultFG = Calc.HexToColor("f0f0f0");
+        public static readonly Color DefaultBG = Calc.HexToColor("1d1d21");
+        public static readonly Color DefaultPressedFG = Calc.HexToColor("4e4ea3");
+        public static readonly Color DefaultPressedBG = Calc.HexToColor("131317");
+        public static readonly Color DefaultHoveredFG = Calc.HexToColor("f0f0f0");
+        public static readonly Color DefaultHoveredBG = Calc.HexToColor("18181c");
+
         public Color FG = Calc.HexToColor("f0f0f0");
         public Color BG = Calc.HexToColor("1d1d21");
         public Color PressedFG = Calc.HexToColor("4e4ea3");

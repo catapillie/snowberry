@@ -11,5 +11,9 @@ namespace LevelEditorMod.Editor.Entities {
 
             GFX.Game["scenery/lamp"].GetSubtexture(Broken ? 16 : 0, 0, 16, 80).DrawJustified(Position, new Vector2(0.5f, 1.0f));
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Lamp", "lamp");
+        }
     }
 }

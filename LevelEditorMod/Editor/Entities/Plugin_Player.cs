@@ -9,5 +9,9 @@ namespace LevelEditorMod.Editor.Entities {
 
             GFX.Game["characters/player/sitDown00"].DrawCentered(Position - Vector2.UnitY * 16);
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Spawn Point", "player");
+        }
     }
 }

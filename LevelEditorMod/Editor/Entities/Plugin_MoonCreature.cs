@@ -9,5 +9,9 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
             GFX.Game["scenery/moon_creatures/tiny05"].DrawCentered(Position);
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Moon Creature", "moonCreature");
+        }
     }
 }

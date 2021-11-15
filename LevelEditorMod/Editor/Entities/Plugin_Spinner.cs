@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 using static Celeste.TrackSpinner;
 
 namespace LevelEditorMod.Editor.Entities {
@@ -35,6 +36,12 @@ namespace LevelEditorMod.Editor.Entities {
                 spinner.DrawCentered(Position, c);
             }
         }
+
+        public static void AddPlacements() {
+            string[] types = new string[] { "Blue", "Red", "Purple", "Rainbow" };
+            foreach(var type in types)
+                Placements.Create($"Spinner ({type})", "spinner", new Dictionary<string, object>() { { "color", type } });
+        }
     }
 
     public class Plugin_MovingSpinner : Entity {
@@ -62,6 +69,12 @@ namespace LevelEditorMod.Editor.Entities {
                 blade.DrawCentered(Position);
                 blade.DrawCentered(stop);
             }
+        }
+
+        public override void ApplyDefaults() {
+            base.ChangeDefault();
+            ResetNodes();
+            AddNode(Position + new Vector2(16, 0));
         }
     }
 

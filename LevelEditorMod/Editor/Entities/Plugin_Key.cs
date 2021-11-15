@@ -12,5 +12,9 @@ namespace LevelEditorMod.Editor.Entities {
             base.Render();
             GFX.Game["collectables/key/idle00"].DrawCentered(Position);
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Key", "key");
+        }
     }
 }

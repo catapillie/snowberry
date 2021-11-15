@@ -15,5 +15,9 @@ namespace LevelEditorMod.Editor.Entities {
                 _ => "objects/campfire/fire00",
             }].DrawJustified(Position, new Vector2(0.5f, 1.0f));
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Campfire", "bonfire");
+        }
     }
 }

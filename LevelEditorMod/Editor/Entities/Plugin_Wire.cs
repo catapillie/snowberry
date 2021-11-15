@@ -7,7 +7,10 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("above")] public bool Above = false;
         [Option("color")] public Color Color = Calc.HexToColor("595866");
 
-        public override void Render() {
+		public override int MinNodes => 1;
+		public override int MaxNodes => 1;
+
+		public override void Render() {
             base.Render();
 
             Vector2 start = Position;
@@ -16,6 +19,10 @@ namespace LevelEditorMod.Editor.Entities {
 
             SimpleCurve curve = new SimpleCurve(start, end, control);
             curve.Render(Color, 20);
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Wire", "wire");
         }
     }
 }

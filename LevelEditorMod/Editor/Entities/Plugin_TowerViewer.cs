@@ -8,7 +8,9 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("onlyY")] public bool OnlyY = false;
         [Option("summit")] public bool Summit = false;
 
-        public override void Render() {
+		public override int MaxNodes => -1;
+
+		public override void Render() {
             base.Render();
 
             MTexture tower = GFX.Game["objects/lookout/lookout05"];
@@ -20,6 +22,10 @@ namespace LevelEditorMod.Editor.Entities {
                 Draw.Line(prev, node, Color.White * 0.5f);
                 prev = node;
             }
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Watchtower", "towerviewer");
         }
     }
 }

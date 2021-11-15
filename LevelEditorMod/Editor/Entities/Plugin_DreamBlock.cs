@@ -8,6 +8,10 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("oneUse")] public bool OneUse = false;
         [Option("below")] public bool Below = false;
 
+        public override int MinWidth => 8;
+        public override int MinHeight => 8;
+        public override int MaxNodes => 1;
+
         public override void Render() {
             base.Render();
 
@@ -26,6 +30,10 @@ namespace LevelEditorMod.Editor.Entities {
             } else {
                 return new Rectangle[] { Bounds };
             }
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Dream Block", "dreamBlock");
         }
     }
 }

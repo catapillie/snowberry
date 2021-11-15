@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Monocle;
 using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.UI {
@@ -7,10 +8,11 @@ namespace LevelEditorMod.Editor.UI {
         private readonly List<UIElement> toRemove = new List<UIElement>();
         private readonly List<UIElement> toAdd = new List<UIElement>();
         private bool canModify = true;
-        protected UIElement Parent;
 
+        public UIElement Parent;
         public Vector2 Position;
         public int Width, Height;
+        public Color? Background;
 
         public bool GrabsScroll = false;
         public bool GrabsClick = false;
@@ -30,6 +32,10 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         public virtual void Render(Vector2 position = default) {
+			if(Background.HasValue) {
+                Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
+                Draw.Rect(rect, Background.Value);
+            }
             foreach (UIElement element in children)
                 element.Render(position + element.Position);
         }
@@ -55,10 +61,17 @@ namespace LevelEditorMod.Editor.UI {
                 toAdd.Add(element);
         }
 
+        public void AddBelow(UIElement element, Vector2 offset) {
+            AddBelow(element);
+            element.Position += offset;
+        }
+
         public void AddBelow(UIElement element) {
+            UIElement low = null;
+            foreach(var item in children)
+                if(low == null || item.Position.Y > low.Position.Y) low = item;
             Add(element);
-            foreach (UIElement child in children)
-                element.Position += new Vector2(0, child.Height);
+            element.Position += new Vector2(0, (low?.Position.Y + low?.Height) ?? 0);
         }
 
         public void AddRight(UIElement element) {

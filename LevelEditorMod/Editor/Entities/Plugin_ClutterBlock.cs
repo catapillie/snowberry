@@ -11,6 +11,9 @@ namespace LevelEditorMod.Editor.Entities {
     public class Plugin_ClutterBlock : Entity {
         private List<MTexture> blocks;
 
+		public override int MinWidth => 8;
+        public override int MinHeight => 8;
+
         public override void Initialize() {
             base.Initialize();
 
@@ -59,6 +62,12 @@ namespace LevelEditorMod.Editor.Entities {
                 for (int j = y; j < sy; j++)
                     map[i, j] = true;
             return true;
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Clutter Blocks (Towels)", "redBlocks");
+            Placements.Create("Clutter Blocks (Books)", "greenBlocks");
+            Placements.Create("Clutter Blocks (Boxes)", "yellowBlocks");
         }
     }
 }

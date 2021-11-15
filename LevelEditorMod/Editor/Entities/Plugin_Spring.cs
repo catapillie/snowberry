@@ -32,5 +32,11 @@ namespace LevelEditorMod.Editor.Entities {
                 _ => 0
             });
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Spring (Up)", "spring");
+            Placements.Create("Spring (Left)", "wallSpringRight");
+            Placements.Create("Spring (Right)", "wallSpringLeft");
+        }
     }
 }

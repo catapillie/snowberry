@@ -18,5 +18,9 @@ namespace LevelEditorMod.Editor.Entities {
             mirror.DrawJustified(Position, new Vector2(0.5f, 1.0f));
             frame.DrawJustified(Position, new Vector2(0.5f, 1.0f));
         }
+
+        public static void AddPlacements() {
+            Placements.Create("Dream Mirror", "dreammirror");
+        }
     }
 }

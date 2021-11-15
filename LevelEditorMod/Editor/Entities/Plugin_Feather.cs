@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("infiniteStar")]
@@ -13,6 +14,11 @@ namespace LevelEditorMod.Editor.Entities {
             GFX.Game["objects/flyFeather/idle00"].DrawCentered(Position);
             if (Shielded)
                 Draw.Circle(Position, 12f, Color.White, 5);
+        }
+
+        public static void AddPlacements() {
+            Placements.Create("Feather", "infiniteStar");
+            Placements.Create("Feather (Shielded)", "infiniteStar", new Dictionary<string, object>() { { "shielded", true } });
         }
     }
 }

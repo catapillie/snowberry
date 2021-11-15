@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 using static Celeste.Spikes;
 
 namespace LevelEditorMod.Editor.Entities {
@@ -12,8 +13,12 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("type")] public string Type = "default";
 
         private Directions dir;
+        bool initialized = false;
 
-        public override void Initialize() {
+        public override int MinWidth => (!initialized || dir == Directions.Left || dir == Directions.Right) ? -1 : 8;
+        public override int MinHeight => (!initialized || dir == Directions.Up || dir == Directions.Down) ? -1 : 8;
+
+		public override void Initialize() {
             base.Initialize();
 
             dir = Name switch {
@@ -22,6 +27,7 @@ namespace LevelEditorMod.Editor.Entities {
                 "spikesDown" => Directions.Down,
                 _ => Directions.Up,
             };
+            initialized = true;
         }
 
         public override void Render() {
@@ -55,6 +61,14 @@ namespace LevelEditorMod.Editor.Entities {
                         break;
                 }
             }
+        }
+
+        public static void AddPlacements() {
+            string[] directions = new string[] { "Up", "Down", "Left", "Right" };
+            string[] types = new string[] { "Default", "Outline", "Cliffside", "Reflection" };
+			foreach(var type in types) 
+				foreach(var dir in directions) 
+                    Placements.Create($"Spikes ({dir}, {type})", "spikes" + dir, new Dictionary<string, object>() { { "type", type.ToLower() } });
         }
     }
 }
