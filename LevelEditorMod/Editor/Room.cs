@@ -1,5 +1,6 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using LevelEditorMod.Editor.Triggers;
 using Microsoft.Xna.Framework;
 using Monocle;
 using System;
@@ -55,6 +56,8 @@ namespace LevelEditorMod.Editor {
         public readonly List<Entity> Entities = new List<Entity>();
         public readonly List<Entity> Triggers = new List<Entity>();
         public readonly List<Entity> AllEntities = new List<Entity>();
+
+        public readonly Dictionary<Type, List<Entity>> TrackedEntities = new Dictionary<Type, List<Entity>>();
 
         public int LoadSeed {
             get {
@@ -135,8 +138,9 @@ namespace LevelEditorMod.Editor {
             // Entities
             foreach (EntityData entity in data.Entities) {
                 if (Entity.TryCreate(this, entity, out Entity e)) {
-                    Entities.Add(e);
-                    AllEntities.Add(e);
+                    AddEntity(e);
+                    //Entities.Add(e);
+                    //AllEntities.Add(e);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown entity ('{entity.Name}')");
             }
@@ -144,15 +148,17 @@ namespace LevelEditorMod.Editor {
             // Player Spawnpoints (excluded from LevelData.Entities)
             foreach (Vector2 spawn in data.Spawns) {
                 var spawnEntity = Entity.Create("player", this).SetPosition(spawn);
-                Entities.Add(spawnEntity);
-                AllEntities.Add(spawnEntity);
+                AddEntity(spawnEntity);
+                //Entities.Add(spawnEntity);
+                //AllEntities.Add(spawnEntity);
             }
 
             // Triggers
             foreach (EntityData trigger in data.Triggers) {
                 if (Entity.TryCreate(this, trigger, out Entity t)) {
-                    Triggers.Add(t);
-                    AllEntities.Add(t);
+                    //Triggers.Add(t);
+                    //AllEntities.Add(t);
+                    AddEntity(t);
                 } else
                     Module.Log(LogLevel.Warn, $"Attempted to load unknown trigger ('{trigger.Name}')");
             }
@@ -456,5 +462,31 @@ namespace LevelEditorMod.Editor {
 
             return ret;
         }
+
+        public void AddEntity(Entity e) {
+            AllEntities.Add(e);
+            if(e is Plugin_Trigger)
+                Triggers.Add(e);
+            else
+                Entities.Add(e);
+			if(e.Tracked) {
+                Type tracking = e.GetType();
+                if(!TrackedEntities.ContainsKey(tracking))
+                    TrackedEntities[tracking] = new List<Entity>();
+                TrackedEntities[tracking].Add(e);
+			}
+        }
+
+        public void RemoveEntity(Entity e) {
+            AllEntities.Remove(e);
+            Entities.Remove(e);
+            Triggers.Remove(e);
+            Type tracking = e.GetType();
+            if(e.Tracked && TrackedEntities.ContainsKey(tracking)) {
+				TrackedEntities[tracking].Remove(e);
+				if(TrackedEntities[tracking].Count == 0)
+                    TrackedEntities.Remove(tracking);
+			}
+		}
     }
 }

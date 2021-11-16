@@ -38,6 +38,8 @@ namespace LevelEditorMod.Editor {
         public Vector2 Origin { get; private set; }
         public Rectangle Bounds => new Rectangle(X, Y, Width, Height);
 
+        public bool Tracked { get; protected set; }
+
         // -1 = not resizable in that direction
         public virtual int MinWidth => -1;
         public virtual int MinHeight => -1;

@@ -88,6 +88,8 @@ namespace LevelEditorMod.Editor {
             public static Vector2 WorldLast { get; internal set; }
         }
 
+        public static bool FancyRender = true;
+
         private static readonly Color bg = Calc.HexToColor("060607");
 
         private Camera camera;
@@ -241,6 +243,11 @@ namespace LevelEditorMod.Editor {
 			// tool updating
 			var tool = Tool.Tools[Toolbar.CurrentTool];
             tool.Update(canClick);
+
+			// keybinds
+			if(MInput.Keyboard.Pressed(Keys.F)) {
+                FancyRender = !FancyRender;
+			}
         }
 
         public void SwitchTool(int toolIdx) {

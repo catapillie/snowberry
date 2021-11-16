@@ -83,9 +83,10 @@ namespace LevelEditorMod.Editor {
 			if(MInput.Keyboard.Check(Keys.Delete)) {
 				foreach(var item in Editor.SelectedEntities) {
 					entitiesRemoved = true;
-					item.Entity.Room.AllEntities.Remove(item.Entity);
-					item.Entity.Room.Entities.Remove(item.Entity);
-					item.Entity.Room.Triggers.Remove(item.Entity);
+					//item.Entity.Room.AllEntities.Remove(item.Entity);
+					//item.Entity.Room.Entities.Remove(item.Entity);
+					//item.Entity.Room.Triggers.Remove(item.Entity);
+					item.Entity.Room.RemoveEntity(item.Entity);
 				}
 				Editor.SelectedEntities.Clear();
 			}
@@ -776,9 +777,10 @@ namespace LevelEditorMod.Editor {
 			if((MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
 				Entity toAdd = selection.Build(Editor.SelectedRoom);
 				UpdateEntity(toAdd, area);
-				Editor.SelectedRoom.AllEntities.Add(toAdd);
-				if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
-				else Editor.SelectedRoom.Entities.Add(toAdd);
+				Editor.SelectedRoom.AddEntity(toAdd);
+				//Editor.SelectedRoom.AllEntities.Add(toAdd);
+				//if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
+				//else Editor.SelectedRoom.Entities.Add(toAdd);
 			}
 
 			RefreshPreview(lastPlacement != selection);
