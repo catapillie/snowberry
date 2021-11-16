@@ -69,8 +69,9 @@ namespace LevelEditorMod.Editor {
 
 					Editor.SelectedEntities = Editor.SelectedRoom.GetSelectedEntities(Editor.Selection.Value);
 				} else if(Editor.SelectedEntities != null) {
-					Vector2 worldSnapped = (Editor.Mouse.World / 8).Floor() * 8;
-					Vector2 worldLastSnapped = (Editor.Mouse.WorldLast / 8).Floor() * 8;
+					bool noSnap = (MInput.Keyboard.Check(Keys.LeftControl) || MInput.Keyboard.Check(Keys.RightControl));
+					Vector2 worldSnapped = noSnap ? Editor.Mouse.World : (Editor.Mouse.World / 8).Round() * 8;
+					Vector2 worldLastSnapped = noSnap? Editor.Mouse.WorldLast : (Editor.Mouse.WorldLast / 8).Round() * 8;
 					Vector2 move = worldSnapped - worldLastSnapped;
 					foreach(EntitySelection s in Editor.SelectedEntities)
 						s.Move(move);
@@ -816,7 +817,7 @@ namespace LevelEditorMod.Editor {
 
 		private void UpdateEntity(Entity e, Rectangle area) {
 			UpdateSize(e, area);
-			var mpos = (Editor.Mouse.World / 8).Round() * 8;
+			var mpos = (MInput.Keyboard.Check(Keys.LeftControl) || MInput.Keyboard.Check(Keys.RightControl)) ? Editor.Mouse.World : (Editor.Mouse.World / 8).Round() * 8;
 			if(lastPress != null)
 				e.SetPosition(new Vector2(e.Width > 0 ? (area.Left / 8) * 8 : mpos.X, e.Height > 0 ? (area.Top / 8) * 8 : mpos.Y));
 			else
