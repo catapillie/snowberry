@@ -823,7 +823,7 @@ namespace LevelEditorMod.Editor {
 				e.SetPosition(mpos);
 			e.ResetNodes();
 			while(e.Nodes.Length < e.MinNodes)
-				e.AddNode((e.Nodes.Length > 0 ? e.Nodes.Last() : e.Position) + Vector2.UnitX * 20);
+				e.AddNode((e.Nodes.Length > 0 ? e.Nodes.Last() : e.Position) + Vector2.UnitX * 24);
 			e.ApplyDefaults();
 			e.Initialize();
 		}
