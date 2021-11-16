@@ -46,6 +46,7 @@ namespace LevelEditorMod.Editor.Entities {
             }
 
             DrawBlockStyle(new Vector2(moveRect.X, moveRect.Y), moveRect.Width, moveRect.Height, nineSliceTarget, null, Color.White * 0.7f);
+            DrawBlockStyle(Nodes[0], Width, Height, nineSliceGreen, lights, Color.White * 0.25f);
             DrawBlockStyle(Position, Width, Height, nineSliceGreen, lights, Color.White);
         }
 

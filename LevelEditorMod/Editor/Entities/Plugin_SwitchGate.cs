@@ -1,7 +1,6 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
@@ -27,8 +26,8 @@ namespace LevelEditorMod.Editor.Entities {
                 LoadTextures();
 			}
 
-            DrawBlockStyle(Position, Width, Height, nineSlice, middle, Color.White);
             DrawBlockStyle(Nodes[0], Width, Height, nineSlice, middle, Color.White * 0.25f);
+            DrawBlockStyle(Position, Width, Height, nineSlice, middle, Color.White);
             DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2, Color.White * 0.5f, 8, 4);
         }
 
