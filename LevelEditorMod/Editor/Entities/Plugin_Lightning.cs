@@ -28,27 +28,37 @@ namespace LevelEditorMod.Editor.Entities {
             if (Editor.FancyRender) {
                 int prev0 = 0, prev1 = 0, prev3 = 0, prev4 = 0;
                 int slice = 4;
-                for(int i = 0; i < Width / slice; i++) {
-                    bool last = i + 1 >= Width / slice;
-                    if(!IsLightningAt(Position.X + i * slice + 2, Position.Y - 4)) {
-                        Draw.Line(Position + new Vector2(i * slice, prev0), Position + new Vector2(i * slice + slice, prev0 = (last ? 0 : Calc.Random.Next(-2, 3))), ElectricityColors[0]);
-                        Draw.Line(Position + new Vector2(i * slice, prev1), Position + new Vector2(i * slice + slice, prev1 = (last ? 0 : Calc.Random.Next(-2, 3))), ElectricityColors[1]);
-                    }
-                    if(!IsLightningAt(Position.X + i * slice + 2, Position.Y + 4 + Height)) {
-                        Draw.Line(Position + new Vector2(i * slice, Height + prev3), Position + new Vector2(i * slice + slice, Height + (prev3 = (last ? 0 : Calc.Random.Next(-2, 3)))), ElectricityColors[0]);
-                        Draw.Line(Position + new Vector2(i * slice, Height + prev4), Position + new Vector2(i * slice + slice, Height + (prev4 = (last ? 0 : Calc.Random.Next(-2, 3)))), ElectricityColors[1]);
+                for(int j = 0; j < Width / (slice * 2); j++) {
+                    bool drawUp = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y - 4);
+                    bool drawDown = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y + 4 + Height);
+                    for(int k = 0; k < 2; k++) {
+                        int i = j * 2 + k;
+                        bool last = i + 1 >= Width / slice;
+                        if(drawUp) {
+                            Draw.Line(Position + new Vector2(i * slice, prev0), Position + new Vector2(i * slice + slice, prev0 = (last ? 0 : Calc.Random.Next(-2, 3))), ElectricityColors[0]);
+                            Draw.Line(Position + new Vector2(i * slice, prev1), Position + new Vector2(i * slice + slice, prev1 = (last ? 0 : Calc.Random.Next(-2, 3))), ElectricityColors[1]);
+                        }
+                        if(drawDown) {
+                            Draw.Line(Position + new Vector2(i * slice, Height + prev3), Position + new Vector2(i * slice + slice, Height + (prev3 = (last ? 0 : Calc.Random.Next(-2, 3)))), ElectricityColors[0]);
+                            Draw.Line(Position + new Vector2(i * slice, Height + prev4), Position + new Vector2(i * slice + slice, Height + (prev4 = (last ? 0 : Calc.Random.Next(-2, 3)))), ElectricityColors[1]);
+                        }
                     }
                 }
                 prev0 = 0; prev1 = 0; prev3 = 0; prev4 = 0;
-                for(int i = 0; i < Height / slice; i++) {
-                    bool last = i + 1 >= Height / slice;
-                    if(!IsLightningAt(Position.X - 4, Position.Y + i * slice + 2)) {
-                        Draw.Line(Position + new Vector2(prev0, i * slice), Position + new Vector2(prev0 = (last ? 0 : Calc.Random.Next(-2, 3)), i * slice + slice), ElectricityColors[0]);
-                        Draw.Line(Position + new Vector2(prev1, i * slice), Position + new Vector2(prev1 = (last ? 0 : Calc.Random.Next(-2, 3)), i * slice + slice), ElectricityColors[1]);
-                    }
-                    if(!IsLightningAt(Position.X + 4 + Width, Position.Y + i * slice + 2)) {
-                        Draw.Line(Position + new Vector2(Width + prev3, i * slice), Position + new Vector2(Width + (prev3 = (last ? 0 : Calc.Random.Next(-2, 3))), i * slice + slice), ElectricityColors[0]);
-                        Draw.Line(Position + new Vector2(Width + prev4, i * slice), Position + new Vector2(Width + (prev4 = (last ? 0 : Calc.Random.Next(-2, 3))), i * slice + slice), ElectricityColors[1]);
+                for(int j = 0; j < Height / (slice * 2); j++) {
+                    bool drawLeft = !IsLightningAt(Position.X - 4, Position.Y + j * slice * 2 + 2);
+                    bool drawRight = !IsLightningAt(Position.X + 4 + Width, Position.Y + j * slice * 2 + 2);
+                    for(int k = 0; k < 2; k++) {
+                        int i = j * 2 + k;
+                        bool last = i + 1 >= Height / slice;
+                        if(drawLeft) {
+                            Draw.Line(Position + new Vector2(prev0, i * slice), Position + new Vector2(prev0 = (last ? 0 : Calc.Random.Next(-2, 3)), i * slice + slice), ElectricityColors[0]);
+                            Draw.Line(Position + new Vector2(prev1, i * slice), Position + new Vector2(prev1 = (last ? 0 : Calc.Random.Next(-2, 3)), i * slice + slice), ElectricityColors[1]);
+                        }
+                        if(drawRight) {
+                            Draw.Line(Position + new Vector2(Width + prev3, i * slice), Position + new Vector2(Width + (prev3 = (last ? 0 : Calc.Random.Next(-2, 3))), i * slice + slice), ElectricityColors[0]);
+                            Draw.Line(Position + new Vector2(Width + prev4, i * slice), Position + new Vector2(Width + (prev4 = (last ? 0 : Calc.Random.Next(-2, 3))), i * slice + slice), ElectricityColors[1]);
+                        }
                     }
                 }
             } else
