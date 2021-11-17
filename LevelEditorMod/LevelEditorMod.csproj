@@ -68,6 +68,7 @@
     <Compile Include="Editor\Decal.cs" />
     <Compile Include="Editor\EditorModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
+    <Compile Include="Editor\Entities\Plugin_NPC.cs" />
     <Compile Include="Editor\Entities\Plugin_Torch.cs" />
     <Compile Include="Editor\Entities\Plugin_Glider.cs" />
     <Compile Include="Editor\Entities\Plugin_SwitchGate.cs" />
