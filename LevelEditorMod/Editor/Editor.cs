@@ -324,6 +324,10 @@ namespace LevelEditorMod.Editor {
             #endregion
         }
 
+        public Vector2 GetCameraPos() {
+            return camera.Position;
+        }
+
         private static void CreatePlaytestMapDataHook(Action<MapData> orig_Load, MapData self) {
             if(!generatePlaytestMapData)
                 orig_Load(self);
