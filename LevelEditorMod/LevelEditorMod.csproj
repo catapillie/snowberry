@@ -134,7 +134,10 @@
     <Compile Include="Editor\UI\UICheckBox.cs" />
     <Compile Include="Editor\UI\UIColorPicker.cs" />
     <Compile Include="Editor\UI\UIRoomSelectionPanel.cs" />
+    <Compile Include="Editor\UI\UIMainMenu.cs" />
+    <Compile Include="Editor\UI\UIRibbon.cs" />
     <Compile Include="Editor\UI\UIScrollPane.cs" />
+    <Compile Include="Editor\UI\UISearchBar.cs" />
     <Compile Include="Editor\UI\UISelectionPanel.cs" />
     <Compile Include="Editor\UI\UILabel.cs" />
     <Compile Include="Editor\UI\UIToolbar.cs" />
@@ -150,6 +153,7 @@
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CelesteEditorModule.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">

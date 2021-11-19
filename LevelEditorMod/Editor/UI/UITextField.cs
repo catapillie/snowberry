@@ -13,8 +13,9 @@ namespace LevelEditorMod.Editor.UI {
 
         public Action<string> OnInputChange;
         public string Value { get; private set; }
+        public int ValueWidth => widthAtIndex[widthAtIndex.Length - 1];
         private int[] widthAtIndex;
-        private readonly Font font;
+        public readonly Font Font;
 
         private float lerp;
 
@@ -31,7 +32,7 @@ namespace LevelEditorMod.Editor.UI {
         protected char[] AllowedCharacters;
 
         public UITextField(Font font, int width, string input = "") {
-            this.font = font;
+            Font = font;
             UpdateInput(input ?? "null");
             charIndex = selection = Value.Length;
 
@@ -70,7 +71,7 @@ namespace LevelEditorMod.Editor.UI {
             int w = 0;
             for (int i = 0; i < widthAtIndex.Length - 1; i++) {
                 widthAtIndex[i] = w;
-                w += (int)font.Measure(Value[i]).X + 1;
+                w += (int)Font.Measure(Value[i]).X + 1;
             }
             widthAtIndex[widthAtIndex.Length - 1] = w;
             OnInputUpdate(Value);
@@ -182,12 +183,15 @@ namespace LevelEditorMod.Editor.UI {
             hovering = inside;
         }
 
+        protected virtual void DrawText(Vector2 position)
+            => Font.Draw(Value, position, Vector2.One, FG);
+
         public override void Render(Vector2 position = default) {
             base.Render(position);
 
             Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, hovering && !Selected ? 0.25f : lerp));
-            font.Draw(Value, position, Vector2.One, FG);
-
+            DrawText(position);
+            
             Draw.Rect(position + Vector2.UnitY * Height, Width, 1, Line);
             if (lerp != 0f) {
                 float ease = Ease.ExpoOut(lerp);
@@ -197,14 +201,14 @@ namespace LevelEditorMod.Editor.UI {
 
             if (Selected) {
                 if ((Engine.Scene.TimeActive - timeOffset) % 1f < 0.5f) {
-                    Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, font.LineHeight, FG);
+                    Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, Font.LineHeight, FG);
                 }
                 if (selection != charIndex) {
                     int a = widthAtIndex[charIndex], b = widthAtIndex[selection];
                     if (a < b)
-                        Draw.Rect(position + Vector2.UnitX * a, b - a, font.LineHeight, Color.Blue * 0.25f);
+                        Draw.Rect(position + Vector2.UnitX * a, b - a, Font.LineHeight, Color.Blue * 0.25f);
                     else
-                        Draw.Rect(position + Vector2.UnitX * b, a - b, font.LineHeight, Color.Blue * 0.25f);
+                        Draw.Rect(position + Vector2.UnitX * b, a - b, Font.LineHeight, Color.Blue * 0.25f);
                 }
             }
         }

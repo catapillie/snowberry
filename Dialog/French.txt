@@ -1,0 +1,22 @@
+# *** Main Menu ***
+
+	LEVELEDITORMOD_MAINMENU_YES=						oui
+	LEVELEDITORMOD_MAINMENU_NO=							non
+
+	LEVELEDITORMOD_MAINMENU_CREATE=						+ nouvelle map
+
+	LEVELEDITORMOD_MAINMENU_LOAD=						↓ ouvrir une map
+	LEVELEDITORMOD_MAINMENU_LOAD_CANCEL=				← menu principal
+	LEVELEDITORMOD_MAINMENU_LOAD_CONFIRM=				voulez-vous vraiment ouvrir cette map ?
+	LEVELEDITORMOD_MAINMENU_LOAD_UNSAVED=				(toutes les modifications non enregistrées seront perdues)
+	LEVELEDITORMOD_MAINMENU_LOAD_TIP=					pour passer ce message, maintenez CTRL en cliquant sur la map
+
+	LEVELEDITORMOD_MAINMENU_LOADSEARCH=					rechercher une map ou un @mod...
+	LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_NONE=			aucun résultat !
+	LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_ONE=			une map trouvée :
+	LEVELEDITORMOD_MAINMENU_LOADSEARCHBAR_MORE=			maps trouvées :
+
+	LEVELEDITORMOD_MAINMENU_EXIT=						← quitter
+
+	LEVELEDITORMOD_MAINMENU_SETTINGS=					paramètres
+	LEVELEDITORMOD_MAINMENU_CREDITS=					par catapillie, leppa, Viv

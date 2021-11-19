@@ -10,6 +10,9 @@ namespace LevelEditorMod.Editor.UI {
         private bool canModify = true;
 
         public UIElement Parent;
+        public bool Visible = true;
+        public bool RenderChildren = true;
+
         public Vector2 Position;
         public int Width, Height;
         public Color? Background;
@@ -36,8 +39,10 @@ namespace LevelEditorMod.Editor.UI {
                 Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
                 Draw.Rect(rect, Background.Value);
             }
-            foreach (UIElement element in children)
-                element.Render(position + element.Position);
+            if (RenderChildren)
+                foreach (UIElement element in children)
+                    if (element.Visible)
+                        element.Render(position + element.Position);
         }
 
         protected virtual void Initialize() { }
@@ -101,6 +106,35 @@ namespace LevelEditorMod.Editor.UI {
 
         public bool CanClickThrough() {
             return !GrabsClick && !children.Exists(a => !a.CanClickThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
+        }
+
+        public static UIElement Regroup(params UIElement[] elems) {
+            UIElement group = new UIElement();
+            RegroupIn(group, elems);
+            return group;
+        }
+
+        public static void RegroupIn<T>(T group, params UIElement[] elems) where T : UIElement {
+            if (elems != null && elems.Length > 0) {
+                int ax = int.MaxValue, ay = int.MaxValue;
+                int bx = int.MinValue, by = int.MinValue;
+
+                foreach (UIElement el in elems) {
+                    group.Add(el);
+                    Rectangle bounds = el.Bounds;
+                    if (bounds.Left < ax) ax = bounds.X;
+                    if (bounds.Top < ay) ay = bounds.Y;
+                    if (bounds.Right > bx) bx = bounds.Right;
+                    if (bounds.Bottom > by) by = bounds.Bottom;
+                }
+
+                group.Position = new Vector2(ax, ay);
+                group.Width = bx - ax;
+                group.Height = by - ay;
+
+                foreach (UIElement el in elems)
+                    el.Position -= group.Position;
+            }
         }
     }
 }
