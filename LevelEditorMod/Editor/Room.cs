@@ -58,6 +58,7 @@ namespace LevelEditorMod.Editor {
         public readonly List<Entity> AllEntities = new List<Entity>();
 
         public readonly Dictionary<Type, List<Entity>> TrackedEntities = new Dictionary<Type, List<Entity>>();
+        public readonly Dictionary<Type, bool> TrackedEntitiesModified = new Dictionary<Type, bool>();
 
         public int LoadSeed {
             get {
@@ -283,6 +284,8 @@ namespace LevelEditorMod.Editor {
                 }
             } else
                 Draw.Rect(offset, Width * 8, Height * 8, Color.Black * 0.5f);
+
+            TrackedEntitiesModified.Clear();
         }
 
         public void UpdateBounds() {
@@ -488,5 +491,11 @@ namespace LevelEditorMod.Editor {
                     TrackedEntities.Remove(tracking);
 			}
 		}
+
+        public void MarkTrackedEntityDirty(Entity e) {
+			if(e.Tracked) {
+                TrackedEntitiesModified[e.GetType()] = true;
+			}
+        }
     }
 }

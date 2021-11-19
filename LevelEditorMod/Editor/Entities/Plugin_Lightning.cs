@@ -1,11 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Monocle;
+using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("lightning")]
     public class Plugin_Lightning : Entity {
 
         [Option("moveTime")] public float MoveTime = 1;
+
+        private List<bool> upperEdges;
+        private List<bool> lowerEdges;
+        private List<bool> leftEdges;
+        private List<bool> rightEdges;
 
         public static Color[] ElectricityColors = new Color[2]{
             Calc.HexToColor("8cf7e2"),
@@ -26,11 +32,26 @@ namespace LevelEditorMod.Editor.Entities {
             Draw.Rect(Position, Width, Height, ElectricityColors[0] * 0.15f);
 
             if (Editor.FancyRender) {
-                int prev0 = 0, prev1 = 0, prev3 = 0, prev4 = 0;
                 int slice = 4;
-                for(int j = 0; j < Width / (slice * 2); j++) {
-                    bool drawUp = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y - 4);
-                    bool drawDown = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y + 4 + Height);
+                int horizLimit = Width / (slice * 2);
+                int vertLimit = Height / (slice * 2);
+
+                bool dirty = upperEdges == null || (Room != null && Room.TrackedEntitiesModified.ContainsKey(typeof(Plugin_Lightning)) && Room.TrackedEntitiesModified[typeof(Plugin_Lightning)]);
+                if(dirty) {
+                    upperEdges = new List<bool>(horizLimit);
+                    lowerEdges = new List<bool>(horizLimit);
+                    leftEdges = new List<bool>(vertLimit);
+                    rightEdges = new List<bool>(vertLimit);
+                }
+
+                int prev0 = 0, prev1 = 0, prev3 = 0, prev4 = 0;
+                for(int j = 0; j < horizLimit; j++) {
+					if(upperEdges.Count <= j) {
+                        upperEdges.Add(false);
+                        lowerEdges.Add(false);
+                    }
+                    bool drawUp = dirty ? upperEdges[j] = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y - 4) : upperEdges[j];
+                    bool drawDown = dirty ? lowerEdges[j] = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y + 4 + Height) : lowerEdges[j];
                     for(int k = 0; k < 2; k++) {
                         int i = j * 2 + k;
                         bool last = i + 1 >= Width / slice;
@@ -45,9 +66,13 @@ namespace LevelEditorMod.Editor.Entities {
                     }
                 }
                 prev0 = 0; prev1 = 0; prev3 = 0; prev4 = 0;
-                for(int j = 0; j < Height / (slice * 2); j++) {
-                    bool drawLeft = !IsLightningAt(Position.X - 4, Position.Y + j * slice * 2 + 2);
-                    bool drawRight = !IsLightningAt(Position.X + 4 + Width, Position.Y + j * slice * 2 + 2);
+                for(int j = 0; j < vertLimit; j++) {
+                    if(leftEdges.Count <= j) {
+                        leftEdges.Add(false);
+                        rightEdges.Add(false);
+                    }
+                    bool drawLeft = dirty ? leftEdges[j] = !IsLightningAt(Position.X - 4, Position.Y + j * slice * 2 + 2) : leftEdges[j];
+                    bool drawRight = dirty ? rightEdges[j] = !IsLightningAt(Position.X + 4 + Width, Position.Y + j * slice * 2 + 2) : rightEdges[j];
                     for(int k = 0; k < 2; k++) {
                         int i = j * 2 + k;
                         bool last = i + 1 >= Height / slice;

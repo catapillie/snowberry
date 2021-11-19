@@ -11,6 +11,10 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("color")] public CrystalColor SpinnerColor = CrystalColor.Blue;
         [Option("dust")] public bool Dust = false;
 
+        public Plugin_Spinner() {
+            Tracked = true;
+        }
+
         public override void Render() {
             base.Render();
             
@@ -42,7 +46,9 @@ namespace LevelEditorMod.Editor.Entities {
         }
 
         public CrystalColor? GetColorForVanillaMap() {
-            return Editor.GetCurrent()?.Map?.From.ID switch {
+            if(Editor.GetCurrent() == null || Editor.GetCurrent().Map == null)
+                return null;
+            return Editor.GetCurrent().Map.From.ID switch {
                 5 => CrystalColor.Red,
                 6 => CrystalColor.Purple,
                 10 => CrystalColor.Rainbow,
@@ -51,8 +57,10 @@ namespace LevelEditorMod.Editor.Entities {
         }
 
         public bool IsVanillaDust() {
+            if(Editor.GetCurrent() == null || Editor.GetCurrent().Map == null || Room == null && Editor.SelectedRoom == null)
+                return false;
             AreaKey area = Editor.GetCurrent().Map.From;
-            return area.ID == 3 || (area.ID == 7 && ((Room ?? Editor.SelectedRoom)?.Name.StartsWith("d-") ?? false));
+            return area.ID == 3 || (area.ID == 7 && ((Room ?? Editor.SelectedRoom)?.Name?.StartsWith("d-") ?? false));
         }
     }
 

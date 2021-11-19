@@ -79,12 +79,14 @@ namespace LevelEditorMod.Editor {
         public Entity SetPosition(Vector2 position) {
             Position = position;
             updateSelection = true;
+            Room.MarkTrackedEntityDirty(this);
             return this;
         }
 
         public void Move(Vector2 amount) {
             Position += amount;
             updateSelection = true;
+            Room.MarkTrackedEntityDirty(this);
         }
 
         public void SetNode(int i, Vector2 position) {
@@ -92,6 +94,7 @@ namespace LevelEditorMod.Editor {
                 Nodes[i] = position;
                 updateSelection = true;
             }
+            Room.MarkTrackedEntityDirty(this);
         }
 
         public void MoveNode(int i, Vector2 amount) {
@@ -99,26 +102,31 @@ namespace LevelEditorMod.Editor {
                 nodes[i] += amount;
                 updateSelection = nodesChanged = true;
             }
+            Room.MarkTrackedEntityDirty(this);
         }
 
         public void AddNode(Vector2 position) {
             nodes.Add(position);
             nodesChanged = true;
+            Room.MarkTrackedEntityDirty(this);
         }
 
         internal void ResetNodes() {
             nodes.Clear();
             nodesChanged = true;
+            Room.MarkTrackedEntityDirty(this);
         }
 
         public void SetWidth(int width) {
             Width = width;
             updateSelection = true;
+            Room.MarkTrackedEntityDirty(this);
         }
 
         public void SetHeight(int heigth) {
             Height = heigth;
             updateSelection = true;
+            Room.MarkTrackedEntityDirty(this);
         }
 
         public virtual void ChangeDefault() {}
