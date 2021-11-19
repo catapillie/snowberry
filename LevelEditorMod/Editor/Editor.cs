@@ -252,16 +252,16 @@ namespace LevelEditorMod.Editor {
                             canClick = false;
                     }
                 }
+
+                // tool updating
+                var tool = Tool.Tools[Toolbar.CurrentTool];
+                tool.Update(canClick);
+
+                // keybinds
+                if (MInput.Keyboard.Pressed(Keys.F)) {
+                    FancyRender = !FancyRender;
+                }
             }
-
-			// tool updating
-			var tool = Tool.Tools[Toolbar.CurrentTool];
-            tool.Update(canClick);
-
-			// keybinds
-			if(MInput.Keyboard.Pressed(Keys.F)) {
-                FancyRender = !FancyRender;
-			}
         }
 
         public void SwitchTool(int toolIdx) {

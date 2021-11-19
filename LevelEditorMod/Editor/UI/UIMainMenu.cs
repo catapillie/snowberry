@@ -215,6 +215,7 @@ namespace LevelEditorMod.Editor.UI {
                     Height = Parent.Height - 30,
                     Position = new Vector2(-16, 22),
                     BG = Color.Transparent,
+                    Background = Color.Transparent,
                     ShowScrollBar = false,
                 };
 
