@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using System;
 
 namespace LevelEditorMod.Editor.Entities {
     [Plugin("glider")]
@@ -20,7 +21,7 @@ namespace LevelEditorMod.Editor.Entities {
         }
 
         private Vector2 PlatformAdd(int num) {
-            return new Vector2(-12 + num, -5 + 1.8f);
+            return new Vector2(-12 + num, -5 + (int)Math.Round(Math.Sin(3 + num * 0.2f) * 1.8));
         }
 
         private Color PlatformColor(int num) {
