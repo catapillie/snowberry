@@ -780,7 +780,8 @@ namespace LevelEditorMod.Editor {
 					if(item.EntityID > highestID)
 						highestID = item.EntityID;
 				}
-				toAdd.EntityID = highestID + 1;
+				if(toAdd.Name != "player")
+					toAdd.EntityID = highestID + 1;
 				Editor.SelectedRoom.AddEntity(toAdd);
 			}
 
