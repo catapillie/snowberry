@@ -56,7 +56,7 @@ namespace LevelEditorMod.Editor.UI {
         public override void Update(Vector2 position = default) {
 			base.Update(position);
             if(Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y)) {
-                int wheel = Math.Sign(MInput.Mouse.WheelDelta);
+                int wheel = (MInput.Mouse.WheelDelta);
                 var points = ScrollPoints(13);
                 if(wheel > 0 && points.X < 0)
                     children.ForEach(ch => ch.Position += Vector2.UnitY * 13);
