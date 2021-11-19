@@ -11,11 +11,37 @@ namespace LevelEditorMod.Editor.Entities {
         [Option("color")] public CrystalColor SpinnerColor = CrystalColor.Blue;
         [Option("dust")] public bool Dust = false;
 
+        private List<Entity> connectTo;
+
         public Plugin_Spinner() {
             Tracked = true;
         }
 
-        public override void Render() {
+		public override void RenderBefore() {
+			base.RenderBefore();
+            if(Editor.FancyRender && !(Dust || IsVanillaDust())) {
+                CrystalColor color = GetColorForVanillaMap() ?? SpinnerColor;
+
+                var colourString = color switch {
+                    CrystalColor.Blue => "blue",
+                    CrystalColor.Red => "red",
+                    CrystalColor.Purple => "purple",
+                    _ => "white"
+                };
+
+                Color c = Color.White;
+                if(color == CrystalColor.Rainbow) {
+                    c = Calc.HsvToColor(0.4f + Calc.YoYo(Position.Length() % 280 / 280) * 0.4f, 0.4f, 0.9f);
+                }
+
+                UpdateConnections();
+                MTexture bg = GFX.Game[$"danger/crystal/bg_{colourString}00"];
+                foreach(var item in connectTo)
+                    bg.DrawCentered(Position + (item.Position - Position) / 2, c);
+            }
+        }
+
+		public override void Render() {
             base.Render();
             
             CrystalColor color = GetColorForVanillaMap() ?? SpinnerColor;
@@ -24,18 +50,28 @@ namespace LevelEditorMod.Editor.Entities {
                 GFX.Game["danger/dustcreature/base00"].DrawCentered(Position);
                 GFX.Game["danger/dustcreature/center00"].DrawCentered(Position);
             } else {
-                MTexture spinner = GFX.Game[color switch {
-                    CrystalColor.Blue => "danger/crystal/fg_blue03",
-                    CrystalColor.Red => "danger/crystal/fg_red03",
-                    CrystalColor.Purple => "danger/crystal/fg_purple03",
-                    _ => "danger/crystal/fg_white03"
-                }];
-
+                var colourString = color switch {
+                    CrystalColor.Blue => "blue",
+                    CrystalColor.Red => "red",
+                    CrystalColor.Purple => "purple",
+                    _ => "white"
+                };
                 Color c = Color.White;
-                if (color == CrystalColor.Rainbow) {
+                if(color == CrystalColor.Rainbow)
                     c = Calc.HsvToColor(0.4f + Calc.YoYo(Position.Length() % 280 / 280) * 0.4f, 0.4f, 0.9f);
-                }
+                MTexture spinner = GFX.Game[$"danger/crystal/fg_{colourString}03"];
                 spinner.DrawCentered(Position, c);
+            }
+        }
+
+        private void UpdateConnections() {
+			if(connectTo == null || Room.DirtyTrackedEntities.ContainsKey(typeof(Plugin_Spinner)) && Room.DirtyTrackedEntities[typeof(Plugin_Spinner)]) {
+                connectTo = new List<Entity>();
+				foreach(var item in Room.TrackedEntities[typeof(Plugin_Spinner)]) {
+					if((item.Position - Position).LengthSquared() < 24 * 24) {
+                        connectTo.Add(item);
+					}
+				}
             }
         }
 

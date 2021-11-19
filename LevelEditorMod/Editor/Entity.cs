@@ -142,6 +142,8 @@ namespace LevelEditorMod.Editor {
 
 		public virtual void Render() { }
 
+        public virtual void RenderBefore() { }
+
         #region Entity Instantiating
 
         public virtual void ApplyDefaults() {}
