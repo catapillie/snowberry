@@ -13,12 +13,14 @@ namespace LevelEditorMod.Editor.Entities {
 
         public override void Render() {
             base.Render();
+            
+            CrystalColor color = GetColorForVanillaMap() ?? SpinnerColor;
 
-            if (Dust) {
+            if (Dust || IsVanillaDust()) {
                 GFX.Game["danger/dustcreature/base00"].DrawCentered(Position);
                 GFX.Game["danger/dustcreature/center00"].DrawCentered(Position);
             } else {
-                MTexture spinner = GFX.Game[SpinnerColor switch {
+                MTexture spinner = GFX.Game[color switch {
                     CrystalColor.Blue => "danger/crystal/fg_blue03",
                     CrystalColor.Red => "danger/crystal/fg_red03",
                     CrystalColor.Purple => "danger/crystal/fg_purple03",
@@ -26,13 +28,9 @@ namespace LevelEditorMod.Editor.Entities {
                 }];
 
                 Color c = Color.White;
-                if (SpinnerColor == CrystalColor.Rainbow) {
+                if (color == CrystalColor.Rainbow) {
                     c = Calc.HsvToColor(0.4f + Calc.YoYo(Position.Length() % 280 / 280) * 0.4f, 0.4f, 0.9f);
                 }
-                //spinner.DrawCentered(Position + Vector2.UnitX, Color.Black);
-                //spinner.DrawCentered(Position - Vector2.UnitX, Color.Black);
-                //spinner.DrawCentered(Position + Vector2.UnitY, Color.Black);
-                //spinner.DrawCentered(Position - Vector2.UnitY, Color.Black);
                 spinner.DrawCentered(Position, c);
             }
         }
@@ -41,6 +39,20 @@ namespace LevelEditorMod.Editor.Entities {
             string[] types = new string[] { "Blue", "Red", "Purple", "Rainbow" };
             foreach(var type in types)
                 Placements.Create($"Spinner ({type})", "spinner", new Dictionary<string, object>() { { "color", type } });
+        }
+
+        public CrystalColor? GetColorForVanillaMap() {
+            return Editor.GetCurrent()?.Map?.From.ID switch {
+                5 => CrystalColor.Red,
+                6 => CrystalColor.Purple,
+                10 => CrystalColor.Rainbow,
+                _ => null
+            };
+        }
+
+        public bool IsVanillaDust() {
+            AreaKey area = Editor.GetCurrent().Map.From;
+            return area.ID == 3 || (area.ID == 7 && ((Room ?? Editor.SelectedRoom)?.Name.StartsWith("d-") ?? false));
         }
     }
 
