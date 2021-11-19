@@ -36,7 +36,7 @@ namespace LevelEditorMod.Editor.UI {
                 Entity entity = selection.Entity;
                 int spacing = Fonts.Regular.LineHeight + 2;
 
-                Add(label = new UILabel(entity.Name) {
+                Add(label = new UILabel($"{entity.Name} (#{entity.EntityID})") {
                     FG = Color.DarkKhaki,
                     Underline = true
                 });

@@ -27,7 +27,7 @@ namespace LevelEditorMod.Editor {
 
         public string Name { get; private set; }
 
-        public int EntityID { get; private set; }
+        public int EntityID = 0;
 
         public Vector2 Position { get; private set; }
         public int X => (int)Position.X;

@@ -83,9 +83,6 @@ namespace LevelEditorMod.Editor {
 			if(MInput.Keyboard.Check(Keys.Delete)) {
 				foreach(var item in Editor.SelectedEntities) {
 					entitiesRemoved = true;
-					//item.Entity.Room.AllEntities.Remove(item.Entity);
-					//item.Entity.Room.Entities.Remove(item.Entity);
-					//item.Entity.Room.Triggers.Remove(item.Entity);
 					item.Entity.Room.RemoveEntity(item.Entity);
 				}
 				Editor.SelectedEntities.Clear();
@@ -746,7 +743,7 @@ namespace LevelEditorMod.Editor {
 			var ret = new UIScrollPane();
 			ret.Width = 180;
 			ret.TopPadding = 10;
-			foreach(var item in Placements.All) {
+			foreach(var item in Placements.All.OrderBy(k => k.Name)) {
 				UIButton b;
 				ret.AddBelow(b = new UIButton(item.Name, Fonts.Regular, 4, 4) {
 					OnPress = () => curLeftSelection = curLeftSelection != item ? item : null,
@@ -777,10 +774,14 @@ namespace LevelEditorMod.Editor {
 			if((MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
 				Entity toAdd = selection.Build(Editor.SelectedRoom);
 				UpdateEntity(toAdd, area);
+				// TODO: find lowest unoccupied ID
+				int highestID = 0;
+				foreach(var item in Editor.GetCurrent().Map.Rooms.SelectMany(k => k.AllEntities)) {
+					if(item.EntityID > highestID)
+						highestID = item.EntityID;
+				}
+				toAdd.EntityID = highestID + 1;
 				Editor.SelectedRoom.AddEntity(toAdd);
-				//Editor.SelectedRoom.AllEntities.Add(toAdd);
-				//if(toAdd is Plugin_Trigger) Editor.SelectedRoom.Triggers.Add(toAdd);
-				//else Editor.SelectedRoom.Entities.Add(toAdd);
 			}
 
 			RefreshPreview(lastPlacement != selection);
