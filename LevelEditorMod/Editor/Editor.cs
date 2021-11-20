@@ -172,6 +172,13 @@ namespace LevelEditorMod.Editor {
             };
             ui.AddBelow(test);
 
+            UIButton export = new UIButton("Export", Fonts.Regular, 6, 6) {
+                OnPress = () => {
+                    BinaryExporter.ExportMap(Map);
+                }
+            };
+            ui.AddBelow(export);
+
             SwitchTool(0);
         }
 

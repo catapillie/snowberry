@@ -6,10 +6,13 @@ using Monocle;
 using System.Collections.Generic;
 
 namespace LevelEditorMod.Editor {
+
+    using Element = BinaryPacker.Element;
+
     public class Map {
 
         // TODO: represent stylegrounds in-editor
-        private readonly BinaryPacker.Element bgStylegounds, fgStylegrounds;
+        private readonly Element bgStylegrounds, fgStylegrounds;
 
         public readonly string Name;
         public readonly AreaKey From;
@@ -28,7 +31,7 @@ namespace LevelEditorMod.Editor {
             foreach (Rectangle filler in data.Filler)
                 Fillers.Add(filler);
             From = data.Area;
-            bgStylegounds = data.Background;
+            bgStylegrounds = data.Background;
             fgStylegrounds = data.Foreground;
         }
 
@@ -85,7 +88,7 @@ namespace LevelEditorMod.Editor {
             Module.Log(LogLevel.Info, "meta: " + data.Meta);
             // ...
             data.Foreground = fgStylegrounds;
-            data.Background = bgStylegounds;
+            data.Background = bgStylegrounds;
             // bounds
             int num = int.MaxValue;
             int num2 = int.MaxValue;
@@ -129,6 +132,42 @@ namespace LevelEditorMod.Editor {
 
             int num5 = 64;
             data.Bounds = new Rectangle(num - num5, num2 - num5, num3 - num + num5 * 2, num4 - num2 + num5 * 2);
+        }
+
+        public Element Export() {
+            Element map = new Element();
+            map.Children = new List<Element>();
+
+            // children:
+            //   levels w/ levels as children
+            Element levels = new Element();
+            levels.Name = "levels";
+            levels.Children = new List<Element>();
+            foreach(var room in Rooms)
+                levels.Children.Add(room.CreateLevelData());
+            map.Children.Add(levels);
+
+            //   Filler w/ children w/ x,y,w,h
+            Element fillers = new Element();
+            fillers.Name = "Filler";
+            fillers.Children = new List<Element>();
+            foreach(var filler in Fillers) {
+                Element fill = new Element();
+                fill.Attributes = new Dictionary<string, object>() {
+                    { "x", filler.X },
+                    { "y", filler.Y },
+                    { "w", filler.Width },
+                    { "h", filler.Height }
+                };
+                fillers.Children.Add(fill);
+			}
+            map.Children.Add(fillers);
+
+            //   style: w/ optional color, Backgrounds child & Foregrounds child
+            Element style = new Element();
+            style.Name = "Style";
+            style.Children = new List<Element>() { bgStylegrounds ?? new Element(), fgStylegrounds ?? new Element() };
+			return map;
         }
     }
 }
