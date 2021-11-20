@@ -1,11 +1,11 @@
-﻿using LevelEditorMod.Editor;
+﻿using Snowberry.Editor;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace LevelEditorMod {
+namespace Snowberry {
 
 	using Element = Celeste.BinaryPacker.Element;
 

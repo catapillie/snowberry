@@ -6,6 +6,9 @@ using Monocle;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
+
+    using Element = BinaryPacker.Element;
+
     public class Map {
 
         // TODO: represent stylegrounds in-editor
