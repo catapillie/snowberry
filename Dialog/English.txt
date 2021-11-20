@@ -1,0 +1,22 @@
+# *** Main Menu ***
+
+	SNOWBERRY_MAINMENU_YES=						yes
+	SNOWBERRY_MAINMENU_NO=						no
+
+	SNOWBERRY_MAINMENU_CREATE=					+ new map
+
+	SNOWBERRY_MAINMENU_LOAD=					↓ open existing map
+	SNOWBERRY_MAINMENU_LOAD_CANCEL=				← main menu
+	SNOWBERRY_MAINMENU_LOAD_CONFIRM=        	are you sure you want to open this map?
+	SNOWBERRY_MAINMENU_LOAD_UNSAVED=			(all unsaved changes will be lost)
+	SNOWBERRY_MAINMENU_LOAD_TIP=				to skip this message, hold CTRL while clicking on the map
+
+	SNOWBERRY_MAINMENU_LOADSEARCH=				search map or @mod...
+	SNOWBERRY_MAINMENU_LOADSEARCHBAR_NONE=		no results!
+	SNOWBERRY_MAINMENU_LOADSEARCHBAR_ONE=		one map found :
+	SNOWBERRY_MAINMENU_LOADSEARCHBAR_MORE=		maps found :
+
+	SNOWBERRY_MAINMENU_EXIT=					← exit
+
+	SNOWBERRY_MAINMENU_SETTINGS=				settings
+	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
