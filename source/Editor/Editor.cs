@@ -111,6 +111,7 @@ namespace Snowberry.Editor {
         public UIToolbar Toolbar;
         public UIElement ToolPanel;
 
+        // TODO: potentially replace with just setting the MapData of Playtest
         private static bool generatePlaytestMapData = false;
         internal static Session PlaytestSession;
         internal static MapData PlaytestMapData;
@@ -120,6 +121,9 @@ namespace Snowberry.Editor {
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
             Map = map;
+
+            SelectedRoom = null;
+            SelectedFillerIndex = -1;
         }
 
         internal static void Open(MapData data) {
@@ -129,10 +133,25 @@ namespace Snowberry.Editor {
             Map map = null;
             if(data != null) {
                 Snowberry.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
-                // Copies the target's metadata into Playtest's metadata.
+                // Also copies the target's metadata into Playtest's metadata.
                 map = new Map(data);
                 map.Rooms.ForEach(r => r.AllEntities.ForEach(e => e.InitializeAfter()));
             }
+
+            Engine.Scene = new Editor(map);
+        }
+
+        internal static void OpenNew() {
+            Audio.Stop(Audio.CurrentAmbienceEventInstance);
+            Audio.Stop(Audio.CurrentMusicEventInstance);
+
+            Map map = null;
+
+            Snowberry.Log(LogLevel.Info, $"Opening new map in level editor");
+            // Also empties the target's metadata.
+            map = new Map("snowberry map");
+            map.Rooms.ForEach(r => r.AllEntities.ForEach(e => e.InitializeAfter()));
+            
 
             Engine.Scene = new Editor(map);
         }
@@ -146,7 +165,7 @@ namespace Snowberry.Editor {
             ui.Add(Toolbar);
             Toolbar.Width = uiBuffer.Width;
 
-            var nameLabel = new UILabel($"Map: {Map.From.SID} ({Map.From.Mode})");
+            var nameLabel = new UILabel($"Map: {Map.From.SID} (ID: {Map.From.ID}, Mode: {Map.From.Mode})");
             ui.AddBelow(nameLabel);
             nameLabel.Position += new Vector2(10, 10);
 
@@ -362,7 +381,6 @@ namespace Snowberry.Editor {
             if(!generatePlaytestMapData)
                 orig_Load(self);
             else {
-                //CreatePlaytestMapData(self);
                 if(Engine.Scene is Editor editor) {
                     editor.Map.GenerateMapData(self);
                 } else orig_Load(self);
@@ -370,7 +388,7 @@ namespace Snowberry.Editor {
         }
 
         private static MapData HookSessionGetAreaData(Func<Session, MapData> orig, Session self) {
-            if(self == PlaytestSession) {
+            if(self.Area.SID == "Snowberry/Playtest") {
                 return PlaytestMapData;
             }
 
@@ -408,6 +426,10 @@ namespace Snowberry.Editor {
 
             // hold onto info about vanilla's hardcoded stuff
             VanillaLevelID =  from.IsOfficialLevelSet() ? from.ID : -1;
+        }
+
+        internal static void EmptyMapMeta(AreaData of) {
+            CopyMapMeta(new AreaData(), of);
         }
     }
 }

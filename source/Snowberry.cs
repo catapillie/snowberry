@@ -103,7 +103,7 @@ namespace Snowberry {
 
         private System.Collections.IEnumerator DontEnterPlaytestMap(On.Celeste.LevelEnter.orig_Routine orig, LevelEnter self) {
             var session = new DynamicData(self).Get<Session>("session");
-            if(session.Area.SID == "Snowberry/Playtest" && session != Editor.Editor.PlaytestSession) {
+            if(session.Area.SID == "Snowberry/Playtest" && session != Editor.Editor.PlaytestSession && string.IsNullOrEmpty(LevelEnter.ErrorMessage)) {
                 return CantEnterRoutine(self);
             } else
                 return orig(self);

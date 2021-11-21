@@ -12,7 +12,7 @@ namespace Snowberry.Editor {
     public class Map {
 
         // TODO: represent stylegrounds in-editor
-        private readonly Element bgStylegrounds, fgStylegrounds;
+        private readonly Element bgStylegrounds = new Element(), fgStylegrounds = new Element();
 
         public readonly string Name;
         public readonly AreaKey From;
@@ -22,6 +22,11 @@ namespace Snowberry.Editor {
 
         internal Map(string name) {
             Name = name;
+
+            var playtestData = AreaData.Get("Snowberry/Playtest");
+            //Editor.EmptyMapMeta(playtestData);
+            AreaKey playtestKey = playtestData.ToKey();
+            From = playtestKey;
         }
 
         internal Map(MapData data)
