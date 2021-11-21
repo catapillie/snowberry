@@ -20,3 +20,23 @@
 
 	SNOWBERRY_MAINMENU_SETTINGS=				settings
 	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
+
+# *** Editor ***
+
+    SNOWBERRY_EDITOR_RETURN=                    return to map
+    SNOWBERRY_EDITOR_PLAYTEST=                  playtest
+    SNOWBERRY_EDITOR_EXPORT=                    export
+
+    SNOWBERRY_EDITOR_TOOL_ENTITYSELECT=         entity select
+
+    SNOWBERRY_EDITOR_TOOL_DECALSELECT=          decal select
+
+    SNOWBERRY_EDITOR_TOOL_TILEBRUSH=            tile brush
+
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL=             room tool
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE=        no room selected           
+
+    SNOWBERRY_EDITOR_TOOL_ENTITIES=             entities
+
+    SNOWBERRY_EDITOR_UTIL_FOREGROUND=           foreground
+    SNOWBERRY_EDITOR_UTIL_BACKGROUND=           background

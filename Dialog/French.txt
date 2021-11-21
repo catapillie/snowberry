@@ -20,3 +20,23 @@
 
 	SNOWBERRY_MAINMENU_SETTINGS=				paramètres
 	SNOWBERRY_MAINMENU_CREDITS=					par catapillie, leppa, Viv
+
+# *** Editor ***
+
+    SNOWBERRY_EDITOR_RETURN=                    retour à la map
+    SNOWBERRY_EDITOR_PLAYTEST=                  playtester
+    SNOWBERRY_EDITOR_EXPORT=                    exporter
+
+    SNOWBERRY_EDITOR_TOOL_ENTITYSELECT=         sélection entités
+
+    SNOWBERRY_EDITOR_TOOL_DECALSELECT=          sélection decals
+
+    SNOWBERRY_EDITOR_TOOL_TILEBRUSH=            outil tiles
+
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL=             outil écrans
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE=        aucun écran sélectionné
+
+    SNOWBERRY_EDITOR_TOOL_ENTITIES=             entités
+    
+    SNOWBERRY_EDITOR_UTIL_FOREGROUND=           avant-plan
+    SNOWBERRY_EDITOR_UTIL_BACKGROUND=           arrière-plan

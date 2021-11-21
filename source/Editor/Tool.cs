@@ -33,7 +33,7 @@ namespace Snowberry.Editor {
 		static bool canSelect;
 
 		public override string GetName() {
-			return "Entity Select";
+			return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_ENTITYSELECT");
 		}
 
 		public override UIElement CreatePanel() {
@@ -112,17 +112,17 @@ namespace Snowberry.Editor {
 		static bool canSelect;
 
 		public override string GetName() {
-			return "Decal Select";
+			return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_DECALSELECT");
 		}
 
 		public override UIElement CreatePanel() {
 			var panel = new UIElement() {
 				Width = 80
 			};
-			panel.AddBelow(new UISelectionPanel.UIOption("foreground", new UICheckBox(-1, fg) {
+			panel.AddBelow(new UISelectionPanel.UIOption(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_FOREGROUND"), new UICheckBox(-1, fg) {
 				OnPress = val => fg = val
 			}), Vector2.UnitY * 4);
-			panel.AddBelow(new UISelectionPanel.UIOption("background", new UICheckBox(-1, bg) {
+			panel.AddBelow(new UISelectionPanel.UIOption(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND"), new UICheckBox(-1, bg) {
 				OnPress = val => bg = val
 			}), Vector2.UnitY * 4);
 			return panel;
@@ -271,7 +271,7 @@ namespace Snowberry.Editor {
 		}
 
 		public override string GetName() {
-			return "Tile Brush";
+			return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_TILEBRUSH");
 		}
 
 		public override UIElement CreatePanel() {
@@ -288,7 +288,7 @@ namespace Snowberry.Editor {
 				Width = 130,
 				TopPadding = 10
 			};
-			var fgLabel = new UILabel("Foreground");
+			var fgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_FOREGROUND"));
 			fgLabel.Position = new Vector2((tilesetsPanel.Width - fgLabel.Width) / 2, 0);
 			fgLabel.FG = Color.DarkKhaki;
 			fgLabel.Underline = true;
@@ -318,7 +318,7 @@ namespace Snowberry.Editor {
 				i++;
 				fgTilesetButtons.Add(button);
 			}
-			var bgLabel = new UILabel("Background");
+			var bgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND"));
 			bgLabel.Position = new Vector2((tilesetsPanel.Width - bgLabel.Width) / 2, (int)Math.Ceiling(FgTilesets.Count / 2f) * (8 * 3 + 30) + fgLabel.Height + 40);
 			bgLabel.FG = Color.DarkKhaki;
 			bgLabel.Underline = true;
@@ -616,7 +616,7 @@ namespace Snowberry.Editor {
 		}
 
 		public override string GetName() {
-			return "Room Tool";
+			return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_ROOMTOOL");
 		}
 
 		public override void Update(bool canClick) {
@@ -755,7 +755,7 @@ namespace Snowberry.Editor {
 		}
 
 		public override string GetName() {
-			return "Object Placement";
+			return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_ENTITIES");
 		}
 
 		public override void Update(bool canClick) {

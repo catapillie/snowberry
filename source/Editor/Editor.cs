@@ -149,7 +149,11 @@ namespace Snowberry.Editor {
             ui.AddBelow(roomLabel);
             roomLabel.Position += new Vector2(10, 10);
 
-            UIButton rtm = new UIButton("Return to Map", Fonts.Regular, 6, 6) {
+            string editorreturn = Dialog.Clean("SNOWBERRY_EDITOR_RETURN");
+            string editorplaytest = Dialog.Clean("SNOWBERRY_EDITOR_PLAYTEST");
+            string editorexport = Dialog.Clean("SNOWBERRY_EDITOR_EXPORT");
+
+            UIButton rtm = new UIButton(editorreturn, Fonts.Regular, 6, 6) {
                 OnPress = () => {
                     Audio.SetMusic(null);
                     Audio.SetAmbience(null);
@@ -159,7 +163,7 @@ namespace Snowberry.Editor {
             };
             ui.AddBelow(rtm);
 
-            UIButton test = new UIButton("Playtest", Fonts.Regular, 6, 6) {
+            UIButton test = new UIButton(editorplaytest, Fonts.Regular, 6, 6) {
                 OnPress = () => {
                     Audio.SetMusic(null);
                     Audio.SetAmbience(null);
@@ -173,7 +177,7 @@ namespace Snowberry.Editor {
             };
             ui.AddBelow(test);
 
-            UIButton export = new UIButton("Export", Fonts.Regular, 6, 6) {
+            UIButton export = new UIButton(editorexport, Fonts.Regular, 6, 6) {
                 OnPress = () => {
                     BinaryExporter.ExportMap(Map);
                 }

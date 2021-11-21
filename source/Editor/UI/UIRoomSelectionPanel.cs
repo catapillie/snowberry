@@ -45,7 +45,7 @@ namespace Snowberry.Editor.UI {
                             }
                         }, new Vector2(4, 12));
                     } else {
-                        Add(label = new UILabel("No room is selected") {
+                        Add(label = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE")) {
                             FG = Color.DarkKhaki,
                             Underline = true
                         });
