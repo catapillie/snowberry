@@ -2,11 +2,11 @@
 
 	SNOWBERRY_MAINMENU_YES=						oui
 	SNOWBERRY_MAINMENU_NO=						non
+	SNOWBERRY_MAINMENU_CLOSE=				    fermer
 
 	SNOWBERRY_MAINMENU_CREATE=					+ nouvelle map
 
 	SNOWBERRY_MAINMENU_LOAD=					↓ ouvrir une map
-	SNOWBERRY_MAINMENU_LOAD_CANCEL=				← menu principal
 	SNOWBERRY_MAINMENU_LOAD_CONFIRM=			voulez-vous vraiment ouvrir cette map ?
 	SNOWBERRY_MAINMENU_LOAD_UNSAVED=			(toutes les modifications non enregistrées seront perdues)
 	SNOWBERRY_MAINMENU_LOAD_TIP=				pour passer ce message, maintenez CTRL en cliquant sur la map
@@ -20,3 +20,23 @@
 
 	SNOWBERRY_MAINMENU_SETTINGS=				paramètres
 	SNOWBERRY_MAINMENU_CREDITS=					par catapillie, leppa, Viv
+
+# *** Editor ***
+
+    SNOWBERRY_EDITOR_RETURN=                    retour à la map
+    SNOWBERRY_EDITOR_PLAYTEST=                  playtester
+    SNOWBERRY_EDITOR_EXPORT=                    exporter
+
+    SNOWBERRY_EDITOR_TOOL_ENTITYSELECT=         sélection entités
+
+    SNOWBERRY_EDITOR_TOOL_DECALSELECT=          sélection decals
+
+    SNOWBERRY_EDITOR_TOOL_TILEBRUSH=            outil tiles
+
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL=             outil écrans
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE=        aucun écran sélectionné
+
+    SNOWBERRY_EDITOR_TOOL_ENTITIES=             entités
+    
+    SNOWBERRY_EDITOR_UTIL_FOREGROUND=           avant-plan
+    SNOWBERRY_EDITOR_UTIL_BACKGROUND=           arrière-plan

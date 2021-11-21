@@ -2,11 +2,11 @@
 
 	SNOWBERRY_MAINMENU_YES=						yes
 	SNOWBERRY_MAINMENU_NO=						no
+	SNOWBERRY_MAINMENU_CLOSE=				    close
 
 	SNOWBERRY_MAINMENU_CREATE=					+ new map
 
 	SNOWBERRY_MAINMENU_LOAD=					↓ open existing map
-	SNOWBERRY_MAINMENU_LOAD_CANCEL=				← main menu
 	SNOWBERRY_MAINMENU_LOAD_CONFIRM=        	are you sure you want to open this map?
 	SNOWBERRY_MAINMENU_LOAD_UNSAVED=			(all unsaved changes will be lost)
 	SNOWBERRY_MAINMENU_LOAD_TIP=				to skip this message, hold CTRL while clicking on the map
@@ -19,6 +19,27 @@
 	SNOWBERRY_MAINMENU_EXIT=					← exit
 
 	SNOWBERRY_MAINMENU_SETTINGS=				settings
+	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
+
+# *** Editor ***
+
+    SNOWBERRY_EDITOR_RETURN=                    return to map
+    SNOWBERRY_EDITOR_PLAYTEST=                  playtest
+    SNOWBERRY_EDITOR_EXPORT=                    export
+
+    SNOWBERRY_EDITOR_TOOL_ENTITYSELECT=         entity select
+
+    SNOWBERRY_EDITOR_TOOL_DECALSELECT=          decal select
+
+    SNOWBERRY_EDITOR_TOOL_TILEBRUSH=            tile brush
+
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL=             room tool
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE=        no room selected           
+
+    SNOWBERRY_EDITOR_TOOL_ENTITIES=             entities
+
+    SNOWBERRY_EDITOR_UTIL_FOREGROUND=           foreground
+    SNOWBERRY_EDITOR_UTIL_BACKGROUND=           background
 	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
     
 # Error Messages
