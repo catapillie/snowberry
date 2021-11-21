@@ -33,6 +33,8 @@ namespace Snowberry {
             );
 
 			On.Celeste.Editor.MapEditor.ctor += UsePlaytestMap;
+            On.Celeste.MapData.StartLevel += DontCrashOnEmptyPlaytestLevel;
+			On.Celeste.LevelEnter.Routine += DontEnterPlaytestMap;
         }
 
 		public override void LoadContent(bool firstLoad) {
@@ -64,10 +66,13 @@ namespace Snowberry {
         public override void Unload() {
             hook_MapData_orig_Load?.Dispose();
             hook_Session_get_MapData?.Dispose();
+
             On.Celeste.Editor.MapEditor.ctor -= UsePlaytestMap;
+			On.Celeste.MapData.StartLevel -= DontCrashOnEmptyPlaytestLevel;
+            On.Celeste.LevelEnter.Routine -= DontEnterPlaytestMap;
         }
 
-        public static void Log(LogLevel level, string message)
+		public static void Log(LogLevel level, string message)
             => Logger.Log(level, "Snowberry", message);
 
         private void UsePlaytestMap(On.Celeste.Editor.MapEditor.orig_ctor orig, Celeste.Editor.MapEditor self, AreaKey area, bool reloadMapData) {
@@ -83,6 +88,37 @@ namespace Snowberry {
                     templates.Add(new Celeste.Editor.LevelTemplate(item.X, item.Y, item.Width, item.Height));
                 }
             }
+        }
+
+        private LevelData DontCrashOnEmptyPlaytestLevel(On.Celeste.MapData.orig_StartLevel orig, MapData self) {
+            if(self.Area.SID == "Snowberry/Playtest" && self.Levels.Count == 0) {
+                var empty = new BinaryPacker.Element();
+                empty.Children = new List<BinaryPacker.Element>();
+                empty.Attributes = new Dictionary<string, object>();
+                empty.Attributes["name"] = "lvl_empty_map";
+                return new LevelData(empty);
+            } else
+                return orig(self);
+        }
+
+        private System.Collections.IEnumerator DontEnterPlaytestMap(On.Celeste.LevelEnter.orig_Routine orig, LevelEnter self) {
+            var session = new DynamicData(self).Get<Session>("session");
+            if(session.Area.SID == "Snowberry/Playtest" && session != Editor.Editor.PlaytestSession) {
+                return CantEnterRoutine(self);
+            } else
+                return orig(self);
+        }
+
+        private System.Collections.IEnumerator CantEnterRoutine(LevelEnter self) {
+            yield return 1f;
+            Postcard postcard;
+            self.Add(postcard = new Postcard(Dialog.Get("SNOWBERRY_PLAYTEST_MAP_POSTCARD"), "event:/ui/main/postcard_csides_in", "event:/ui/main/postcard_csides_out"));
+            new DynamicData(self).Set("postcard", postcard);
+            yield return postcard.DisplayRoutine();
+            SaveData.Instance.CurrentSession_Safe = new Session(AreaKey.Default);
+            SaveData.Instance.LastArea_Safe = AreaKey.Default;
+
+            Monocle.Engine.Scene = new OverworldLoader(Overworld.StartMode.AreaQuit);
         }
     }
 }

@@ -20,3 +20,7 @@
 
 	SNOWBERRY_MAINMENU_SETTINGS=				settings
 	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
+    
+# Error Messages
+    
+    SNOWBERRY_PLAYTEST_MAP_POSTCARD=            This might be out of the way, but it's not a collectable!{n}{n}This map is used to implement some Snowberry features, and has no real content.
