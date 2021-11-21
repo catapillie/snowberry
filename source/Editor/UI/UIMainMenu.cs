@@ -371,10 +371,10 @@ namespace Snowberry.Editor.UI {
         public static UIMainMenu Instance { get; private set; }
 
         public enum States {
-            Start, Create, Load, Exiting,
+            Start, Create, Load, Exiting, Settings
         }
         private States state = States.Start;
-        private readonly float[] stateLerp = new float[] { 1f, 0f, 0f, 0f };
+        private readonly float[] stateLerp = new float[] { 1f, 0f, 0f, 0f, 0f };
 
         private readonly UIRibbon authors, version;
         private readonly UIButton settings;
@@ -394,17 +394,30 @@ namespace Snowberry.Editor.UI {
             UIMainButtons buttons = new UIMainButtons();
             Add(levelSelector = new UILevelSelector());
 
-            UIButton create = new UIButton(Dialog.Clean("SNOWBERRY_MAINMENU_CREATE"), Fonts.Regular, 16, 24) {
+            string mainmenuload = Dialog.Clean("SNOWBERRY_MAINMENU_LOAD");
+            string mainmenucreate = Dialog.Clean("SNOWBERRY_MAINMENU_CREATE");
+            string mainmenuclose = Dialog.Clean("SNOWBERRY_MAINMENU_CLOSE");
+
+            UIButton create = null, load = null, exit = null;
+
+            create = new UIButton(mainmenucreate, Fonts.Regular, 16, 24) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Cyan,
                 PressedBG = Util.Colors.White,
                 PressedFG = Util.Colors.Cyan,
                 HoveredBG = Util.Colors.DarkCyan,
+                OnPress = () => {
+                    if (state == States.Create) {
+                        state = States.Start;
+                        create.SetText(mainmenucreate, stayCentered: true);
+                    } else {
+                        state = States.Create;
+                        load.SetText(mainmenuload, stayCentered: true);
+                        create.SetText(mainmenuclose, stayCentered: true);
+                    }
+                },
             };
             
-            string mainmenuload = Dialog.Clean("SNOWBERRY_MAINMENU_LOAD");
-            string mainmenuloadcancel = Dialog.Clean("SNOWBERRY_MAINMENU_LOAD_CANCEL");
-            UIButton load = null;
             load = new UIButton(mainmenuload, Fonts.Regular, 5, 4) {
                 OnPress = () => {
                     if (state == States.Load) {
@@ -413,12 +426,13 @@ namespace Snowberry.Editor.UI {
                     } else {
                         state = States.Load;
                         levelSelector.Reload();
-                        load.SetText(mainmenuloadcancel, stayCentered: true);
+                        create.SetText(mainmenucreate, stayCentered: true);
+                        load.SetText(mainmenuclose, stayCentered: true);
                     }
                 },
             };
             
-            UIButton exit = new UIButton(Dialog.Clean("SNOWBERRY_MAINMENU_EXIT"), Fonts.Regular, 10, 4) {
+            exit = new UIButton(Dialog.Clean("SNOWBERRY_MAINMENU_EXIT"), Fonts.Regular, 10, 4) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Red,
                 PressedBG = Util.Colors.White,
@@ -435,7 +449,13 @@ namespace Snowberry.Editor.UI {
             RegroupIn(buttons, create, load, exit);
             buttons.Position = new Vector2(width - buttons.Width, height - buttons.Height) / 2;
 
-            settings = new UIButton(Dialog.Clean("SNOWBERRY_MAINMENU_SETTINGS"), Fonts.Regular, 4, 8);
+            settings = new UIButton(Dialog.Clean("SNOWBERRY_MAINMENU_SETTINGS"), Fonts.Regular, 4, 8) {
+                OnPress = () => {
+                    if (state == States.Start) {
+                        state = States.Settings;
+                    }
+                }
+            };
             Add(settings);
             settings.Position = Vector2.UnitX * (Width - settings.Width) + new Vector2(-8, 8);
 
@@ -478,8 +498,10 @@ namespace Snowberry.Editor.UI {
             version.Position.X = (int)Math.Round(startEase * (-version.Width - 2));
             settings.Position.Y = (int)Math.Round(startEase * (-settings.Height - 16) + 8);
 
+            float createEase = Ease.CubeInOut(stateLerp[1]);
             float loadEase = Ease.CubeInOut(stateLerp[2]);
-            buttons.Position.X = (int)Math.Round((Width - buttons.Width) / 2 - Width / 3 * loadEase);
+            buttons.Position.X = (int)Math.Round((Width - buttons.Width) / 2 - Width / 3 * loadEase + Width / 3 * createEase);
+
             levelSelector.Position.X = (int)Math.Round(buttons.Position.X + buttons.Width + 24 - levelSelector.Width * (1 - loadEase));
             levelSelector.Visible = stateLerp[2] != 0f; 
         }

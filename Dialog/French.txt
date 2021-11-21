@@ -2,11 +2,11 @@
 
 	SNOWBERRY_MAINMENU_YES=						oui
 	SNOWBERRY_MAINMENU_NO=						non
+	SNOWBERRY_MAINMENU_CLOSE=				    fermer
 
 	SNOWBERRY_MAINMENU_CREATE=					+ nouvelle map
 
 	SNOWBERRY_MAINMENU_LOAD=					↓ ouvrir une map
-	SNOWBERRY_MAINMENU_LOAD_CANCEL=				← menu principal
 	SNOWBERRY_MAINMENU_LOAD_CONFIRM=			voulez-vous vraiment ouvrir cette map ?
 	SNOWBERRY_MAINMENU_LOAD_UNSAVED=			(toutes les modifications non enregistrées seront perdues)
 	SNOWBERRY_MAINMENU_LOAD_TIP=				pour passer ce message, maintenez CTRL en cliquant sur la map
