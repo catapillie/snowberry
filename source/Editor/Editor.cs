@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using MonoMod.Utils;
 
 namespace Snowberry.Editor {
     public class Editor : Scene {
@@ -29,7 +30,7 @@ namespace Snowberry.Editor {
                 get => scale;
                 set {
                     scale = value;
-                    if (scale < 1f)
+                    if(scale < 1f)
                         Buffer = null;
                     else {
                         Vector2 size = new Vector2(Engine.Width, Engine.Height) / scale;
@@ -42,14 +43,14 @@ namespace Snowberry.Editor {
             private Matrix matrix, inverse;
             public Matrix Matrix {
                 get {
-                    if (changedView)
+                    if(changedView)
                         UpdateMatrices();
                     return matrix;
                 }
             }
             public Matrix Inverse {
                 get {
-                    if (changedView)
+                    if(changedView)
                         UpdateMatrices();
                     return inverse;
                 }
@@ -65,7 +66,7 @@ namespace Snowberry.Editor {
 
             private void UpdateMatrices() {
                 Matrix m = Matrix.CreateTranslation((int)-Position.X, (int)-Position.Y, 0f) * Matrix.CreateScale(Math.Min(1f, Zoom));
-                if (Buffer != null) {
+                if(Buffer != null) {
                     m *= Matrix.CreateTranslation(Buffer.Width / 2, Buffer.Height / 2, 0f);
                     ViewRect = new Rectangle((int)Position.X - Buffer.Width / 2, (int)Position.Y - Buffer.Height / 2, Buffer.Width, Buffer.Height);
                 } else {
@@ -114,6 +115,8 @@ namespace Snowberry.Editor {
         internal static Session PlaytestSession;
         internal static MapData PlaytestMapData;
 
+        public static int VanillaLevelID { get; private set; }
+
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
             Map = map;
@@ -124,9 +127,11 @@ namespace Snowberry.Editor {
             Audio.Stop(Audio.CurrentMusicEventInstance);
 
             Map map = null;
-            if (data != null) {
+            if(data != null) {
                 Snowberry.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
+                // Copies the target's metadata into Playtest's metadata.
                 map = new Map(data);
+                map.Rooms.ForEach(r => r.AllEntities.ForEach(e => e.InitializeAfter()));
             }
 
             Engine.Scene = new Editor(map);
@@ -188,7 +193,7 @@ namespace Snowberry.Editor {
             camera = new Camera();
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
 
-            if (Map == null)
+            if(Map == null)
                 MenuUI();
             else
                 MappingUI();
@@ -221,14 +226,14 @@ namespace Snowberry.Editor {
                     scale = scale > 1 ? scale - 1 : scale / 2f;
             }
             scale = Calc.Clamp(scale, 0.0625f, 24f);
-            if (scale != camera.Zoom)
+            if(scale != camera.Zoom)
                 camera.Zoom = scale;
 
-            if (camera.Buffer != null)
+            if(camera.Buffer != null)
                 mousePos /= camera.Zoom;
 
-			// controls
-			bool canClick = ui.CanClickThrough();
+            // controls
+            bool canClick = ui.CanClickThrough();
 
             // panning
             if(MInput.Mouse.CheckMiddleButton && canClick) {
@@ -236,7 +241,7 @@ namespace Snowberry.Editor {
                 if(move != Vector2.Zero)
                     camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
             }
-            
+
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
@@ -245,9 +250,9 @@ namespace Snowberry.Editor {
             ui.Update();
 
             // room & filler select
-            if (Map != null) {
-                if ((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
-                    if (MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
+            if(Map != null) {
+                if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
+                    if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
                         Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
 
                         worldClick = Mouse.World;
@@ -255,7 +260,7 @@ namespace Snowberry.Editor {
                         SelectedRoom = Map.GetRoomAt(mouse);
                         SelectedFillerIndex = Map.GetFillerIndexAt(mouse);
                         // don't let tools click when clicking onto new rooms
-                        if (SelectedRoom != before)
+                        if(SelectedRoom != before)
                             canClick = false;
                     }
                 }
@@ -265,7 +270,7 @@ namespace Snowberry.Editor {
                 tool.Update(canClick);
 
                 // keybinds
-                if (MInput.Keyboard.Pressed(Keys.F)) {
+                if(MInput.Keyboard.Pressed(Keys.F)) {
                     FancyRender = !FancyRender;
                 }
             }
@@ -301,14 +306,14 @@ namespace Snowberry.Editor {
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
 
             ui.Render();
-            
+
             Draw.SpriteBatch.End();
 
             #endregion
 
             #region Tool Rendering
 
-            if (Map != null) {
+            if(Map != null) {
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
                 tool.RenderScreenSpace();
                 Draw.SpriteBatch.End();
@@ -324,7 +329,7 @@ namespace Snowberry.Editor {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Engine.Instance.GraphicsDevice.Clear(bg);
-            if (Map != null) {
+            if(Map != null) {
                 Map.Render(camera);
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
                 tool.RenderWorldSpace();
@@ -335,7 +340,7 @@ namespace Snowberry.Editor {
 
             #region Displaying on Backbuffer
 
-            if (camera.Buffer != null) {
+            if(camera.Buffer != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
                 Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
@@ -362,14 +367,47 @@ namespace Snowberry.Editor {
                     editor.Map.GenerateMapData(self);
                 } else orig_Load(self);
             }
-		}
+        }
 
         private static MapData HookSessionGetAreaData(Func<Session, MapData> orig, Session self) {
             if(self == PlaytestSession) {
                 return PlaytestMapData;
-			}
+            }
 
-			return orig(self);
+            return orig(self);
+        }
+
+        internal static void CopyMapMeta(AreaData from, AreaData to) {
+            to.ASideAreaDataBackup = from.ASideAreaDataBackup;
+            to.BloomBase = from.BloomBase;
+            to.BloomStrength = from.BloomStrength;
+            to.CanFullClear = from.CanFullClear;
+            to.CassetteSong = from.CassetteSong;
+            to.CobwebColor = from.CobwebColor;
+            to.ColorGrade = from.ColorGrade;
+            to.CompleteScreenName = from.CompleteScreenName;
+            to.CoreMode = from.CoreMode;
+            to.CrumbleBlock = from.CrumbleBlock;
+            to.DarknessAlpha = from.DarknessAlpha;
+            to.Dreaming = from.Dreaming;
+            to.Icon = from.Icon;
+            to.Interlude = from.Interlude;
+            to.IntroType = from.IntroType;
+            to.IsFinal = from.IsFinal;
+            to.Jumpthru = from.Jumpthru;
+            to.Meta = from.Meta;
+            to.Mode = from.Mode;
+            to.Name = from.Name;
+            to.Spike = from.Spike;
+            // mountain meta?
+            to.TitleAccentColor = from.TitleAccentColor;
+            to.TitleBaseColor = from.TitleBaseColor;
+            to.TitleTextColor = from.TitleTextColor;
+            to.Wipe = from.Wipe;
+            to.WoodPlatform = from.WoodPlatform;
+
+            // hold onto info about vanilla's hardcoded stuff
+            VanillaLevelID =  from.IsOfficialLevelSet() ? from.ID : -1;
         }
     }
 }

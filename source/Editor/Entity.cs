@@ -131,6 +131,7 @@ namespace Snowberry.Editor {
 
         public virtual void ChangeDefault() {}
         public virtual void Initialize() => ChangeDefault();
+        public virtual void InitializeAfter() { }
 		protected virtual Rectangle[] Select() {
             List<Rectangle> ret = new List<Rectangle>();
 			ret.Add(new Rectangle(Width < 6 ? X - 3 : X, Height < 6 ? Y - 3 : Y, Width < 6 ? 6 : Width, Height < 6 ? 6 : Height));

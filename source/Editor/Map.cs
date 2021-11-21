@@ -30,7 +30,12 @@ namespace Snowberry.Editor {
                 Rooms.Add(new Room(roomData, this));
             foreach (Rectangle filler in data.Filler)
                 Fillers.Add(filler);
-            From = data.Area;
+            var playtestData = AreaData.Get("Snowberry/Playtest");
+            var targetData = AreaData.Get(data.Area);
+            AreaKey playtestKey = playtestData.ToKey();
+            From = playtestKey;
+            Editor.CopyMapMeta(targetData, playtestData);
+
             bgStylegrounds = data.Background;
             fgStylegrounds = data.Foreground;
         }

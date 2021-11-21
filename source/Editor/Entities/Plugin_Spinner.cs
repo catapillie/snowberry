@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.Utils;
 using System.Collections.Generic;
 using static Celeste.TrackSpinner;
 
@@ -17,10 +18,17 @@ namespace Snowberry.Editor.Entities {
             Tracked = true;
         }
 
+		public override void InitializeAfter() {
+			base.InitializeAfter();
+            // Handle vanilla stuff
+            Dust |= IsVanillaDust();
+            SpinnerColor = GetColorForVanillaMap() ?? SpinnerColor;
+		}
+
 		public override void RenderBefore() {
 			base.RenderBefore();
-            if(Editor.FancyRender && !(Dust || IsVanillaDust())) {
-                CrystalColor color = GetColorForVanillaMap() ?? SpinnerColor;
+            if(Editor.FancyRender && !Dust) {
+                CrystalColor color = SpinnerColor;
 
                 var colourString = color switch {
                     CrystalColor.Blue => "blue",
@@ -44,9 +52,9 @@ namespace Snowberry.Editor.Entities {
 		public override void Render() {
             base.Render();
             
-            CrystalColor color = GetColorForVanillaMap() ?? SpinnerColor;
+            CrystalColor color = SpinnerColor;
 
-            if (Dust || IsVanillaDust()) {
+            if (Dust) {
                 GFX.Game["danger/dustcreature/base00"].DrawCentered(Position);
                 GFX.Game["danger/dustcreature/center00"].DrawCentered(Position);
             } else {
@@ -82,9 +90,7 @@ namespace Snowberry.Editor.Entities {
         }
 
         public CrystalColor? GetColorForVanillaMap() {
-            if(Editor.GetCurrent() == null || Editor.GetCurrent().Map == null)
-                return null;
-            return Editor.GetCurrent().Map.From.ID switch {
+            return Editor.VanillaLevelID switch {
                 5 => CrystalColor.Red,
                 6 => CrystalColor.Purple,
                 10 => CrystalColor.Rainbow,
@@ -93,10 +99,8 @@ namespace Snowberry.Editor.Entities {
         }
 
         public bool IsVanillaDust() {
-            if(Editor.GetCurrent() == null || Editor.GetCurrent().Map == null || Room == null && Editor.SelectedRoom == null)
-                return false;
-            AreaKey area = Editor.GetCurrent().Map.From;
-            return area.ID == 3 || (area.ID == 7 && ((Room ?? Editor.SelectedRoom)?.Name?.StartsWith("d-") ?? false));
+            int id = Editor.VanillaLevelID;
+            return id == 3 || (id == 7 && ((Room ?? Editor.SelectedRoom)?.Name?.StartsWith("d-") ?? false));
         }
     }
 
@@ -104,7 +108,13 @@ namespace Snowberry.Editor.Entities {
         [Option("dust")] public bool Dust = false;
         [Option("star")] public bool Star = false;
 
-        public override void Render() {
+		public override void InitializeAfter() {
+			base.InitializeAfter();
+            Dust |= IsVanillaDust();
+            Star |= IsVanillaStar();
+		}
+
+		public override void Render() {
             base.Render();
 
             Vector2 stop = Nodes[0];
@@ -131,6 +141,16 @@ namespace Snowberry.Editor.Entities {
             base.ChangeDefault();
             ResetNodes();
             AddNode(Position + new Vector2(16, 0));
+        }
+
+        public bool IsVanillaDust() {
+            int id = Editor.VanillaLevelID;
+            return id == 3 || (id == 7 && ((Room ?? Editor.SelectedRoom)?.Name?.StartsWith("d-") ?? false));
+        }
+
+        public bool IsVanillaStar() {
+            int id = Editor.VanillaLevelID;
+            return id == 10;
         }
     }
 
