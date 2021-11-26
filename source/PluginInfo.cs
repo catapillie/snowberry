@@ -8,7 +8,9 @@ using System.Collections.ObjectModel;
 
 namespace Snowberry {
     public class PluginInfo {
-        internal static readonly Dictionary<string, PluginInfo> All = new();
+        internal static readonly Dictionary<string, PluginInfo> Entities = new();
+        internal static readonly Dictionary<string, PluginInfo> Stylegrounds = new();
+        internal static readonly Dictionary<string, PluginInfo> OtherPlugins = new();
 
         private readonly string name;
         private readonly ConstructorInfo ctor;
@@ -45,6 +47,9 @@ namespace Snowberry {
         public static void GenerateFromAssembly(Assembly assembly, SnowberryModule module) {
             Placements.All.Clear();
             foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Plugin).IsAssignableFrom(t))) {
+                bool isEntity = typeof(Entity).IsAssignableFrom(t);
+                bool isStyleground = typeof(Styleground).IsAssignableFrom(t);
+
                 foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>(inherit: false)) {
                     if (pl.Name == null || pl.Name == string.Empty) {
                         Snowberry.Log(LogLevel.Warn, $"Found plugin with null or empty name! skipping... (Type: {t})");
@@ -59,20 +64,28 @@ namespace Snowberry {
 
 
                     PluginInfo info = new PluginInfo(pl.Name, t, ctor, module);
-                    All.Add(pl.Name, info);
+
+                    if(isEntity)
+                        Entities.Add(pl.Name, info);
+                    else if(isStyleground)
+                        Stylegrounds.Add(pl.Name, info);
+                    else
+                        OtherPlugins.Add(pl.Name, info);
 
                     Snowberry.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' plugin");
                 }
 
-                MethodInfo addPlacements = t.GetMethod("AddPlacements");
-                if(addPlacements != null) {
-                    if(addPlacements.GetParameters().Length == 0) {
-                        addPlacements.Invoke(null, new object[0]);
+                if(isEntity) {
+                    MethodInfo addPlacements = t.GetMethod("AddPlacements");
+                    if(addPlacements != null) {
+                        if(addPlacements.GetParameters().Length == 0) {
+                            addPlacements.Invoke(null, new object[0]);
+                        } else {
+                            Snowberry.Log(LogLevel.Warn, $"Found entity plugin with invalid AddPlacements (has parameters)! skipping... (Type: {t})");
+                        }
                     } else {
-                        Snowberry.Log(LogLevel.Warn, $"Found entity plugin with invalid AddPlacements (has parameters)! skipping... (Type: {t})");
+                        Snowberry.Log(LogLevel.Info, $"Found entity plugin without placements. (Type: {t})");
                     }
-                } else {
-                    Snowberry.Log(LogLevel.Info, $"Found entity plugin without placements. (Type: {t})");
                 }
             }
         }

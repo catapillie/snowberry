@@ -3,6 +3,7 @@ using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
+using Snowberry.Editor.Stylegrounds;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
@@ -11,14 +12,14 @@ namespace Snowberry.Editor {
 
     public class Map {
 
-        // TODO: represent stylegrounds in-editor
-        private readonly Element bgStylegrounds = new Element(), fgStylegrounds = new Element();
-
         public readonly string Name;
         public readonly AreaKey From;
 
         public readonly List<Room> Rooms = new List<Room>();
         public readonly List<Rectangle> Fillers = new List<Rectangle>();
+
+        public readonly List<Styleground> FGStylegrounds = new();
+        public readonly List<Styleground> BGStylegrounds = new();
 
         internal Map(string name) {
             Name = name;
@@ -41,8 +42,30 @@ namespace Snowberry.Editor {
             From = playtestKey;
             Editor.CopyMapMeta(targetData, playtestData);
 
-            bgStylegrounds = data.Background;
-            fgStylegrounds = data.Foreground;
+			// load stylegrounds
+			if(data.Foreground != null && data.Foreground.Children != null) {
+				foreach(var item in data.Foreground.Children) {
+                    string name = item.Name.ToLowerInvariant();
+
+                    if(name.Equals("apply")) {
+						if(item.Children != null) {
+							foreach(var child in item.Children) {
+                                Styleground styleground = Styleground.Create(child.Name.ToLower(), this, child, item);
+								if(styleground != null)
+                                    FGStylegrounds.Add(styleground);
+                                else
+                                    Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                            }
+                        }
+                    } else {
+                        Styleground styleground = Styleground.Create(name, this, item);
+                        if(styleground != null)
+                            FGStylegrounds.Add(styleground);
+                        else
+                            Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                    }
+				}
+			}
         }
 
         internal Room GetRoomAt(Point at) {
@@ -96,9 +119,8 @@ namespace Snowberry.Editor {
 			foreach(var filler in Fillers)
                 data.Filler.Add(filler);
             Snowberry.Log(LogLevel.Info, "meta: " + data.Meta);
-            // ...
-            data.Foreground = fgStylegrounds;
-            data.Background = bgStylegrounds;
+            // TODO: set stylegrounds
+
             // bounds
             int num = int.MaxValue;
             int num2 = int.MaxValue;
@@ -176,7 +198,7 @@ namespace Snowberry.Editor {
             //   style: w/ optional color, Backgrounds child & Foregrounds child
             Element style = new Element();
             style.Name = "Style";
-            style.Children = new List<Element>() { bgStylegrounds ?? new Element(), fgStylegrounds ?? new Element() };
+            style.Children = new List<Element>() { /*bgStylegrounds ?? new Element(), fgStylegrounds ?? new Element()*/ };
 			return map;
         }
     }

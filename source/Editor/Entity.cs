@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
+
     public abstract class Entity : Plugin {
         public Room Room { get; private set; }
 
@@ -152,7 +153,7 @@ namespace Snowberry.Editor {
         }
 
         public static Entity Create(string name, Room room) {
-            if (PluginInfo.All.TryGetValue(name, out PluginInfo plugin)) {
+            if (PluginInfo.Entities.TryGetValue(name, out PluginInfo plugin)) {
                 Entity entity = plugin.Instantiate<Entity>();
 
                 entity.Room = room;
@@ -166,7 +167,7 @@ namespace Snowberry.Editor {
         }
 
         internal static Entity Create(Room room, EntityData entityData) {
-            if (PluginInfo.All.TryGetValue(entityData.Name, out PluginInfo plugin)) {
+            if (PluginInfo.Entities.TryGetValue(entityData.Name, out PluginInfo plugin)) {
                 Entity entity = plugin.Instantiate<Entity>();
 
                 entity.Room = room;
