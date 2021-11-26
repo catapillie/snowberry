@@ -1,31 +1,10 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
-using System;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class PluginAttribute : Attribute {
-        internal readonly string Name;
-
-        public PluginAttribute(string entityName) {
-            Name = entityName;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class OptionAttribute : Attribute {
-        internal readonly string Name;
-
-        public OptionAttribute(string optionName) {
-            Name = optionName;
-        }
-    }
-
-    public abstract class Entity {
+    public abstract class Entity : Plugin {
         public Room Room { get; private set; }
-
-        public string Name { get; private set; }
 
         public int EntityID = 0;
 
@@ -73,8 +52,6 @@ namespace Snowberry.Editor {
                 return selectionRectangles;
             }
         }
-
-        public PluginInfo Plugin { get; private set; }
 
         public Entity SetPosition(Vector2 position) {
             Position = position;
@@ -168,7 +145,7 @@ namespace Snowberry.Editor {
         private Entity InitializeData(Dictionary<string, object> data) {
             if (data != null)
                 foreach (KeyValuePair<string, object> pair in data)
-                    Plugin[this, pair.Key] = pair.Value;
+                    Set(pair.Key, pair.Value);
 
             Initialize();
             return this;
@@ -176,10 +153,8 @@ namespace Snowberry.Editor {
 
         public static Entity Create(string name, Room room) {
             if (PluginInfo.All.TryGetValue(name, out PluginInfo plugin)) {
-                Entity entity = plugin.Instantiate();
-                entity.Plugin = plugin;
+                Entity entity = plugin.Instantiate<Entity>();
 
-                entity.Name = name;
                 entity.Room = room;
 
                 entity.ApplyDefaults();
@@ -192,10 +167,8 @@ namespace Snowberry.Editor {
 
         internal static Entity Create(Room room, EntityData entityData) {
             if (PluginInfo.All.TryGetValue(entityData.Name, out PluginInfo plugin)) {
-                Entity entity = plugin.Instantiate();
-                entity.Plugin = plugin;
+                Entity entity = plugin.Instantiate<Entity>();
 
-                entity.Name = entityData.Name;
                 entity.Room = room;
 
                 return entity.InitializeData(entityData);

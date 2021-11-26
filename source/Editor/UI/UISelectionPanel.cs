@@ -58,7 +58,7 @@ namespace Snowberry.Editor.UI {
                 y.Position.X = h.Position.X = Math.Max(y.Position.X, h.Position.X);
 
                 int l = 3 * spacing;
-                foreach (var option in entity.Plugin.OptionDict) {
+                foreach (var option in entity.Info.Options) {
                     object value = option.Value.GetValue(entity);
                     if (option.Value.FieldType == typeof(bool)) {
                         Add(BoolOption(option.Key, (bool)value, entity, option.Value, l));

@@ -1,67 +1,53 @@
 ﻿using Celeste.Mod;
 using Snowberry.Editor;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace Snowberry {
     public class PluginInfo {
-        public static readonly Dictionary<string, PluginInfo> All = new Dictionary<string, PluginInfo>();
+        internal static readonly Dictionary<string, PluginInfo> All = new();
 
-        private readonly Type Type;
-        public readonly Dictionary<string, FieldInfo> OptionDict = new Dictionary<string, FieldInfo>();
+        private readonly string name;
         private readonly ConstructorInfo ctor;
 
-        public readonly SnowberryModule EditorModule;
+        public readonly ReadOnlyDictionary<string, FieldInfo> Options;
 
-        public object this[Entity entity, string option] {
-            get {
-                if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
-                    return ObjectToRaw(f.GetValue(entity));
-                }
-                return null;
-            }
-            set {
-                if (entity.GetType() == Type && OptionDict.TryGetValue(option, out FieldInfo f)) {
-                    object val = RawToObject(f.FieldType, value);
-                    if(val != null)
-                        try {
-                            f.SetValue(entity, val);
-                        } catch(ArgumentException e) {
-                            Snowberry.Log(LogLevel.Warn, "Tried to set field " + option + " to an invalid value " + val);
-                            Snowberry.Log(LogLevel.Warn, e.ToString());
-                        }
-                        
-                }
-            }
-        }
+        public readonly SnowberryModule Module;
 
         public PluginInfo(string name, Type t, ConstructorInfo ctor, SnowberryModule module) {
+            this.name = name;
             this.ctor = ctor;
-            Type = t;
-            EditorModule = module;
+            Module = module;
+
+            Dictionary<string, FieldInfo> options = new();
             foreach (FieldInfo f in t.GetFields()) {
                 if (f.GetCustomAttribute<OptionAttribute>() is OptionAttribute option) {
                     if (option.Name == null || option.Name == string.Empty) {
-                        Snowberry.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from entity '{name}' was ignored because it had a null or empty option name!");
+                        Snowberry.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from plugin '{name}' was ignored because it had a null or empty option name!");
                         continue;
-                    } else if (!OptionDict.ContainsKey(option.Name))
-                        OptionDict.Add(option.Name, f);
+                    } else if (!options.ContainsKey(option.Name))
+                        options.Add(option.Name, f);
                 }
             }
+            Options = new ReadOnlyDictionary<string, FieldInfo>(options);
         }
 
-        public Entity Instantiate()
-            => (Entity)ctor.Invoke(new object[] { });
+        public T Instantiate<T>() where T : Plugin {
+            T plugin = (T)ctor.Invoke(new object[] { });
+            plugin.Info = this;
+            plugin.Name = name;
+            return plugin;
+        }
 
         public static void GenerateFromAssembly(Assembly assembly, SnowberryModule module) {
             Placements.All.Clear();
-            foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Entity).IsAssignableFrom(t))) {
+            foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Plugin).IsAssignableFrom(t))) {
                 foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>(inherit: false)) {
                     if (pl.Name == null || pl.Name == string.Empty) {
-                        Snowberry.Log(LogLevel.Warn, $"Found entity plugin with null or empty name! skipping... (Type: {t})");
+                        Snowberry.Log(LogLevel.Warn, $"Found plugin with null or empty name! skipping... (Type: {t})");
                         continue;
                     }
 
@@ -71,9 +57,11 @@ namespace Snowberry {
                         continue;
                     }
 
-                    All.Add(pl.Name, new PluginInfo(pl.Name, t, ctor, module));
 
-                    Snowberry.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' entity plugin");
+                    PluginInfo info = new PluginInfo(pl.Name, t, ctor, module);
+                    All.Add(pl.Name, info);
+
+                    Snowberry.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' plugin");
                 }
 
                 MethodInfo addPlacements = t.GetMethod("AddPlacements");
@@ -87,40 +75,6 @@ namespace Snowberry {
                     Snowberry.Log(LogLevel.Info, $"Found entity plugin without placements. (Type: {t})");
                 }
             }
-        }
-
-        private static object RawToObject(Type targetType, object raw) {
-            if (targetType == typeof(Color)) {
-                return Monocle.Calc.HexToColor(raw.ToString());
-            }
-            if (targetType.IsEnum) {
-                try {
-                    ObjectToRaw(Enum.Parse(targetType, raw.ToString()));
-                    return Enum.Parse(targetType, raw.ToString());
-                } catch {
-                    return null;
-                }
-            }
-            if (targetType == typeof(char)) {
-                return raw.ToString()[0];
-            }
-            if(targetType == typeof(string) && raw.GetType() != typeof(string)) {
-                return raw.ToString();
-            }
-            return raw;
-        }
-
-        private static object ObjectToRaw(object obj) {
-            return obj switch {
-                Color color => BitConverter.ToString(new byte[] { color.R, color.G, color.B }).Replace("-", string.Empty),
-                Enum => obj.ToString(),
-                char ch => ch.ToString(),
-                _ => obj,
-            };
-        }
-
-        public List<string> GetOptions() {
-            return OptionDict.Keys.ToList();
         }
     }
 }

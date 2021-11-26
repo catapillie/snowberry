@@ -19,7 +19,7 @@ namespace Snowberry.Editor {
 			public Entity Build(Room room) {
 				Entity e = Entity.Create(EntityName, room);
 				foreach(var item in Defaults)
-					e.Plugin[e, item.Key] = item.Value;
+					e.Set(item.Key, item.Value);
 				return e;
 			}
 		}

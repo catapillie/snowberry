@@ -67,6 +67,7 @@
     <Compile Include="BinaryExporter.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="SnowberryModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
     <Compile Include="Editor\Entities\Plugin_SeekerBarrier.cs" />
