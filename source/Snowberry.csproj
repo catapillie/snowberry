@@ -150,7 +150,6 @@
     <Compile Include="Graphics\Fonts.cs" />
     <Compile Include="Graphics\Font.cs" />
     <Compile Include="Graphics\FormattedText.cs" />
-    <Compile Include="LevelEditor.cs" />
     <Compile Include="Snowberry.cs" />
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

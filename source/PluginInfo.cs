@@ -43,7 +43,6 @@ namespace Snowberry {
         }
 
         public static void GenerateFromAssembly(Assembly assembly, SnowberryModule module) {
-            Placements.All.Clear();
             foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Plugin).IsAssignableFrom(t))) {
                 foreach (PluginAttribute pl in t.GetCustomAttributes<PluginAttribute>(inherit: false)) {
                     if (pl.Name == null || pl.Name == string.Empty) {
