@@ -45,7 +45,6 @@ namespace Snowberry {
         }
 
         public static void GenerateFromAssembly(Assembly assembly, SnowberryModule module) {
-            Placements.All.Clear();
             foreach (Type t in assembly.GetTypesSafe().Where(t => !t.IsAbstract && typeof(Plugin).IsAssignableFrom(t))) {
                 bool isEntity = typeof(Entity).IsAssignableFrom(t);
                 bool isStyleground = typeof(Styleground).IsAssignableFrom(t);

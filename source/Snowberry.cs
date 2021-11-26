@@ -17,6 +17,8 @@ namespace Snowberry {
             private set;
         }
 
+        public static SnowberryModule[] Modules { get; private set; }
+
         public Snowberry() {
             Instance = this;
         }
@@ -45,24 +47,6 @@ namespace Snowberry {
             Fonts.Load();
         }
 
-        private void LoadModules() {
-            LevelEditor.EditorModules.Clear();
-            foreach (EverestModule module in Everest.Modules) {
-                Assembly asm = module.GetType().Assembly;
-                foreach (Type type in asm.GetTypesSafe().Where(t => !t.IsAbstract && typeof(SnowberryModule).IsAssignableFrom(t))) {
-                    ConstructorInfo ctor = type.GetConstructor(new Type[] { });
-                    if (ctor != null) {
-                        SnowberryModule editorModule = (SnowberryModule) ctor.Invoke(new object[] { });
-                        LevelEditor.EditorModules.Add(editorModule);
-
-                        PluginInfo.GenerateFromAssembly(asm, editorModule);
-
-                        Log(LogLevel.Info, $"Successfully loaded Snowberry Module '{editorModule.Name}'");
-                    }
-                }
-            }
-        }
-
         public override void Unload() {
             hook_MapData_orig_Load?.Dispose();
             hook_Session_get_MapData?.Dispose();
@@ -72,7 +56,29 @@ namespace Snowberry {
             On.Celeste.LevelEnter.Routine -= DontEnterPlaytestMap;
         }
 
-		public static void Log(LogLevel level, string message)
+        private static void LoadModules() {
+            List<SnowberryModule> modules = new List<SnowberryModule>();
+
+            foreach (EverestModule module in Everest.Modules) {
+                Assembly asm = module.GetType().Assembly;
+                foreach (Type type in asm.GetTypesSafe().Where(t => !t.IsAbstract && typeof(SnowberryModule).IsAssignableFrom(t))) {
+                    ConstructorInfo ctor = type.GetConstructor(new Type[] { });
+                    if (ctor != null) {
+                        SnowberryModule editorModule = (SnowberryModule)ctor.Invoke(new object[] { });
+
+                        PluginInfo.GenerateFromAssembly(asm, editorModule);
+
+                        modules.Add(editorModule);
+                        Log(LogLevel.Info, $"Successfully loaded Snowberry Module '{editorModule.Name}'");
+                    }
+                }
+            }
+
+            Modules = modules.ToArray();
+        }
+
+
+        public static void Log(LogLevel level, string message)
             => Logger.Log(level, "Snowberry", message);
 
         private void UsePlaytestMap(On.Celeste.Editor.MapEditor.orig_ctor orig, Celeste.Editor.MapEditor self, AreaKey area, bool reloadMapData) {
