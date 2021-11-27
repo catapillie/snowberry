@@ -361,7 +361,7 @@ namespace Snowberry.Editor {
                 entityElem.Attributes["originY"] = entity.Origin.Y;
 
 				foreach(var opt in entity.Info.Options.Keys) {
-                    var val = entity.GetRaw(opt);
+                    var val = entity.Get(opt);
                     if(val != null)
                         entityElem.Attributes[opt] = val;
 				}
@@ -396,7 +396,7 @@ namespace Snowberry.Editor {
                 triggersElem.Attributes["originY"] = tigger.Origin.Y;
 
                 foreach(var opt in tigger.Info.Options.Keys) {
-                    var val = tigger.GetRaw(opt);
+                    var val = tigger.Get(opt);
                     if(val != null)
                         triggersElem.Attributes[opt] = val;
                 }

@@ -26,32 +26,19 @@ namespace Snowberry {
         public PluginInfo Info { get; internal set; }
         public string Name { get; internal set; }
 
-        public void SetRaw(string option, string value) {
-            if (Info.Options.TryGetValue(option, out FieldInfo f)) {
-                object val = RawToObject(f.FieldType, value);
-                if (val != null) {
-                    try {
-                        f.SetValue(this, val);
-                    } catch (ArgumentException e) {
-                        Snowberry.Log(LogLevel.Warn, "Tried to set field " + option + " to an invalid value " + val);
-                        Snowberry.Log(LogLevel.Warn, e.ToString());
-                    }
-                }
-            }
-        }
-
         public void Set(string option, object value) {
             if (Info.Options.TryGetValue(option, out FieldInfo f)) {
+                object v = value is string str ? RawToObject(f.FieldType, str) : value;
                 try {
-                    f.SetValue(this, value);
+                    f.SetValue(this, v);
                 } catch (ArgumentException e) {
-                    Snowberry.Log(LogLevel.Warn, "Tried to set field " + option + " to an invalid value " + value);
+                    Snowberry.Log(LogLevel.Warn, "Tried to set field " + option + " to an invalid value " + v);
                     Snowberry.Log(LogLevel.Warn, e.ToString());
                 }
             }
         }
 
-        public string GetRaw(string option) {
+        public object Get(string option) {
             if (Info.Options.TryGetValue(option, out FieldInfo f))
                 return ObjectToRaw(f.GetValue(this));
             return null;
@@ -63,7 +50,6 @@ namespace Snowberry {
             }
             if (targetType.IsEnum) {
                 try {
-                    ObjectToRaw(Enum.Parse(targetType, raw));
                     return Enum.Parse(targetType, raw);
                 } catch {
                     return null;
@@ -72,18 +58,15 @@ namespace Snowberry {
             if (targetType == typeof(char)) {
                 return raw[0];
             }
-            if (targetType == typeof(string) && raw.GetType() != typeof(string)) {
-                return raw;
-            }
             return raw;
         }
 
-        private static string ObjectToRaw(object obj) {
+        private static object ObjectToRaw(object obj) {
             return obj switch {
                 Color color => BitConverter.ToString(new byte[] { color.R, color.G, color.B }).Replace("-", string.Empty),
                 Enum => obj.ToString(),
                 char ch => ch.ToString(),
-                _ => obj.ToString(),
+                _ => obj,
             };
         }
     }
