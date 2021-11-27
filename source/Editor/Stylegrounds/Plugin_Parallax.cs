@@ -10,6 +10,8 @@ namespace Snowberry.Editor.Stylegrounds {
 		[Option("blendmode")] public string BlendMode = "alphablend";
 		[Option("fadeIn")] public bool FadeIn = false;
 
+		public override string Title() => $"{Dialog.Clean("SNOWBERRY_STYLEGROUNDS_IMAGE")}: \"{Texture}\" {(Atlas != "game" ? $"in {Atlas}" : "")}";
+
 		public override void Render() {
 			base.Render();
 		}

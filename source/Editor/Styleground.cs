@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Celeste;
+
+using Microsoft.Xna.Framework;
 
 using Monocle;
 
@@ -50,6 +52,8 @@ namespace Snowberry.Editor {
 
 		// Render on the Snowberry background
 		public virtual void Render() {}
+
+		public virtual string Title() => Dialog.Clean("SNOWBERRY_STYLEGROUNDS_" + Name.ToUpperInvariant());
 
 		public bool IsVisible(Room room) {
 			/*if(DreamingOnly.HasValue && DreamingOnly.Value != level.Session.Dreaming) {

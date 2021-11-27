@@ -38,10 +38,21 @@
 
     SNOWBERRY_EDITOR_TOOL_ENTITIES=             entities
 
+    SNOWBERRY_EDITOR_TOOL_STYLEGROUNDS=         stylegrounds
+
     SNOWBERRY_EDITOR_UTIL_FOREGROUND=           foreground
     SNOWBERRY_EDITOR_UTIL_BACKGROUND=           background
 	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
+
+# *** Stylegrounds ***
     
+    SNOWBERRY_STYLEGROUNDS_IMAGE=               image
+    SNOWBERRY_STYLEGROUNDS_BLACKHOLE=           blackhole
+    SNOWBERRY_STYLEGROUNDS_RAIN=                rain
+    SNOWBERRY_STYLEGROUNDS_STARFIELD=           starfield
+    SNOWBERRY_STYLEGROUNDS_STARDUST=            stardust
+    SNOWBERRY_STYLEGROUNDS_PLANETS=             planets
+
 # Error Messages
     
     SNOWBERRY_PLAYTEST_MAP_POSTCARD=            This might be out of the way, but it's not a collectable!{n}{n}This map is used to implement some Snowberry features, and has no real content.

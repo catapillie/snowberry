@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections.Generic;
-using MonoMod.Utils;
 
 namespace Snowberry.Editor {
     public class Editor : Scene {
@@ -117,6 +116,7 @@ namespace Snowberry.Editor {
         internal static MapData PlaytestMapData;
 
         public static int VanillaLevelID { get; private set; }
+        public static AreaKey? From;
 
         private Editor(Map map) {
             Engine.Instance.IsMouseVisible = true;
@@ -134,9 +134,11 @@ namespace Snowberry.Editor {
             if(data != null) {
                 Snowberry.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
                 // Also copies the target's metadata into Playtest's metadata.
+                From = data.Area;
                 map = new Map(data);
                 map.Rooms.ForEach(r => r.AllEntities.ForEach(e => e.InitializeAfter()));
-            }
+            } else
+                From = null;
 
             Engine.Scene = new Editor(map);
         }
@@ -151,7 +153,7 @@ namespace Snowberry.Editor {
             // Also empties the target's metadata.
             map = new Map("snowberry map");
             map.Rooms.ForEach(r => r.AllEntities.ForEach(e => e.InitializeAfter()));
-            
+            From = null;
 
             Engine.Scene = new Editor(map);
         }
@@ -165,7 +167,7 @@ namespace Snowberry.Editor {
             ui.Add(Toolbar);
             Toolbar.Width = uiBuffer.Width;
 
-            var nameLabel = new UILabel($"Map: {Map.From.SID} (ID: {Map.From.ID}, Mode: {Map.From.Mode})");
+            var nameLabel = new UILabel($"Map: {From?.SID ?? "(new map)"} (ID: {From?.ID ?? -1}, Mode: {From?.Mode ?? AreaMode.Normal})");
             ui.AddBelow(nameLabel);
             nameLabel.Position += new Vector2(10, 10);
 
@@ -177,15 +179,17 @@ namespace Snowberry.Editor {
             string editorplaytest = Dialog.Clean("SNOWBERRY_EDITOR_PLAYTEST");
             string editorexport = Dialog.Clean("SNOWBERRY_EDITOR_EXPORT");
 
-            UIButton rtm = new UIButton(editorreturn, Fonts.Regular, 6, 6) {
-                OnPress = () => {
-                    Audio.SetMusic(null);
-                    Audio.SetAmbience(null);
+            if(From.HasValue) {
+                UIButton rtm = new UIButton(editorreturn, Fonts.Regular, 6, 6) {
+                    OnPress = () => {
+                        Audio.SetMusic(null);
+                        Audio.SetAmbience(null);
 
-                    LevelEnter.Go(new Session(Map.From), true);
-                }
-            };
-            ui.AddBelow(rtm);
+                        LevelEnter.Go(new Session(From.Value), true);
+                    }
+                };
+                ui.AddBelow(rtm);
+            }
 
             UIButton test = new UIButton(editorplaytest, Fonts.Regular, 6, 6) {
                 OnPress = () => {

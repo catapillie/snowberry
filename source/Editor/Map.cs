@@ -66,6 +66,32 @@ namespace Snowberry.Editor {
                     }
 				}
 			}
+
+            if(data.Background != null && data.Background.Children != null) {
+                foreach(var item in data.Background.Children) {
+                    string name = item.Name.ToLowerInvariant();
+
+                    if(name.Equals("apply")) {
+                        if(item.Children != null) {
+                            foreach(var child in item.Children) {
+                                Styleground styleground = Styleground.Create(child.Name.ToLower(), this, child, item);
+                                if(styleground != null)
+                                    BGStylegrounds.Add(styleground);
+                                else
+                                    Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                            }
+                        }
+                    } else {
+                        Styleground styleground = Styleground.Create(name, this, item);
+                        if(styleground != null)
+                            BGStylegrounds.Add(styleground);
+                        else
+                            Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                    }
+                }
+            }
+
+            Snowberry.Log(LogLevel.Info, $"Loaded {FGStylegrounds.Count} foreground stylegrounds and {BGStylegrounds.Count} background stylegrounds.");
         }
 
         internal Room GetRoomAt(Point at) {

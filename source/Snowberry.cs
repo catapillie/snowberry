@@ -97,6 +97,7 @@ namespace Snowberry {
         }
 
         private LevelData DontCrashOnEmptyPlaytestLevel(On.Celeste.MapData.orig_StartLevel orig, MapData self) {
+            // TODO: just add an empty room
             if(self.Area.SID == "Snowberry/Playtest" && self.Levels.Count == 0) {
                 var empty = new BinaryPacker.Element();
                 empty.Children = new List<BinaryPacker.Element>();

@@ -1,5 +1,4 @@
 ﻿using Celeste;
-using Snowberry.Editor.Triggers;
 using Snowberry.Editor.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -11,11 +10,13 @@ using System.Linq;
 
 namespace Snowberry.Editor {
 
-	// Object Select (rect/lasso??), Object Placement (entity/trigger/decal), Tile Select, Tile Brush (fg/bg)
-	// selection filters (entity/trigger/decal, layers/tags??) can be handled in the panel
 	public abstract class Tool {
 
-		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new DecalSelectionTool(), new TileBrushTool(), new RoomTool(), new PlacementTool() };
+		public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new DecalSelectionTool(), new TileBrushTool(), new RoomTool(), new PlacementTool(), new StylegroundsTool() };
+
+		public static readonly Color LeftSelectedBtnBg = Calc.HexToColor("274292");
+		public static readonly Color RightSelectedBtnBg = Calc.HexToColor("922727");
+		public static readonly Color BothSelectedBtnBg = Calc.HexToColor("7d2792");
 
 		public abstract string GetName();
 
@@ -232,10 +233,6 @@ namespace Snowberry.Editor {
 		private List<UIButton> modeButtons = new List<UIButton>();
 
 		private static bool isPainting;
-
-		private static readonly Color LeftTilesetBtnBg = Calc.HexToColor("274292");
-		private static readonly Color RightTilesetBtnBg = Calc.HexToColor("922727");
-		private static readonly Color BothTilesetBtnBg = Calc.HexToColor("7d2792");
 
 		public TileBrushTool() {
 			FgTilesets = GetTilesets(false);
@@ -511,11 +508,11 @@ namespace Snowberry.Editor {
 			for(int i = 0; i < fgTilesetButtons.Count; i++) {
 				UIButton button = fgTilesetButtons[i];
 				if(LeftFg && RightFg && CurLeftTileset == CurRightTileset && CurLeftTileset == i)
-					button.BG = button.PressedBG = button.HoveredBG = BothTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = BothSelectedBtnBg;
 				else if(LeftFg && CurLeftTileset == i)
-					button.BG = button.PressedBG = button.HoveredBG = LeftTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = LeftSelectedBtnBg;
 				else if(RightFg && CurRightTileset == i)
-					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = RightSelectedBtnBg;
 				else {
 					button.BG = UIButton.DefaultBG;
 					button.PressedBG = UIButton.DefaultPressedBG;
@@ -525,11 +522,11 @@ namespace Snowberry.Editor {
 			for(int i = 0; i < bgTilesetButtons.Count; i++) {
 				UIButton button = bgTilesetButtons[i];
 				if(!LeftFg && !RightFg && CurLeftTileset == CurRightTileset && CurLeftTileset == i)
-					button.BG = button.PressedBG = button.HoveredBG = BothTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = BothSelectedBtnBg;
 				else if(!LeftFg && CurLeftTileset == i)
-					button.BG = button.PressedBG = button.HoveredBG = LeftTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = LeftSelectedBtnBg;
 				else if(!RightFg && CurRightTileset == i)
-					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = RightSelectedBtnBg;
 				else {
 					button.BG = UIButton.DefaultBG;
 					button.PressedBG = UIButton.DefaultPressedBG;
@@ -539,11 +536,11 @@ namespace Snowberry.Editor {
 			for(int i = 0; i < modeButtons.Count; i++) {
 				UIButton button = modeButtons[i];
 				if(LeftMode == RightMode && RightMode == (TileBrushMode)i)
-					button.BG = button.PressedBG = button.HoveredBG = BothTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = BothSelectedBtnBg;
 				else if(LeftMode == (TileBrushMode)i)
-					button.BG = button.PressedBG = button.HoveredBG = LeftTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = LeftSelectedBtnBg;
 				else if(RightMode == (TileBrushMode)i)
-					button.BG = button.PressedBG = button.HoveredBG = RightTilesetBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = RightSelectedBtnBg;
 				else {
 					button.BG = UIButton.DefaultBG;
 					button.PressedBG = UIButton.DefaultPressedBG;
@@ -734,10 +731,6 @@ namespace Snowberry.Editor {
 		Vector2? lastPress = null;
 		Placements.Placement lastPlacement = null;
 
-		private static readonly Color LeftPlacementBtnBg = Calc.HexToColor("274292");
-		private static readonly Color RightPlacementBtnBg = Calc.HexToColor("922727");
-		private static readonly Color BothPlacementBtnBg = Calc.HexToColor("7d2792");
-
 		public override UIElement CreatePanel() {
 			placementButtons.Clear();
 			var ret = new UIScrollPane();
@@ -798,11 +791,11 @@ namespace Snowberry.Editor {
 			foreach(var item in placementButtons) {
 				var button = item.Value;
 				if(item.Key.Equals(curLeftSelection) && item.Key.Equals(curRightSelection))
-					button.BG = button.PressedBG = button.HoveredBG = BothPlacementBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = BothSelectedBtnBg;
 				else if(item.Key.Equals(curLeftSelection))
-					button.BG = button.PressedBG = button.HoveredBG = LeftPlacementBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = LeftSelectedBtnBg;
 				else if(item.Key.Equals(curRightSelection))
-					button.BG = button.PressedBG = button.HoveredBG = RightPlacementBtnBg;
+					button.BG = button.PressedBG = button.HoveredBG = RightSelectedBtnBg;
 				else {
 					button.BG = UIButton.DefaultBG;
 					button.HoveredBG = UIButton.DefaultHoveredBG;
@@ -851,6 +844,59 @@ namespace Snowberry.Editor {
 				Calc.PushRandom(preview.GetHashCode());
 				preview.Render();
 				Calc.PopRandom();
+			}
+		}
+	}
+
+	public class StylegroundsTool : Tool {
+
+		public List<UIButton> StylegroundButtons = new();
+		public int SelectedStyleground = 0;
+
+		public override UIElement CreatePanel() {
+			StylegroundButtons.Clear();
+
+			UIElement panel = new() {
+				Width = 180,
+				Background = Calc.HexToColor("202929") * (185 / 255f),
+				GrabsClick = true,
+				GrabsScroll = true
+			};
+			UIScrollPane stylegrounds = new() {
+				TopPadding = 10,
+				Position = new Vector2(10),
+				Width = 170
+			};
+			int i = 0;
+			foreach(var styleground in Editor.GetCurrent().Map.FGStylegrounds.Union(Editor.GetCurrent().Map.BGStylegrounds)) {
+				int copy = i;
+				UIButton element = new UIButton(styleground.Title(), Fonts.Regular, 4, 2) {
+					Position = new Vector2(0, i * 20),
+					OnPress = () => { SelectedStyleground = copy; }
+				};
+				stylegrounds.Add(element);
+				StylegroundButtons.Add(element);
+				i++;
+			}
+			stylegrounds.Background = null;
+			panel.Add(stylegrounds);
+			return panel;
+		}
+
+		public override string GetName() {
+			return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_STYLEGROUNDS");
+		}
+
+		public override void Update(bool canClick) {
+			for(int i = 0; i < StylegroundButtons.Count; i++) {
+				UIButton item = StylegroundButtons[i];
+				if(i == SelectedStyleground) {
+					item.BG = item.HoveredBG = item.PressedBG = LeftSelectedBtnBg;
+				} else {
+					item.BG = UIButton.DefaultBG;
+					item.HoveredBG = UIButton.DefaultHoveredBG;
+					item.PressedBG = UIButton.DefaultPressedBG;
+				}
 			}
 		}
 	}

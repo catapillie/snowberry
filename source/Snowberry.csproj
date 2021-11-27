@@ -68,8 +68,12 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
     <Compile Include="Editor\Styleground.cs" />
+    <Compile Include="Editor\Stylegrounds\Plugin_Stardust.cs" />
+    <Compile Include="Editor\Stylegrounds\Plugin_Rain.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Blackhole.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Parallax.cs" />
+    <Compile Include="Editor\Stylegrounds\Plugin_Planets.cs" />
+    <Compile Include="Editor\Stylegrounds\Plugin_Snow.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Starfield.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="SnowberryModule.cs" />
