@@ -1,3 +1,5 @@
+SNOWBERRY_SNOWBERRY={# d12626}Snowberry{#}
+
 # *** Main Menu ***
 
 	SNOWBERRY_MAINMENU_YES=						oui
@@ -37,6 +39,21 @@
     SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE=        aucun écran sélectionné
 
     SNOWBERRY_EDITOR_TOOL_ENTITIES=             entités
+
+    SNOWBERRY_EDITOR_TOOL_STYLEGROUNDS=         plans
     
     SNOWBERRY_EDITOR_UTIL_FOREGROUND=           avant-plan
     SNOWBERRY_EDITOR_UTIL_BACKGROUND=           arrière-plan
+
+# *** Stylegrounds ***
+    
+    SNOWBERRY_STYLEGROUNDS_IMAGE=               image
+    SNOWBERRY_STYLEGROUNDS_BLACKHOLE=           trou noir
+    SNOWBERRY_STYLEGROUNDS_RAIN=                pluie
+    SNOWBERRY_STYLEGROUNDS_STARFIELD=           champ étoilé
+    SNOWBERRY_STYLEGROUNDS_STARDUST=            poussière d'étoiles
+    SNOWBERRY_STYLEGROUNDS_PLANETS=             planètes
+
+# Error Messages
+    
+    SNOWBERRY_PLAYTEST_MAP_POSTCARD=            Ceci est peut-être hors d'atteinte, mais ce n'est pas à collectionner !{n}{n}Cette map est utilisée pour implémenter certaines fonctionnalités de {+SNOWBERRY_SNOWBERRY}, et n'a aucun contenu.

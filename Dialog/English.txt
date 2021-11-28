@@ -1,3 +1,5 @@
+SNOWBERRY_SNOWBERRY={# d12626}Snowberry{#}
+
 # *** Main Menu ***
 
 	SNOWBERRY_MAINMENU_YES=						yes
@@ -42,7 +44,6 @@
 
     SNOWBERRY_EDITOR_UTIL_FOREGROUND=           foreground
     SNOWBERRY_EDITOR_UTIL_BACKGROUND=           background
-	SNOWBERRY_MAINMENU_CREDITS=					by catapillie, leppa, Viv
 
 # *** Stylegrounds ***
     
@@ -55,4 +56,4 @@
 
 # Error Messages
     
-    SNOWBERRY_PLAYTEST_MAP_POSTCARD=            This might be out of the way, but it's not a collectable!{n}{n}This map is used to implement some Snowberry features, and has no real content.
+    SNOWBERRY_PLAYTEST_MAP_POSTCARD=            This might be out of the way, but it's not a collectable!{n}{n}This map is used to implement some {+SNOWBERRY_SNOWBERRY} features, and has no real content.
