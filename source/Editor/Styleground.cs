@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 using static Celeste.BinaryPacker;
 
@@ -53,18 +55,16 @@ namespace Snowberry.Editor {
 		// Render on the Snowberry background
 		public virtual void Render() {}
 
-		public virtual string Title() => Dialog.Clean("SNOWBERRY_STYLEGROUNDS_" + Name.ToUpperInvariant());
+		public virtual string Title() => Name;
 
 		public bool IsVisible(Room room) {
-			/*if(DreamingOnly.HasValue && DreamingOnly.Value != level.Session.Dreaming) {
-				return false;
-			}*/
+			string roomName = room?.Name ?? "";
 
-			if(ExcludeFrom != null && ExcludeFrom.Contains(room.Name)) {
+			if(ExcludeFrom != null && ExcludeFrom.Any(k => MatchRoomName(k, roomName))) {
 				return false;
 			}
 
-			if(OnlyIn != null && !OnlyIn.Contains(room.Name)) {
+			if(OnlyIn != null && !OnlyIn.Any(k => MatchRoomName(k, roomName))) {
 				return false;
 			}
 
@@ -73,7 +73,7 @@ namespace Snowberry.Editor {
 
 		public static bool MatchRoomName(string predicate, string roomName) {
 			// TODO: wildcard matching
-			return predicate.Equals(roomName);
+			return Regex.IsMatch(roomName, predicate);
 		}
 
 		public static Styleground Create(string name, Map map, Element data, Element applyData = null) {

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Snowberry.Editor {
     public class Editor : Scene {
@@ -365,8 +366,10 @@ namespace Snowberry.Editor {
             else
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
-            Engine.Instance.GraphicsDevice.Clear(bg);
+            Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             if (Map != null) {
+                if(camera.Buffer == null)
+                    DrawStylegrounds();
                 Map.Render(camera);
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
                 tool.RenderWorldSpace();
@@ -375,10 +378,15 @@ namespace Snowberry.Editor {
 
             #endregion
 
-            #region Displaying on Backbuffer + HQRender
+			#region Displaying on Backbuffer + HQRender
 
-            if(camera.Buffer != null) {
+			if(camera.Buffer != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
+                Engine.Instance.GraphicsDevice.Clear(bg);
+
+                if(Map != null)
+                    DrawStylegrounds();
+
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
                 Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
                 Draw.SpriteBatch.End();
@@ -397,6 +405,18 @@ namespace Snowberry.Editor {
 
         public Vector2 GetCameraPos() {
             return camera.Position;
+        }
+
+        public Matrix GetStylegroundsMatrix() {
+            return Engine.ScreenMatrix * Matrix.CreateScale(5) * Matrix.CreateTranslation(0, 0, 0);
+        }
+
+        private void DrawStylegrounds() {
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetStylegroundsMatrix());
+            foreach(var styleground in Map.BGStylegrounds.Union(Map.FGStylegrounds))
+                if(styleground.IsVisible(SelectedRoom))
+                    styleground.Render();
+            Draw.SpriteBatch.End();
         }
 
         private static void CreatePlaytestMapDataHook(Action<MapData> orig_Load, MapData self) {
