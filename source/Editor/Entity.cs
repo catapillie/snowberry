@@ -120,8 +120,8 @@ namespace Snowberry.Editor {
 		}
 
 		public virtual void Render() { }
-
         public virtual void RenderBefore() { }
+        public virtual void HQRender() { }
 
         #region Entity Instantiating
 

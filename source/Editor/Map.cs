@@ -3,7 +3,6 @@ using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-using Snowberry.Editor.Stylegrounds;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
@@ -137,6 +136,26 @@ namespace Snowberry.Editor {
             	Draw.Rect(rect, Color.White * (Editor.SelectedFillerIndex == i ? 0.14f : 0.1f));
             }
             Draw.SpriteBatch.End();
+        }
+
+        internal void HQRender(Editor.Camera camera) {
+            Rectangle viewRect = camera.ViewRect;
+
+            Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
+            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+
+            foreach (Room room in Rooms) {
+                Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
+                if (!viewRect.Intersects(rect))
+                    continue;
+
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.ScreenView);
+                room.HQRender(camera.ScreenView);
+                Draw.SpriteBatch.End();
+            }
+
+            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
+            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
         }
 
         public void GenerateMapData(MapData data){

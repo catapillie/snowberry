@@ -39,7 +39,7 @@ namespace Snowberry.Editor {
                 }
             }
 
-            private Matrix matrix, inverse;
+            private Matrix matrix, inverse, screenview;
             public Matrix Matrix {
                 get {
                     if(changedView)
@@ -54,6 +54,13 @@ namespace Snowberry.Editor {
                     return inverse;
                 }
             }
+            public Matrix ScreenView {
+                get {
+                    if (changedView)
+                        UpdateMatrices();
+                    return screenview;
+                }
+            }
 
             public Rectangle ViewRect { get; private set; }
 
@@ -65,14 +72,17 @@ namespace Snowberry.Editor {
 
             private void UpdateMatrices() {
                 Matrix m = Matrix.CreateTranslation((int)-Position.X, (int)-Position.Y, 0f) * Matrix.CreateScale(Math.Min(1f, Zoom));
-                if(Buffer != null) {
+
+                if (Buffer != null) {
                     m *= Matrix.CreateTranslation(Buffer.Width / 2, Buffer.Height / 2, 0f);
                     ViewRect = new Rectangle((int)Position.X - Buffer.Width / 2, (int)Position.Y - Buffer.Height / 2, Buffer.Width, Buffer.Height);
+                    screenview = m * Matrix.CreateScale(Zoom);
                 } else {
                     m *= Engine.ScreenMatrix * Matrix.CreateTranslation(Engine.ViewWidth / 2, Engine.ViewHeight / 2, 0f);
                     int w = (int)(Engine.Width / Zoom);
                     int h = (int)(Engine.Height / Zoom);
                     ViewRect = new Rectangle((int)Position.X - w / 2, (int)Position.Y - h / 2, w, h);
+                    screenview = m;
                 }
                 inverse = Matrix.Invert(matrix = m);
 
@@ -356,7 +366,7 @@ namespace Snowberry.Editor {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Engine.Instance.GraphicsDevice.Clear(bg);
-            if(Map != null) {
+            if (Map != null) {
                 Map.Render(camera);
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
                 tool.RenderWorldSpace();
@@ -365,7 +375,7 @@ namespace Snowberry.Editor {
 
             #endregion
 
-            #region Displaying on Backbuffer
+            #region Displaying on Backbuffer + HQRender
 
             if(camera.Buffer != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -373,6 +383,10 @@ namespace Snowberry.Editor {
                 Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
                 Draw.SpriteBatch.End();
             }
+
+            // HQRender
+            if (Map != null)
+                Map.HQRender(camera);
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
             Draw.SpriteBatch.Draw(uiBuffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Vector2.One * 2, SpriteEffects.None, 0f);

@@ -159,9 +159,9 @@ namespace Snowberry.Editor.Entities {
         [Option("speed")] public Speeds Speed = Speeds.Normal;
         [Option("startCenter")] public bool StartAtCenter = false;
 
-        public override void Render() {
+        public override void HQRender() {
             DrawUtil.DottedLine(Position, Nodes[0], Color.White * 0.5f, 8, 4);
-            base.Render();
+            base.HQRender();
         }
     }
 
@@ -169,9 +169,9 @@ namespace Snowberry.Editor.Entities {
     public class Plugin_RotateSpinner : Plugin_MovingSpinner {
         [Option("clockwise")] public bool Clockwise = false;
 
-        public override void Render() {
+        public override void HQRender() {
             Draw.Circle(Position, Vector2.Distance(Position, Nodes[0]), Color.White * 0.5f, 20);
-            base.Render();
+            base.HQRender();
         }
     }
 }

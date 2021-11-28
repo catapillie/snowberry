@@ -17,9 +17,15 @@ namespace Snowberry.Editor.Entities {
             MTexture orb = GFX.Game["objects/badelineboost/idle00"];
             orb.DrawCentered(Position);
 
+            foreach (Vector2 node in Nodes)
+                orb.DrawCentered(node);
+        }
+
+        public override void HQRender() {
+            base.HQRender();
+
             Vector2 prev = Position;
             foreach (Vector2 node in Nodes) {
-                orb.DrawCentered(node);
                 DrawUtil.DottedLine(prev, node, Color.Red * 0.5f, 8, 4);
                 prev = node;
             }

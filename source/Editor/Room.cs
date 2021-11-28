@@ -294,6 +294,23 @@ namespace Snowberry.Editor {
             DirtyTrackedEntities.Clear();
         }
 
+        internal void HQRender(Matrix m) {
+            Vector2 offset = Position * 8;
+
+            Vector2 zero = Calc.Round(Vector2.Transform(offset, m));
+            Vector2 size = Calc.Round(Vector2.Transform(offset + new Vector2(Width * 8, Height * 8), m) - zero);
+            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
+                (int)zero.X, (int)zero.Y,
+                (int)size.X, (int)size.Y);
+
+            // Entities
+            foreach (Entity entity in Entities)
+                entity.HQRender();
+            // Triggers
+            foreach (Entity trigger in Triggers)
+                trigger.HQRender();
+        }
+
         public void UpdateBounds() {
             var newFgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
 			for(int x = 0; x < fgTileMap.Columns; x++)

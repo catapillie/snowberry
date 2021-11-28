@@ -19,9 +19,15 @@ namespace Snowberry.Editor.Entities {
             MTexture baddy = GFX.Game["characters/badelineBoss/charge00"];
             baddy.DrawCentered(Position);
 
+            foreach (Vector2 node in Nodes)
+                baddy.DrawCentered(node);
+        }
+
+        public override void HQRender() {
+            base.HQRender();
+            
             Vector2 prev = Position;
             foreach (Vector2 node in Nodes) {
-                baddy.DrawCentered(node);
                 DrawUtil.DottedLine(prev, node, Color.Red * 0.5f, 8, 4);
                 prev = node;
             }

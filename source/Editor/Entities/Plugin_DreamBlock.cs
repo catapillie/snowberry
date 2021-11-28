@@ -75,9 +75,6 @@ namespace Snowberry.Editor.Entities {
                 Draw.Rect(new Vector2(X + Width - 2f, Y + Height - 2f), 2f, 2f, Color.White);
             } else
                 Draw.HollowRect(Position, Width, Height, Color.White);
-
-            if (Nodes.Length != 0)
-                DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2f, Color.White, 4, 2);
 		}
 
         private Vector2 PutInside(Vector2 pos) {
@@ -123,6 +120,13 @@ namespace Snowberry.Editor.Entities {
 
         private float LineAmplitude(float seed, float index) {
             return (float)(Math.Sin((double)(seed + index / 16f) + Math.Sin(seed * 2f + index / 32f) * 6.2831854820251465) + 1.0) * 1.5f;
+        }
+
+        public override void HQRender() {
+            base.HQRender();
+
+            if (Nodes.Length != 0)
+                DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2f, Color.White, 4, 2);
         }
 
         protected override Rectangle[] Select() {
