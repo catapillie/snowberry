@@ -22,56 +22,59 @@ namespace Snowberry.Editor.Stylegrounds {
 			base.Render();
 
 			Editor editor = Editor.Instance;
-			if(editor == null)
+			if (editor == null)
 				return;
 			
 			MTexture mtex = (Atlas == "game" && GFX.Game.Has(Texture)) ? GFX.Game[Texture] : (Atlas == "gui" && GFX.Gui.Has(Texture) ? GFX.Gui[Texture] : GFX.Misc[Texture]);
 			Vector2 cameraPos = Editor.Instance.Camera.Position.Floor();
 			Vector2 pos = (Position - cameraPos * Scroll).Floor();
 
-			if(Color.A <= 1)
+			if (Color.A <= 1)
 				return;
 
-			if(LoopX) {
-				while(pos.X < 0f)
-					pos.X += mtex.Width;
-				while(pos.X > 0f)
-					pos.X -= mtex.Width;
-			}
-
-			if(LoopY) {
-				while(pos.Y < 0f)
-					pos.Y += mtex.Height;
-				while(pos.Y > 0f)
-					pos.Y -= mtex.Height;
-			}
-
 			SpriteEffects flip = SpriteEffects.None;
-			if(FlipX && FlipY) {
-				flip = (SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically);
-			} else if(FlipX) {
+			if (FlipX && FlipY) {
+				flip = SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically;
+			} else if (FlipX) {
 				flip = SpriteEffects.FlipHorizontally;
-			} else if(FlipY) {
+			} else if (FlipY) {
 				flip = SpriteEffects.FlipVertically;
 			}
 
-			if(BlendMode == "additive") {
+			if (LoopX) {
+				while (pos.X < editor.Camera.ViewRect.X)
+					pos.X += mtex.Width;
+				while (pos.X > editor.Camera.ViewRect.X)
+					pos.X -= mtex.Width;
+			}
+			
+			if (LoopY) {
+				while (pos.Y < editor.Camera.ViewRect.Y)
+					pos.Y += mtex.Height;
+				while (pos.Y > editor.Camera.ViewRect.Y)
+					pos.Y -= mtex.Height;
+			}
+
+			if (BlendMode == "additive") {
 				Draw.SpriteBatch.End();
 				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.Camera.Matrix);
 			}
 
-			for(float num2 = pos.X; num2 < 320f; num2 += mtex.Width) {
-				for(float num3 = pos.Y; num3 < 180f; num3 += mtex.Height) {
-					mtex.Draw(new Vector2(num2, num3), Vector2.Zero, Color, 1f, 0f, flip);
-					if(!LoopY)
+			Vector2 drawPos = pos;
+			do {
+				do {
+					mtex.Draw(drawPos, Vector2.Zero, Color, 1f, 0f, flip);
+					if (!LoopY)
 						break;
-				}
-
-				if(!LoopX)
+					drawPos.Y += mtex.Height;
+				} while (drawPos.Y < editor.Camera.ViewRect.Bottom);
+				if (!LoopX)
 					break;
-			}
-			
-			if(BlendMode == "additive") {
+				drawPos.X += mtex.Width;
+				drawPos.Y = pos.Y;
+			} while (drawPos.X < editor.Camera.ViewRect.Right);
+
+			if (BlendMode == "additive") {
 				Draw.SpriteBatch.End();
 				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.Camera.Matrix);
 			}
