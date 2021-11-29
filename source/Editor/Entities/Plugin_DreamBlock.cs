@@ -41,7 +41,7 @@ namespace Snowberry.Editor.Entities {
                         _ => Color.LightGray * (0.5f + layer / 2f * 0.5f)
                     };
 
-                    pos += (Editor.GetCurrent()?.GetCameraPos() ?? Vector2.Zero) * (0.3f + 0.25f * layer);
+                    pos += Editor.Instance.Camera.Position * (0.3f + 0.25f * layer);
                     pos = PutInside(pos);
                     MTexture mTexture;
                     int animTimer = 0; // todo: animated entities?

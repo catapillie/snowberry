@@ -225,7 +225,7 @@ namespace Snowberry.Editor {
             return result;
         }
 
-        internal void Render(Rectangle viewRect, Editor.Camera camera) {
+        internal void Render(Rectangle viewRect, Editor.BufferCamera camera) {
             Vector2 offset = Position * 8;
 
             Vector2 zero = Calc.Round(Vector2.Transform(offset, camera.Matrix));

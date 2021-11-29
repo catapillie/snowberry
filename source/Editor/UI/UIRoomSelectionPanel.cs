@@ -39,7 +39,7 @@ namespace Snowberry.Editor.UI {
                             HoveredFG = Color.Crimson,
                             PressedFG = Color.DarkRed,
                             OnPress = () => {
-                                Editor.GetCurrent().Map.Fillers.RemoveAt(Editor.SelectedFillerIndex);
+                                Editor.Instance.Map.Fillers.RemoveAt(Editor.SelectedFillerIndex);
                                 Editor.SelectedFillerIndex = -1;
                                 RoomTool.ScheduledRefresh = true;
                             }
@@ -83,13 +83,13 @@ namespace Snowberry.Editor.UI {
                         // validate room name
                         if(newName.Length <= 0 || Regex.Match(newName, "[0-9a-zA-Z\\-_ ]+").Length != newName.Length)
                             newNameInvalid.FG = Color.Red;
-                        else if(Editor.GetCurrent().Map.Rooms.Exists(it => it.Name.Equals(newName)))
+                        else if(Editor.Instance.Map.Rooms.Exists(it => it.Name.Equals(newName)))
                             newNameTaken.FG = Color.Red;
                         else {
                             // add room
                             var b = RoomTool.PendingRoom.Value;
                             var newRoom = new Room(newName, new Rectangle(b.X / 8, b.Y / 8, b.Width / 8, b.Height / 8));
-                            Editor.GetCurrent().Map.Rooms.Add(newRoom);
+                            Editor.Instance.Map.Rooms.Add(newRoom);
                             Editor.SelectedRoom = newRoom;
                             RoomTool.PendingRoom = null;
                             RoomTool.ScheduledRefresh = true;
@@ -101,8 +101,8 @@ namespace Snowberry.Editor.UI {
                         OnPress = () => {
                             var b = RoomTool.PendingRoom.Value;
                             var newFiller = new Rectangle(b.X / 8, b.Y / 8, b.Width / 8, b.Height / 8);
-                            Editor.GetCurrent().Map.Fillers.Add(newFiller);
-                            Editor.SelectedFillerIndex = Editor.GetCurrent().Map.Fillers.Count - 1;
+                            Editor.Instance.Map.Fillers.Add(newFiller);
+                            Editor.SelectedFillerIndex = Editor.Instance.Map.Fillers.Count - 1;
                             RoomTool.PendingRoom = null;
                             RoomTool.ScheduledRefresh = true;
                         }
@@ -208,7 +208,7 @@ namespace Snowberry.Editor.UI {
                 HoveredFG = Color.Crimson,
                 PressedFG = Color.DarkRed,
                 OnPress = () => {
-                    Editor.GetCurrent().Map.Rooms.Remove(room);
+                    Editor.Instance.Map.Rooms.Remove(room);
                     Editor.SelectedRoom = null;
                     RoomTool.ScheduledRefresh = true;
                 }

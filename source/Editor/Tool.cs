@@ -44,7 +44,7 @@ namespace Snowberry.Editor {
 		}
 
 		public override void Update(bool canClick) {
-			var editor = Editor.GetCurrent();
+			var editor = Editor.Instance;
 
 			if(MInput.Mouse.CheckLeftButton && canClick) {
 				if(MInput.Mouse.PressedLeftButton) {
@@ -130,7 +130,7 @@ namespace Snowberry.Editor {
 		}
 
 		public override void Update(bool canClick) {
-			var editor = Editor.GetCurrent();
+			var editor = Editor.Instance;
 
 			if(MInput.Mouse.CheckLeftButton && canClick) {
 				if(MInput.Mouse.PressedLeftButton) {
@@ -405,8 +405,8 @@ namespace Snowberry.Editor {
 				var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8 - Editor.SelectedRoom.Position.X), (float)Math.Floor(Editor.Mouse.World.Y / 8 - Editor.SelectedRoom.Position.Y));
 				int x = (int)tilePos.X; int y = (int)tilePos.Y;
 				if(Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
-					var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling();
-					var roomLastPress = (Editor.GetCurrent().worldClick / 8).Ceiling() - Editor.SelectedRoom.Position;
+					var lastPress = (Editor.Instance.worldClick / 8).Ceiling();
+					var roomLastPress = (Editor.Instance.worldClick / 8).Ceiling() - Editor.SelectedRoom.Position;
 					int ax = (int)Math.Min(x, roomLastPress.X);
 					int ay = (int)Math.Min(y, roomLastPress.Y);
 					int bx = (int)Math.Max(x, roomLastPress.X);
@@ -623,7 +623,7 @@ namespace Snowberry.Editor {
 				ScheduledRefresh = false;
 				lastSelected = Editor.SelectedRoom;
 				lastFillerSelected = Editor.SelectedFillerIndex;
-				if(Editor.GetCurrent().ToolPanel is UIRoomSelectionPanel selectionPanel)
+				if(Editor.Instance.ToolPanel is UIRoomSelectionPanel selectionPanel)
 					selectionPanel.Refresh();
 				if(Editor.SelectedRoom != null) {
 					lastRoomOffset = Editor.SelectedRoom.Position - (Editor.Mouse.World / 8);
@@ -686,7 +686,7 @@ namespace Snowberry.Editor {
 			if(canClick) {
 				if(Editor.SelectedRoom == null) {
 					if(MInput.Mouse.CheckLeftButton) {
-						var lastPress = (Editor.GetCurrent().worldClick / 8).Ceiling() * 8;
+						var lastPress = (Editor.Instance.worldClick / 8).Ceiling() * 8;
 						var mpos = (Editor.Mouse.World / 8).Ceiling() * 8;
 						int ax = (int)Math.Min(mpos.X, lastPress.X);
 						int ay = (int)Math.Min(mpos.Y, lastPress.Y);
@@ -769,7 +769,7 @@ namespace Snowberry.Editor {
 				UpdateEntity(toAdd, area);
 				// TODO: find lowest unoccupied ID
 				int highestID = 0;
-				foreach(var item in Editor.GetCurrent().Map.Rooms.SelectMany(k => k.AllEntities)) {
+				foreach(var item in Editor.Instance.Map.Rooms.SelectMany(k => k.AllEntities)) {
 					if(item.EntityID > highestID)
 						highestID = item.EntityID;
 				}
@@ -868,7 +868,7 @@ namespace Snowberry.Editor {
 				Width = 170
 			};
 			int i = 0;
-			foreach(var styleground in Editor.GetCurrent().Map.FGStylegrounds.Union(Editor.GetCurrent().Map.BGStylegrounds)) {
+			foreach(var styleground in Editor.Instance.Map.FGStylegrounds.Union(Editor.Instance.Map.BGStylegrounds)) {
 				int copy = i;
 				UIButton element = new UIButton(styleground.Title(), Fonts.Regular, 4, 2) {
 					Position = new Vector2(0, i * 20),

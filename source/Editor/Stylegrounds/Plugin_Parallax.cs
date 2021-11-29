@@ -21,12 +21,12 @@ namespace Snowberry.Editor.Stylegrounds {
 		public override void Render() {
 			base.Render();
 
-			Editor editor = Editor.GetCurrent();
+			Editor editor = Editor.Instance;
 			if(editor == null)
 				return;
 			
 			MTexture mtex = (Atlas == "game" && GFX.Game.Has(Texture)) ? GFX.Game[Texture] : (Atlas == "gui" && GFX.Gui.Has(Texture) ? GFX.Gui[Texture] : GFX.Misc[Texture]);
-			Vector2 cameraPos = editor.GetCameraPos().Floor();
+			Vector2 cameraPos = Editor.Instance.Camera.Position.Floor();
 			Vector2 pos = (Position - cameraPos * Scroll).Floor();
 
 			if(Color.A <= 1)
@@ -57,7 +57,7 @@ namespace Snowberry.Editor.Stylegrounds {
 
 			if(BlendMode == "additive") {
 				Draw.SpriteBatch.End();
-				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.GetStylegroundsMatrix());
+				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.Camera.Matrix);
 			}
 
 			for(float num2 = pos.X; num2 < 320f; num2 += mtex.Width) {
@@ -73,7 +73,7 @@ namespace Snowberry.Editor.Stylegrounds {
 			
 			if(BlendMode == "additive") {
 				Draw.SpriteBatch.End();
-				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.GetStylegroundsMatrix());
+				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.Camera.Matrix);
 			}
 		}
 	}

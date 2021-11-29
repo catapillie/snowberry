@@ -110,11 +110,17 @@ namespace Snowberry.Editor {
 			return -1;
         }
 
-        internal void Render(Editor.Camera camera) {
+        internal void Render(Editor.BufferCamera camera) {
             Rectangle viewRect = camera.ViewRect;
 
             Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
+
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+            foreach (var styleground in BGStylegrounds)
+                if (styleground.IsVisible(Editor.SelectedRoom))
+                    styleground.Render();
+            Draw.SpriteBatch.End();
 
             foreach (Room room in Rooms) {
 				Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
@@ -128,7 +134,13 @@ namespace Snowberry.Editor {
 
             Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
-            
+
+            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+            foreach (var styleground in FGStylegrounds)
+                if (styleground.IsVisible(Editor.SelectedRoom))
+                    styleground.Render();
+            Draw.SpriteBatch.End();
+
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
 			for(int i = 0; i < Fillers.Count; i++) {
 				Rectangle filler = Fillers[i];
@@ -138,7 +150,7 @@ namespace Snowberry.Editor {
             Draw.SpriteBatch.End();
         }
 
-        internal void HQRender(Editor.Camera camera) {
+        internal void HQRender(Editor.BufferCamera camera) {
             Rectangle viewRect = camera.ViewRect;
 
             Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;

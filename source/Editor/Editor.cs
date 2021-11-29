@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Snowberry.Editor {
     public class Editor : Scene {
-        internal class Camera {
+        public class BufferCamera {
             private bool changedView = true;
 
             private Vector2 pos;
@@ -67,7 +67,7 @@ namespace Snowberry.Editor {
 
             public RenderTarget2D Buffer { get; private set; }
 
-            public Camera() {
+            public BufferCamera() {
                 Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.Width, Engine.Height);
             }
 
@@ -99,11 +99,13 @@ namespace Snowberry.Editor {
             public static Vector2 WorldLast { get; internal set; }
         }
 
+        public static Editor Instance { get; private set; }
+
         public static bool FancyRender = true;
 
         private static readonly Color bg = Calc.HexToColor("060607");
 
-        private Camera camera;
+        public BufferCamera Camera { get; private set; }
 
         public Vector2 mousePos, lastMousePos;
         public Vector2 worldClick;
@@ -135,6 +137,7 @@ namespace Snowberry.Editor {
 
             SelectedRoom = null;
             SelectedFillerIndex = -1;
+            Instance = this;
         }
 
         internal static void Open(MapData data) {
@@ -228,7 +231,7 @@ namespace Snowberry.Editor {
 
         public override void Begin() {
             base.Begin();
-            camera = new Camera();
+            Camera = new BufferCamera();
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
 
             if(Map == null)
@@ -239,7 +242,7 @@ namespace Snowberry.Editor {
 
         public override void End() {
             base.End();
-            camera.Buffer?.Dispose();
+            Camera.Buffer?.Dispose();
             uiBuffer.Dispose();
             ui.Destroy();
         }
@@ -256,7 +259,7 @@ namespace Snowberry.Editor {
             // zooming
             bool canZoom = ui.CanScrollThrough();
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
-            float scale = camera.Zoom;
+            float scale = Camera.Zoom;
             if(canZoom) {
                 if(wheel > 0)
                     scale = scale >= 1 ? scale + 1 : scale * 2f;
@@ -264,11 +267,11 @@ namespace Snowberry.Editor {
                     scale = scale > 1 ? scale - 1 : scale / 2f;
             }
             scale = Calc.Clamp(scale, 0.0625f, 24f);
-            if(scale != camera.Zoom)
-                camera.Zoom = scale;
+            if(scale != Camera.Zoom)
+                Camera.Zoom = scale;
 
-            if(camera.Buffer != null)
-                mousePos /= camera.Zoom;
+            if(Camera.Buffer != null)
+                mousePos /= Camera.Zoom;
 
             // controls
             bool canClick = ui.CanClickThrough();
@@ -277,13 +280,13 @@ namespace Snowberry.Editor {
             if(MInput.Mouse.CheckMiddleButton && canClick) {
                 Vector2 move = lastMousePos - mousePos;
                 if(move != Vector2.Zero)
-                    camera.Position += move / (camera.Buffer == null ? camera.Zoom : 1f);
+                    Camera.Position += move / (Camera.Buffer == null ? Camera.Zoom : 1f);
             }
 
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
-            Mouse.World = Calc.Round(Vector2.Transform(camera.Buffer == null ? mouseVec : mousePos, camera.Inverse));
+            Mouse.World = Calc.Round(Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse));
 
             ui.Update();
 
@@ -328,12 +331,6 @@ namespace Snowberry.Editor {
             SelectedEntities = null;
         }
 
-        public static Editor GetCurrent() {
-            if(Engine.Scene is Editor editor)
-                return editor;
-            return null;
-        }
-
         public override void Render() {
             var tool = Map == null ? null : Tool.Tools[Toolbar.CurrentTool];
 
@@ -361,17 +358,15 @@ namespace Snowberry.Editor {
 
             #region Map Rendering
 
-            if(camera.Buffer != null)
-                Engine.Instance.GraphicsDevice.SetRenderTarget(camera.Buffer);
+            if(Camera.Buffer != null)
+                Engine.Instance.GraphicsDevice.SetRenderTarget(Camera.Buffer);
             else
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
             Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
             if (Map != null) {
-                if(camera.Buffer == null)
-                    DrawStylegrounds();
-                Map.Render(camera);
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
+                Map.Render(Camera);
+                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.Matrix);
                 tool.RenderWorldSpace();
                 Draw.SpriteBatch.End();
             }
@@ -380,43 +375,24 @@ namespace Snowberry.Editor {
 
 			#region Displaying on Backbuffer + HQRender
 
-			if(camera.Buffer != null) {
+			if(Camera.Buffer != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
                 Engine.Instance.GraphicsDevice.Clear(bg);
 
-                if(Map != null)
-                    DrawStylegrounds();
-
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
-                Draw.SpriteBatch.Draw(camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, camera.Zoom, SpriteEffects.None, 0f);
+                Draw.SpriteBatch.Draw(Camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Camera.Zoom, SpriteEffects.None, 0f);
                 Draw.SpriteBatch.End();
             }
 
             // HQRender
             if (Map != null)
-                Map.HQRender(camera);
+                Map.HQRender(Camera);
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
             Draw.SpriteBatch.Draw(uiBuffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Vector2.One * 2, SpriteEffects.None, 0f);
             Draw.SpriteBatch.End();
 
             #endregion
-        }
-
-        public Vector2 GetCameraPos() {
-            return camera.Position;
-        }
-
-        public Matrix GetStylegroundsMatrix() {
-            return Engine.ScreenMatrix * Matrix.CreateScale(5) * Matrix.CreateTranslation(0, 0, 0);
-        }
-
-        private void DrawStylegrounds() {
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, GetStylegroundsMatrix());
-            foreach(var styleground in Map.BGStylegrounds.Union(Map.FGStylegrounds))
-                if(styleground.IsVisible(SelectedRoom))
-                    styleground.Render();
-            Draw.SpriteBatch.End();
         }
 
         private static void CreatePlaytestMapDataHook(Action<MapData> orig_Load, MapData self) {
