@@ -52,6 +52,8 @@ namespace Snowberry.Editor {
 
 		public bool InstantOut;
 
+		public virtual bool Additive => false;
+
 		// Render on the Snowberry background
 		public virtual void Render() {}
 

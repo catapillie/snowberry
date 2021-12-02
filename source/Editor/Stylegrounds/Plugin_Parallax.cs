@@ -1,6 +1,4 @@
 ﻿using Celeste;
-
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -15,8 +13,10 @@ namespace Snowberry.Editor.Stylegrounds {
 		[Option("blendmode")] public string BlendMode = "alphablend";
 		[Option("fadeIn")] public bool FadeIn = false;
 
-		// image: "bgs/blah" in "game"
-		public override string Title() => $"{Dialog.Clean("SNOWBERRY_STYLEGROUNDS_IMAGE")}: \"{Texture}\" {(Atlas != "game" ? $"in {Atlas}" : "")}";
+        public sealed override bool Additive => BlendMode == "additive";
+
+        // image: "bgs/blah" in "game"
+        public override string Title() => $"{Dialog.Clean("SNOWBERRY_STYLEGROUNDS_IMAGE")}: \"{Texture}\" {(Atlas != "game" ? $"in {Atlas}" : "")}";
 
 		public override void Render() {
 			base.Render();
@@ -27,7 +27,7 @@ namespace Snowberry.Editor.Stylegrounds {
 			
 			MTexture mtex = (Atlas == "game" && GFX.Game.Has(Texture)) ? GFX.Game[Texture] : (Atlas == "gui" && GFX.Gui.Has(Texture) ? GFX.Gui[Texture] : GFX.Misc[Texture]);
 			Vector2 cameraPos = editor.Camera.Position.Floor() - new Vector2(160, 90);
-			Vector2 pos = (Position + cameraPos * (Vector2.One - Scroll / editor.Camera.Zoom)).Floor();
+			Vector2 pos = (Position + cameraPos * (Vector2.One - Scroll)).Floor();
 
 			if (Color.A <= 1)
 				return;
@@ -55,11 +55,6 @@ namespace Snowberry.Editor.Stylegrounds {
 					pos.Y -= mtex.Height;
 			}
 
-			if (BlendMode == "additive") {
-				Draw.SpriteBatch.End();
-				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.Camera.Matrix);
-			}
-
 			Vector2 drawPos = pos;
 			do {
 				do {
@@ -73,11 +68,6 @@ namespace Snowberry.Editor.Stylegrounds {
 				drawPos.X += mtex.Width;
 				drawPos.Y = pos.Y;
 			} while (drawPos.X < editor.Camera.ViewRect.Right);
-
-			if (BlendMode == "additive") {
-				Draw.SpriteBatch.End();
-				Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, editor.Camera.Matrix);
-			}
 		}
 	}
 }
