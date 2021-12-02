@@ -26,8 +26,8 @@ namespace Snowberry.Editor.Stylegrounds {
 				return;
 			
 			MTexture mtex = (Atlas == "game" && GFX.Game.Has(Texture)) ? GFX.Game[Texture] : (Atlas == "gui" && GFX.Gui.Has(Texture) ? GFX.Gui[Texture] : GFX.Misc[Texture]);
-			Vector2 cameraPos = Editor.Instance.Camera.Position.Floor();
-			Vector2 pos = (Position - cameraPos * Scroll).Floor();
+			Vector2 cameraPos = editor.Camera.Position.Floor() - new Vector2(160, 90);
+			Vector2 pos = (Position + cameraPos * (Vector2.One - Scroll / editor.Camera.Zoom)).Floor();
 
 			if (Color.A <= 1)
 				return;

@@ -27,6 +27,8 @@ namespace Snowberry.Editor {
         public Vector2 Position => new Vector2(X, Y);
         public Vector2 Size => new Vector2(Width, Height);
 
+        public Rectangle ScissorRect { get; private set; }
+
         // Music data
         public string Music = "";
         public string AltMusic = "";
@@ -225,14 +227,20 @@ namespace Snowberry.Editor {
             return result;
         }
 
-        internal void Render(Rectangle viewRect, Editor.BufferCamera camera) {
+        internal void CalculateScissorRect(Editor.BufferCamera camera) {
             Vector2 offset = Position * 8;
 
             Vector2 zero = Calc.Round(Vector2.Transform(offset, camera.Matrix));
             Vector2 size = Calc.Round(Vector2.Transform(offset + new Vector2(Width * 8, Height * 8), camera.Matrix) - zero);
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
+            ScissorRect = new Rectangle(
                 (int)zero.X, (int)zero.Y,
                 (int)size.X, (int)size.Y);
+        }
+
+        internal void Render(Rectangle viewRect) {
+            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = ScissorRect;
+
+            Vector2 offset = Position * 8;
 
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
 
@@ -295,13 +303,7 @@ namespace Snowberry.Editor {
         }
 
         internal void HQRender(Matrix m) {
-            Vector2 offset = Position * 8;
-
-            Vector2 zero = Calc.Round(Vector2.Transform(offset, m));
-            Vector2 size = Calc.Round(Vector2.Transform(offset + new Vector2(Width * 8, Height * 8), m) - zero);
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
-                (int)zero.X, (int)zero.Y,
-                (int)size.X, (int)size.Y);
+            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = ScissorRect;
 
             // Entities
             foreach (Entity entity in Entities)
