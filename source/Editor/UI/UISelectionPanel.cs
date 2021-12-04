@@ -9,7 +9,7 @@ namespace Snowberry.Editor.UI {
             public readonly UIElement Input;
 
             public UIOption(string name, UIElement input) {
-                this.Input = input;
+                Input = input;
 
                 UILabel label;
                 Add(label = new UILabel($"{name} : ") {

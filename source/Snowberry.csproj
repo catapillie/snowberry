@@ -75,6 +75,10 @@
     <Compile Include="Editor\Stylegrounds\Plugin_Planets.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Snow.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Starfield.cs" />
+    <Compile Include="Editor\UI\Menus\MainMenu\UILevelRibbon.cs" />
+    <Compile Include="Editor\UI\Menus\UIConfirmMessage.cs" />
+    <Compile Include="Editor\UI\Menus\MainMenu\UILevelSelector.cs" />
+    <Compile Include="Editor\UI\Menus\MainMenu\UIMainMenuButtons.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="SnowberryModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
@@ -144,7 +148,7 @@
     <Compile Include="Editor\UI\UICheckBox.cs" />
     <Compile Include="Editor\UI\UIColorPicker.cs" />
     <Compile Include="Editor\UI\UIRoomSelectionPanel.cs" />
-    <Compile Include="Editor\UI\UIMainMenu.cs" />
+    <Compile Include="Editor\UI\Menus\MainMenu\UIMainMenu.cs" />
     <Compile Include="Editor\UI\UIRibbon.cs" />
     <Compile Include="Editor\UI\UIScrollPane.cs" />
     <Compile Include="Editor\UI\UISearchBar.cs" />
@@ -169,5 +173,6 @@
       <Link>.editorconfig</Link>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

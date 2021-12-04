@@ -1,13 +1,13 @@
 ﻿using Celeste;
 using Celeste.Mod;
-using Snowberry.Editor.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Snowberry.Editor.UI;
+using Snowberry.Editor.UI.Menus;
 
 namespace Snowberry.Editor {
     public class Editor : Scene {
@@ -112,8 +112,9 @@ namespace Snowberry.Editor {
 
         public Map Map { get; private set; }
 
-        private readonly UIElement ui = new UIElement();
         private RenderTarget2D uiBuffer;
+        private readonly UIElement ui = new UIElement();
+        public static UIConfirmMessage Confirmation { get; private set; }
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
@@ -231,13 +232,22 @@ namespace Snowberry.Editor {
 
         public override void Begin() {
             base.Begin();
+
             Camera = new BufferCamera();
+
             uiBuffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, Engine.ViewWidth / 2, Engine.ViewHeight / 2);
+            ui.Width = uiBuffer.Width;
+            ui.Height = uiBuffer.Height;
 
             if(Map == null)
                 MenuUI();
             else
                 MappingUI();
+
+            ui.Add(Confirmation = new UIConfirmMessage() {
+                Width = ui.Width,
+                Height = ui.Height,
+            });
         }
 
         public override void End() {
