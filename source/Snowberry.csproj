@@ -79,6 +79,7 @@
     <Compile Include="Editor\UI\Menus\UIConfirmMessage.cs" />
     <Compile Include="Editor\UI\Menus\MainMenu\UILevelSelector.cs" />
     <Compile Include="Editor\UI\Menus\MainMenu\UIMainMenuButtons.cs" />
+    <Compile Include="Editor\UI\Menus\UIPluginOptionList.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="SnowberryModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />

@@ -94,11 +94,16 @@ namespace Snowberry.Editor.UI.Menus {
             Add(settings);
             settings.Position = Vector2.UnitX * (Width - settings.Width) + new Vector2(-8, 8);
 
+            Color rib = Calc.HexToColor("20212e"), acc = Calc.HexToColor("3889d9");
             Add(authors = new UIRibbon(Dialog.Clean("SNOWBERRY_MAINMENU_CREDITS")) {
                 Position = new Vector2(0, 8),
+                BG = rib,
+                BGAccent = acc,
             });
             Add(version = new UIRibbon($"ver{Snowberry.Instance.Metadata.VersionString}") {
                 Position = new Vector2(0, 23),
+                BG = rib,
+                BGAccent = acc,
             });
         }
 
@@ -134,7 +139,10 @@ namespace Snowberry.Editor.UI.Menus {
             buttons.Position.X = (int)Math.Round((Width - buttons.Width) / 2 - Width / 3 * loadEase + Width / 3 * createEase);
 
             levelSelector.Position.X = (int)Math.Round(buttons.Position.X + buttons.Width + 24 - levelSelector.Width * (1 - loadEase));
-            levelSelector.Visible = stateLerp[2] != 0f; 
+            levelSelector.Visible = stateLerp[2] != 0f;
+
+            float settingsEase = Ease.CubeInOut(stateLerp[4]);
+            buttons.Position.Y = (int)Math.Round((Height - buttons.Height) / 2 - (Height / 2 + buttons.Height) * settingsEase);
         }
 
         public override void Render(Vector2 position = default) {
