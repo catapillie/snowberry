@@ -1,0 +1,59 @@
+SNOWBERRY_SNOWBERRY={# d12626}Snowberry{#}
+
+# *** Main Menu ***
+
+	SNOWBERRY_MAINMENU_YES=						oui
+	SNOWBERRY_MAINMENU_NO=						non
+	SNOWBERRY_MAINMENU_CLOSE=				    fermer
+
+	SNOWBERRY_MAINMENU_CREATE=					+ nouvelle map
+
+	SNOWBERRY_MAINMENU_LOAD=					↓ ouvrir une map
+	SNOWBERRY_MAINMENU_LOAD_CONFIRM=			voulez-vous vraiment ouvrir cette map ?
+	SNOWBERRY_MAINMENU_LOAD_UNSAVED=			(toutes les modifications non enregistrées seront perdues)
+	SNOWBERRY_MAINMENU_LOAD_TIP=				pour passer ce message, maintenez CTRL en cliquant sur la map
+
+	SNOWBERRY_MAINMENU_LOADSEARCH=				rechercher une map ou un @mod...
+	SNOWBERRY_MAINMENU_LOADSEARCHBAR_NONE=		aucun résultat !
+	SNOWBERRY_MAINMENU_LOADSEARCHBAR_ONE=		une map trouvée :
+	SNOWBERRY_MAINMENU_LOADSEARCHBAR_MORE=		maps trouvées :
+
+	SNOWBERRY_MAINMENU_EXIT=					← quitter
+
+	SNOWBERRY_MAINMENU_SETTINGS=				paramètres
+	SNOWBERRY_MAINMENU_CREDITS=					par catapillie, leppa, Viv
+
+# *** Editor ***
+
+    SNOWBERRY_EDITOR_RETURN=                    retour à la map
+    SNOWBERRY_EDITOR_PLAYTEST=                  playtester
+    SNOWBERRY_EDITOR_EXPORT=                    exporter
+
+    SNOWBERRY_EDITOR_TOOL_ENTITYSELECT=         sélection entités
+
+    SNOWBERRY_EDITOR_TOOL_DECALSELECT=          sélection decals
+
+    SNOWBERRY_EDITOR_TOOL_TILEBRUSH=            outil tiles
+
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL=             outil écrans
+    SNOWBERRY_EDITOR_TOOL_ROOMTOOL_NONE=        aucun écran sélectionné
+
+    SNOWBERRY_EDITOR_TOOL_ENTITIES=             entités
+
+    SNOWBERRY_EDITOR_TOOL_STYLEGROUNDS=         plans
+    
+    SNOWBERRY_EDITOR_UTIL_FOREGROUND=           avant-plan
+    SNOWBERRY_EDITOR_UTIL_BACKGROUND=           arrière-plan
+
+# *** Stylegrounds ***
+    
+    SNOWBERRY_STYLEGROUNDS_IMAGE=               image
+    SNOWBERRY_STYLEGROUNDS_BLACKHOLE=           trou noir
+    SNOWBERRY_STYLEGROUNDS_RAIN=                pluie
+    SNOWBERRY_STYLEGROUNDS_STARFIELD=           champ étoilé
+    SNOWBERRY_STYLEGROUNDS_STARDUST=            poussière d'étoiles
+    SNOWBERRY_STYLEGROUNDS_PLANETS=             planètes
+
+# Error Messages
+    
+    SNOWBERRY_PLAYTEST_MAP_POSTCARD=            Ceci est peut-être hors d'atteinte, mais ce n'est pas à collectionner !{n}{n}Cette map est utilisée pour implémenter certaines fonctionnalités de {+SNOWBERRY_SNOWBERRY}, et n'a aucun contenu.
