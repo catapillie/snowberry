@@ -1,6 +1,6 @@
 - Name: Snowberry
   Version: 1.0.0
-  DLL: source/bin/Debug/Snowberry.dll
+  DLL: source/bin/Debug/net452/Snowberry.dll
   Dependencies:
     - Name: Everest
       Version: 1.3070.0
