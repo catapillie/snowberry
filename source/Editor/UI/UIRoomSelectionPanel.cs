@@ -7,27 +7,27 @@ using static Snowberry.Editor.UI.UISelectionPanel;
 
 namespace Snowberry.Editor.UI {
 
-	class UIRoomSelectionPanel : UIElement {
+    class UIRoomSelectionPanel : UIElement {
 
-		public Color BG = Calc.HexToColor("202929");
+        public Color BG = Calc.HexToColor("202929");
 
-		public UIRoomSelectionPanel() {
-			BG.A = 127;
-			GrabsClick = true;
-		}
+        public UIRoomSelectionPanel() {
+            BG.A = 127;
+            GrabsClick = true;
+        }
 
-		public override void Render(Vector2 position = default) {
-			Draw.Rect(Bounds, BG);
-			base.Render(position);
-		}
+        public override void Render(Vector2 position = default) {
+            Draw.Rect(Bounds, BG);
+            base.Render(position);
+        }
 
-		public void Refresh() {
+        public void Refresh() {
             Clear();
             UIElement label;
 
-            if(Editor.SelectedRoom == null) {
-                if(!RoomTool.PendingRoom.HasValue) {
-                    if(Editor.SelectedFillerIndex != -1) {
+            if (Editor.SelectedRoom == null) {
+                if (!RoomTool.PendingRoom.HasValue) {
+                    if (Editor.SelectedFillerIndex != -1) {
                         Add(label = new UILabel("Selected filler: " + Editor.SelectedFillerIndex) {
                             FG = Color.DarkKhaki,
                             Underline = true
@@ -81,9 +81,9 @@ namespace Snowberry.Editor.UI {
                     newRoom.OnPress = () => {
                         newNameInvalid.FG = newNameTaken.FG = Color.Transparent;
                         // validate room name
-                        if(newName.Length <= 0 || Regex.Match(newName, "[0-9a-zA-Z\\-_ ]+").Length != newName.Length)
+                        if (newName.Length <= 0 || Regex.Match(newName, "[0-9a-zA-Z\\-_ ]+").Length != newName.Length)
                             newNameInvalid.FG = Color.Red;
-                        else if(Editor.Instance.Map.Rooms.Exists(it => it.Name.Equals(newName)))
+                        else if (Editor.Instance.Map.Rooms.Exists(it => it.Name.Equals(newName)))
                             newNameTaken.FG = Color.Red;
                         else {
                             // add room
@@ -112,9 +112,9 @@ namespace Snowberry.Editor.UI {
                 }
             }
 
-			int spacing = Fonts.Regular.LineHeight + 2;
+            int spacing = Fonts.Regular.LineHeight + 2;
             Room room = Editor.SelectedRoom;
-            
+
             Add(label = new UILabel("Selected room:") {
                 FG = Color.DarkKhaki,
                 Underline = true
@@ -143,9 +143,9 @@ namespace Snowberry.Editor.UI {
             updateName.OnPress = () => {
                 nameInvalid.FG = nameTaken.FG = Color.Transparent;
                 // validate room name
-                if(name.Length <= 0 || Regex.Match(name, "[0-9a-zA-Z\\-_ ]+").Length != name.Length)
+                if (name.Length <= 0 || Regex.Match(name, "[0-9a-zA-Z\\-_ ]+").Length != name.Length)
                     nameInvalid.FG = Color.Red;
-                else if(room.Map.Rooms.Exists(it => it.Name.Equals(name)))
+                else if (room.Map.Rooms.Exists(it => it.Name.Equals(name)))
                     nameTaken.FG = Color.Red;
                 else
                     room.Name = name;
@@ -176,10 +176,10 @@ namespace Snowberry.Editor.UI {
 
             AddBelow(new UILabel("music layers :"), new Vector2(12, 3));
             AddBelow(new UIOption("layer 1", new UICheckBox(-1, room.MusicLayers[0]) { OnPress = val => room.MusicLayers[0] = val }), new Vector2(4, 3));
-			AddBelow(new UIOption("layer 2", new UICheckBox(-1, room.MusicLayers[1]) { OnPress = val => room.MusicLayers[1] = val }), new Vector2(4, 0));
+            AddBelow(new UIOption("layer 2", new UICheckBox(-1, room.MusicLayers[1]) { OnPress = val => room.MusicLayers[1] = val }), new Vector2(4, 0));
             AddBelow(new UIOption("layer 3", new UICheckBox(-1, room.MusicLayers[2]) { OnPress = val => room.MusicLayers[2] = val }), new Vector2(4, 0));
             AddBelow(new UIOption("layer 4", new UICheckBox(-1, room.MusicLayers[3]) { OnPress = val => room.MusicLayers[3] = val }), new Vector2(4, 0));
-           
+
             AddBelow(new UILabel("camera offset :"), new Vector2(12, 0));
 
             UIOption cameraOffsetX;
@@ -187,7 +187,7 @@ namespace Snowberry.Editor.UI {
             AddBelow(cameraOffsetX = new UIOption("x", new UIValueTextField<float>(Fonts.Regular, 30, room.CameraOffset.X.ToString()) {
                 OnValidInputChange = val => room.CameraOffset.X = val
             }), new Vector2(4, 3));
-            
+
             Add(new UIOption("y", new UIValueTextField<float>(Fonts.Regular, 30, room.CameraOffset.Y.ToString()) {
                 OnValidInputChange = val => room.CameraOffset.Y = val
             }) {
@@ -215,9 +215,9 @@ namespace Snowberry.Editor.UI {
             }, new Vector2(4, 12));
         }
 
-		public override void Update(Vector2 position = default) {
-			base.Update(position);
+        public override void Update(Vector2 position = default) {
+            base.Update(position);
 
-		}
-	}
+        }
+    }
 }

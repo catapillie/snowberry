@@ -1,6 +1,6 @@
 ﻿using Celeste;
-using Monocle;
 using Microsoft.Xna.Framework;
+using Monocle;
 
 namespace Snowberry.Editor.Entities {
     [Plugin("towerviewer")]
@@ -8,9 +8,9 @@ namespace Snowberry.Editor.Entities {
         [Option("onlyY")] public bool OnlyY = false;
         [Option("summit")] public bool Summit = false;
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             MTexture tower = GFX.Game["objects/lookout/lookout05"];

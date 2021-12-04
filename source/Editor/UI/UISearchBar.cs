@@ -22,7 +22,7 @@ namespace Snowberry.Editor.UI {
             Line = Color.Transparent;
             this.termMatcher = termMatcher;
         }
-        
+
         protected override void DrawText(Vector2 position) {
             if (highlighting != null && Value.Length > 0) {
                 Font.Draw(Value, position, Vector2.One, Vector2.Zero, highlighting);
@@ -61,7 +61,7 @@ namespace Snowberry.Editor.UI {
                 base.OnInputUpdate(input);
                 return;
             }
-            
+
             // search pattern
             List<List<Tuple<char?, string>>> search = new();
             foreach (string termList in input.Split(',', ';')) {

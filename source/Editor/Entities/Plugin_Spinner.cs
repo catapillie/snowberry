@@ -1,7 +1,6 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
-using MonoMod.Utils;
 using System.Collections.Generic;
 using static Celeste.TrackSpinner;
 
@@ -18,16 +17,16 @@ namespace Snowberry.Editor.Entities {
             Tracked = true;
         }
 
-		public override void InitializeAfter() {
-			base.InitializeAfter();
+        public override void InitializeAfter() {
+            base.InitializeAfter();
             // Handle vanilla stuff
             Dust |= IsVanillaDust();
             SpinnerColor = GetColorForVanillaMap() ?? SpinnerColor;
-		}
+        }
 
-		public override void RenderBefore() {
-			base.RenderBefore();
-            if(Editor.FancyRender && !Dust) {
+        public override void RenderBefore() {
+            base.RenderBefore();
+            if (Editor.FancyRender && !Dust) {
                 CrystalColor color = SpinnerColor;
 
                 var colourString = color switch {
@@ -38,20 +37,20 @@ namespace Snowberry.Editor.Entities {
                 };
 
                 Color c = Color.White;
-                if(color == CrystalColor.Rainbow) {
+                if (color == CrystalColor.Rainbow) {
                     c = Calc.HsvToColor(0.4f + Calc.YoYo(Position.Length() % 280 / 280) * 0.4f, 0.4f, 0.9f);
                 }
 
                 UpdateConnections();
                 MTexture bg = GFX.Game[$"danger/crystal/bg_{colourString}00"];
-                foreach(var item in connectTo)
+                foreach (var item in connectTo)
                     bg.DrawCentered(Position + (item.Position - Position) / 2, c);
             }
         }
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
-            
+
             CrystalColor color = SpinnerColor;
 
             if (Dust) {
@@ -65,7 +64,7 @@ namespace Snowberry.Editor.Entities {
                     _ => "white"
                 };
                 Color c = Color.White;
-                if(color == CrystalColor.Rainbow)
+                if (color == CrystalColor.Rainbow)
                     c = Calc.HsvToColor(0.4f + Calc.YoYo(Position.Length() % 280 / 280) * 0.4f, 0.4f, 0.9f);
                 MTexture spinner = GFX.Game[$"danger/crystal/fg_{colourString}03"];
                 spinner.DrawCentered(Position, c);
@@ -73,19 +72,19 @@ namespace Snowberry.Editor.Entities {
         }
 
         private void UpdateConnections() {
-			if(connectTo == null || Room.DirtyTrackedEntities.ContainsKey(typeof(Plugin_Spinner)) && Room.DirtyTrackedEntities[typeof(Plugin_Spinner)]) {
+            if (connectTo == null || Room.DirtyTrackedEntities.ContainsKey(typeof(Plugin_Spinner)) && Room.DirtyTrackedEntities[typeof(Plugin_Spinner)]) {
                 connectTo = new List<Entity>();
-				foreach(var item in Room.TrackedEntities[typeof(Plugin_Spinner)]) {
-					if((item.Position - Position).LengthSquared() < 24 * 24) {
+                foreach (var item in Room.TrackedEntities[typeof(Plugin_Spinner)]) {
+                    if ((item.Position - Position).LengthSquared() < 24 * 24) {
                         connectTo.Add(item);
-					}
-				}
+                    }
+                }
             }
         }
 
         public static void AddPlacements() {
             string[] types = new string[] { "Blue", "Red", "Purple", "Rainbow" };
-            foreach(var type in types)
+            foreach (var type in types)
                 Placements.Create($"Spinner ({type})", "spinner", new Dictionary<string, object>() { { "color", type } });
         }
 
@@ -108,13 +107,13 @@ namespace Snowberry.Editor.Entities {
         [Option("dust")] public bool Dust = false;
         [Option("star")] public bool Star = false;
 
-		public override void InitializeAfter() {
-			base.InitializeAfter();
+        public override void InitializeAfter() {
+            base.InitializeAfter();
             Dust |= IsVanillaDust();
             Star |= IsVanillaStar();
-		}
+        }
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             Vector2 stop = Nodes[0];

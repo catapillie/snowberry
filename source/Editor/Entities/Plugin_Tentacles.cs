@@ -6,9 +6,9 @@ namespace Snowberry.Editor.Entities {
     [Plugin("tentacles")]
     public class Plugin_Tentacles : Entity {
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             MTexture icon = GFX.Game["plugins/Snowberry/tentacles"];

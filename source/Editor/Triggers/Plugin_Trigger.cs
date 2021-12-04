@@ -15,10 +15,10 @@ namespace Snowberry.Editor.Triggers {
         protected virtual Color Color { get; } = Calc.HexToColor("0c5f7a");
         protected string Text { get; private set; }
 
-		public override int MinWidth => 8;
-		public override int MinHeight => 8;
+        public override int MinWidth => 8;
+        public override int MinHeight => 8;
 
-		public override void Initialize() {
+        public override void Initialize() {
             base.Initialize();
             Text = string.Join(" ", Regex.Split(char.ToUpper(Name[0]) + Name.Substring(1), @"(?=[A-Z])")).Trim();
         }

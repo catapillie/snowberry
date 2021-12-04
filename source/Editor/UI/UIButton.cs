@@ -58,7 +58,7 @@ namespace Snowberry.Editor.UI {
             SetText(text, font);
         }
 
-        public UIButton(MTexture icon, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8) 
+        public UIButton(MTexture icon, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8)
             : this(spaceX, spaceY, minWidth, minHeight) {
             SetIcon(icon);
             FG = PressedFG = HoveredFG = Color.White;
@@ -107,14 +107,14 @@ namespace Snowberry.Editor.UI {
             if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
                 pressed = true;
             else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
-                if(hovering && pressed) {
-					if(MInput.Mouse.ReleasedLeftButton)
+                if (hovering && pressed) {
+                    if (MInput.Mouse.ReleasedLeftButton)
                         Pressed();
                     else
                         OnRightPress?.Invoke();
-				}
+                }
 
-				pressed = false;
+                pressed = false;
             }
 
             lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
@@ -151,6 +151,6 @@ namespace Snowberry.Editor.UI {
             if (text != null && font != null)
                 font.Draw(text, at, Vector2.One, fg);
             else icon?.Invoke(at, fg);
-		}
+        }
     }
 }

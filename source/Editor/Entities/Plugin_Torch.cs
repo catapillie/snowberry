@@ -8,7 +8,7 @@ namespace Snowberry.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            
+
             GFX.Game[$"objects/temple/{(Lit ? "litTorch" : "torch")}03"].DrawCentered(Position);
         }
 

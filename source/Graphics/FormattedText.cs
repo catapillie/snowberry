@@ -70,7 +70,8 @@ namespace Snowberry {
             return formatted;
         }
 
-        public static FormattedText Parse(string expression)
-            => new FormattedText((string)expression.Clone());
+        public static FormattedText Parse(string expression) {
+            return new FormattedText((string)expression.Clone());
+        }
     }
 }

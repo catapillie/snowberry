@@ -10,9 +10,9 @@ namespace Snowberry.Editor.Entities {
         [Option("order")] public int Order = -1;
         [Option("checkpointID")] public int CheckpointID = -1;
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             bool seeded = Nodes.Length != 0;

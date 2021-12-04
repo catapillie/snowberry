@@ -16,7 +16,7 @@ namespace Snowberry.Editor.Entities {
             GFX.Game[$"objects/clouds/{type}{suffix}00"].DrawCentered(Position);
         }
 
-        public static void AddPlacements(){
+        public static void AddPlacements() {
             Placements.Create("Cloud", "cloud");
             Placements.Create("Cloud (Fragile)", "cloud", new Dictionary<string, object>() { { "fragile", true } });
         }

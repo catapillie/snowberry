@@ -17,7 +17,7 @@ namespace Snowberry.Editor.UI {
         public string Enabled = "✓";
         public string Disabled = "×";
 
-        public UICheckBox(int size, bool check = false) 
+        public UICheckBox(int size, bool check = false)
             : base("", Fonts.Regular, size, size) {
             Checked = check;
             GrabsClick = true;

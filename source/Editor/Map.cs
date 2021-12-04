@@ -41,16 +41,16 @@ namespace Snowberry.Editor {
             From = playtestKey;
             Editor.CopyMapMeta(targetData, playtestData);
 
-			// load stylegrounds
-			if(data.Foreground != null && data.Foreground.Children != null) {
-				foreach(var item in data.Foreground.Children) {
+            // load stylegrounds
+            if (data.Foreground != null && data.Foreground.Children != null) {
+                foreach (var item in data.Foreground.Children) {
                     string name = item.Name.ToLowerInvariant();
 
-                    if(name.Equals("apply")) {
-						if(item.Children != null) {
-							foreach(var child in item.Children) {
+                    if (name.Equals("apply")) {
+                        if (item.Children != null) {
+                            foreach (var child in item.Children) {
                                 Styleground styleground = Styleground.Create(child.Name.ToLower(), this, child, item);
-								if(styleground != null)
+                                if (styleground != null)
                                     FGStylegrounds.Add(styleground);
                                 else
                                     Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
@@ -58,23 +58,23 @@ namespace Snowberry.Editor {
                         }
                     } else {
                         Styleground styleground = Styleground.Create(name, this, item);
-                        if(styleground != null)
+                        if (styleground != null)
                             FGStylegrounds.Add(styleground);
                         else
                             Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
                     }
-				}
-			}
+                }
+            }
 
-            if(data.Background != null && data.Background.Children != null) {
-                foreach(var item in data.Background.Children) {
+            if (data.Background != null && data.Background.Children != null) {
+                foreach (var item in data.Background.Children) {
                     string name = item.Name.ToLowerInvariant();
 
-                    if(name.Equals("apply")) {
-                        if(item.Children != null) {
-                            foreach(var child in item.Children) {
+                    if (name.Equals("apply")) {
+                        if (item.Children != null) {
+                            foreach (var child in item.Children) {
                                 Styleground styleground = Styleground.Create(child.Name.ToLower(), this, child, item);
-                                if(styleground != null)
+                                if (styleground != null)
                                     BGStylegrounds.Add(styleground);
                                 else
                                     Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
@@ -82,7 +82,7 @@ namespace Snowberry.Editor {
                         }
                     } else {
                         Styleground styleground = Styleground.Create(name, this, item);
-                        if(styleground != null)
+                        if (styleground != null)
                             BGStylegrounds.Add(styleground);
                         else
                             Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
@@ -101,13 +101,13 @@ namespace Snowberry.Editor {
         }
 
         internal int GetFillerIndexAt(Point at) {
-			for(int i = 0; i < Fillers.Count; i++) {
-				Rectangle filler = Fillers[i];
-				if(new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8).Contains(at))
+            for (int i = 0; i < Fillers.Count; i++) {
+                Rectangle filler = Fillers[i];
+                if (new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8).Contains(at))
                     return i;
-			}
+            }
 
-			return -1;
+            return -1;
         }
 
         internal void Render(Editor.BufferCamera camera) {
@@ -159,10 +159,10 @@ namespace Snowberry.Editor {
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-			for(int i = 0; i < Fillers.Count; i++) {
-				Rectangle filler = Fillers[i];
-				Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
-            	Draw.Rect(rect, Color.White * (Editor.SelectedFillerIndex == i ? 0.14f : 0.1f));
+            for (int i = 0; i < Fillers.Count; i++) {
+                Rectangle filler = Fillers[i];
+                Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
+                Draw.Rect(rect, Color.White * (Editor.SelectedFillerIndex == i ? 0.14f : 0.1f));
             }
             Draw.SpriteBatch.End();
         }
@@ -187,10 +187,10 @@ namespace Snowberry.Editor {
             Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
         }
 
-        public void GenerateMapData(MapData data){
-			foreach(var room in Rooms)
+        public void GenerateMapData(MapData data) {
+            foreach (var room in Rooms)
                 data.Levels.Add(new LevelData(room.CreateLevelData()));
-			foreach(var filler in Fillers)
+            foreach (var filler in Fillers)
                 data.Filler.Add(filler);
             Snowberry.Log(LogLevel.Info, "meta: " + data.Meta);
             // TODO: set stylegrounds
@@ -200,38 +200,38 @@ namespace Snowberry.Editor {
             int num2 = int.MaxValue;
             int num3 = int.MinValue;
             int num4 = int.MinValue;
-            foreach(LevelData level2 in data.Levels) {
-                if(level2.Bounds.Left < num) {
+            foreach (LevelData level2 in data.Levels) {
+                if (level2.Bounds.Left < num) {
                     num = level2.Bounds.Left;
                 }
-                
-                if(level2.Bounds.Top < num2) {
+
+                if (level2.Bounds.Top < num2) {
                     num2 = level2.Bounds.Top;
                 }
 
-                if(level2.Bounds.Right > num3) {
+                if (level2.Bounds.Right > num3) {
                     num3 = level2.Bounds.Right;
                 }
 
-                if(level2.Bounds.Bottom > num4) {
+                if (level2.Bounds.Bottom > num4) {
                     num4 = level2.Bounds.Bottom;
                 }
             }
 
-            foreach(Rectangle item in data.Filler) {
-                if(item.Left < num) {
+            foreach (Rectangle item in data.Filler) {
+                if (item.Left < num) {
                     num = item.Left;
                 }
 
-                if(item.Top < num2) {
+                if (item.Top < num2) {
                     num2 = item.Top;
                 }
 
-                if(item.Right > num3) {
+                if (item.Right > num3) {
                     num3 = item.Right;
                 }
 
-                if(item.Bottom > num4) {
+                if (item.Bottom > num4) {
                     num4 = item.Bottom;
                 }
             }
@@ -249,7 +249,7 @@ namespace Snowberry.Editor {
             Element levels = new Element();
             levels.Name = "levels";
             levels.Children = new List<Element>();
-            foreach(var room in Rooms)
+            foreach (var room in Rooms)
                 levels.Children.Add(room.CreateLevelData());
             map.Children.Add(levels);
 
@@ -257,7 +257,7 @@ namespace Snowberry.Editor {
             Element fillers = new Element();
             fillers.Name = "Filler";
             fillers.Children = new List<Element>();
-            foreach(var filler in Fillers) {
+            foreach (var filler in Fillers) {
                 Element fill = new Element();
                 fill.Attributes = new Dictionary<string, object>() {
                     { "x", filler.X },
@@ -266,14 +266,14 @@ namespace Snowberry.Editor {
                     { "h", filler.Height }
                 };
                 fillers.Children.Add(fill);
-			}
+            }
             map.Children.Add(fillers);
 
             //   style: w/ optional color, Backgrounds child & Foregrounds child
             Element style = new Element();
             style.Name = "Style";
             style.Children = new List<Element>() { /*bgStylegrounds ?? new Element(), fgStylegrounds ?? new Element()*/ };
-			return map;
+            return map;
         }
     }
 }

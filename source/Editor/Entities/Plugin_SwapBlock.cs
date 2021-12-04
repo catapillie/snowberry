@@ -23,10 +23,10 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-			if(last != Theme || nineSliceGreen == null) {
+            if (last != Theme || nineSliceGreen == null) {
                 last = Theme;
                 LoadTextures();
-			}
+            }
 
             int num = (int)MathHelper.Min(X, Nodes[0].X);
             int num2 = (int)MathHelper.Min(Y, Nodes[0].Y);
@@ -36,9 +36,9 @@ namespace Snowberry.Editor.Entities {
 
             var pathTexture = GFX.Game["objects/swapblock/path" + ((Position.X == Nodes[0].X) ? "V" : "H")];
 
-            if(Theme != SwapBlock.Themes.Moon) {
-                for(int i = moveRect.Left; i < moveRect.Right; i += Width) {
-                    for(int j = moveRect.Top; j < moveRect.Bottom; j += Height) {
+            if (Theme != SwapBlock.Themes.Moon) {
+                for (int i = moveRect.Left; i < moveRect.Right; i += Width) {
+                    for (int j = moveRect.Top; j < moveRect.Bottom; j += Height) {
                         pathTexture.GetSubtexture(0, 0, Math.Min(pathTexture.Width, moveRect.Right - i), Math.Min(pathTexture.Height, moveRect.Bottom - j), clipTexture);
                         clipTexture.DrawCentered(new Vector2(i + clipTexture.Width / 2, j + clipTexture.Height / 2), Color.White);
                     }
@@ -50,11 +50,11 @@ namespace Snowberry.Editor.Entities {
             DrawBlockStyle(Position, Width, Height, nineSliceGreen, lights, Color.White);
         }
 
-		private void LoadTextures() {
+        private void LoadTextures() {
             MTexture mTexture;
             MTexture mTexture3;
 
-            if(Theme == SwapBlock.Themes.Moon) {
+            if (Theme == SwapBlock.Themes.Moon) {
                 mTexture = GFX.Game["objects/swapblock/moon/block"];
                 mTexture3 = GFX.Game["objects/swapblock/moon/target"];
                 lights = GFX.Game["objects/swapblock/moon/midBlock00"];
@@ -66,8 +66,8 @@ namespace Snowberry.Editor.Entities {
 
             nineSliceGreen = new MTexture[3, 3];
             nineSliceTarget = new MTexture[3, 3];
-            for(int i = 0; i < 3; i++) {
-                for(int j = 0; j < 3; j++) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
                     nineSliceGreen[i, j] = mTexture.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
                     nineSliceTarget[i, j] = mTexture3.GetSubtexture(new Rectangle(i * 8, j * 8, 8, 8));
                 }
@@ -81,23 +81,23 @@ namespace Snowberry.Editor.Entities {
             ninSlice[2, 0].Draw(pos + new Vector2(width - 8f, 0f), Vector2.Zero, color);
             ninSlice[0, 2].Draw(pos + new Vector2(0f, height - 8f), Vector2.Zero, color);
             ninSlice[2, 2].Draw(pos + new Vector2(width - 8f, height - 8f), Vector2.Zero, color);
-            for(int i = 1; i < num - 1; i++) {
+            for (int i = 1; i < num - 1; i++) {
                 ninSlice[1, 0].Draw(pos + new Vector2(i * 8, 0f), Vector2.Zero, color);
                 ninSlice[1, 2].Draw(pos + new Vector2(i * 8, height - 8f), Vector2.Zero, color);
             }
 
-            for(int j = 1; j < num2 - 1; j++) {
+            for (int j = 1; j < num2 - 1; j++) {
                 ninSlice[0, 1].Draw(pos + new Vector2(0f, j * 8), Vector2.Zero, color);
                 ninSlice[2, 1].Draw(pos + new Vector2(width - 8f, j * 8), Vector2.Zero, color);
             }
 
-            for(int k = 1; k < num - 1; k++) {
-                for(int l = 1; l < num2 - 1; l++) {
+            for (int k = 1; k < num - 1; k++) {
+                for (int l = 1; l < num2 - 1; l++) {
                     ninSlice[1, 1].Draw(pos + new Vector2(k, l) * 8f, Vector2.Zero, color);
                 }
             }
 
-            if(middle != null) {
+            if (middle != null) {
                 middle.DrawCentered(pos + new Vector2(width / 2f, height / 2f), color);
             }
         }

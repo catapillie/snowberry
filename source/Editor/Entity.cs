@@ -107,25 +107,28 @@ namespace Snowberry.Editor {
             Room.MarkTrackedEntityDirty(this);
         }
 
-        public virtual void ChangeDefault() {}
-        public virtual void Initialize() => ChangeDefault();
-        public virtual void InitializeAfter() { }
-		protected virtual Rectangle[] Select() {
-            List<Rectangle> ret = new List<Rectangle>();
-			ret.Add(new Rectangle(Width < 6 ? X - 3 : X, Height < 6 ? Y - 3 : Y, Width < 6 ? 6 : Width, Height < 6 ? 6 : Height));
-			foreach(var node in nodes) {
-                ret.Add(new Rectangle((int)node.X - 3, (int)node.Y - 3, 6, 6));
-			}
-            return ret.ToArray();
-		}
+        public virtual void ChangeDefault() { }
+        public virtual void Initialize() {
+            ChangeDefault();
+        }
 
-		public virtual void Render() { }
+        public virtual void InitializeAfter() { }
+        protected virtual Rectangle[] Select() {
+            List<Rectangle> ret = new List<Rectangle>();
+            ret.Add(new Rectangle(Width < 6 ? X - 3 : X, Height < 6 ? Y - 3 : Y, Width < 6 ? 6 : Width, Height < 6 ? 6 : Height));
+            foreach (var node in nodes) {
+                ret.Add(new Rectangle((int)node.X - 3, (int)node.Y - 3, 6, 6));
+            }
+            return ret.ToArray();
+        }
+
+        public virtual void Render() { }
         public virtual void RenderBefore() { }
         public virtual void HQRender() { }
 
         #region Entity Instantiating
 
-        public virtual void ApplyDefaults() {}
+        public virtual void ApplyDefaults() { }
 
         private Entity InitializeData(EntityData entityData) {
             Vector2 offset = Room.Position * 8;

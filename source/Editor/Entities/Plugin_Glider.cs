@@ -13,8 +13,8 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
             GFX.Game["objects/glider/idle0"].DrawOutlineCentered(Position);
-            if(Bubble) {
-                for(int i = 0; i < 24; i++) {
+            if (Bubble) {
+                for (int i = 0; i < 24; i++) {
                     Draw.Point(Position + PlatformAdd(i), PlatformColor(i));
                 }
             }
@@ -25,7 +25,7 @@ namespace Snowberry.Editor.Entities {
         }
 
         private Color PlatformColor(int num) {
-            if(num <= 1 || num >= 22) {
+            if (num <= 1 || num >= 22) {
                 return Color.White * 0.4f;
             }
 

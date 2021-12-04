@@ -1,11 +1,10 @@
 ﻿using Celeste;
 using Celeste.Mod;
-using Snowberry.Editor.Triggers;
 using Microsoft.Xna.Framework;
 using Monocle;
+using Snowberry.Editor.Triggers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -183,7 +182,7 @@ namespace Snowberry.Editor {
 
         public bool SetFgTile(int x, int y, char tile) {
             char orig = fgTileMap[x, y];
-            if(orig != tile) {
+            if (orig != tile) {
                 fgTileMap[x, y] = tile;
                 return true;
             }
@@ -192,7 +191,7 @@ namespace Snowberry.Editor {
 
         public bool SetBgTile(int x, int y, char tile) {
             char orig = bgTileMap[x, y];
-            if(orig != tile) {
+            if (orig != tile) {
                 bgTileMap[x, y] = tile;
                 return true;
             }
@@ -260,7 +259,7 @@ namespace Snowberry.Editor {
                 decal.Render(offset);
 
             // Entities
-            foreach(Entity entity in Entities) {
+            foreach (Entity entity in Entities) {
                 Calc.PushRandom(entity.GetHashCode());
                 entity.RenderBefore();
                 Calc.PopRandom();
@@ -315,14 +314,14 @@ namespace Snowberry.Editor {
 
         public void UpdateBounds() {
             var newFgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
-			for(int x = 0; x < fgTileMap.Columns; x++)
-				for(int y = 0; y < fgTileMap.Rows; y++)
+            for (int x = 0; x < fgTileMap.Columns; x++)
+                for (int y = 0; y < fgTileMap.Rows; y++)
                     newFgTiles[x, y] = fgTileMap[x, y];
             fgTileMap = newFgTiles;
 
             var newBgTiles = new VirtualMap<char>(Bounds.Width, Bounds.Height, '0');
-            for(int x = 0; x < bgTileMap.Columns; x++)
-                for(int y = 0; y < bgTileMap.Rows; y++)
+            for (int x = 0; x < bgTileMap.Columns; x++)
+                for (int y = 0; y < bgTileMap.Rows; y++)
                     newBgTiles[x, y] = bgTileMap[x, y];
             bgTileMap = newBgTiles;
 
@@ -330,7 +329,7 @@ namespace Snowberry.Editor {
         }
 
         public Element CreateLevelData() {
-			Element ret = new Element();
+            Element ret = new Element();
             ret.Attributes = new Dictionary<string, object>();
 
             ret.Attributes["name"] = "lvl_" + Name;
@@ -358,15 +357,15 @@ namespace Snowberry.Editor {
             ret.Attributes["cameraOffsetX"] = CameraOffset.X;
             ret.Attributes["cameraOffsetY"] = CameraOffset.Y;
 
-			Element entitiesElement = new Element();
+            Element entitiesElement = new Element();
             entitiesElement.Attributes = new Dictionary<string, object>();
             entitiesElement.Name = "entities";
             entitiesElement.Children = new List<Element>();
             ret.Children = new List<Element>();
             ret.Children.Add(entitiesElement);
 
-			foreach(var entity in Entities) {
-				Element entityElem = new Element();
+            foreach (var entity in Entities) {
+                Element entityElem = new Element();
                 entityElem.Name = entity.Name;
                 entityElem.Children = new List<Element>();
                 entityElem.Attributes = new Dictionary<string, object>();
@@ -379,14 +378,14 @@ namespace Snowberry.Editor {
                 entityElem.Attributes["originX"] = entity.Origin.X;
                 entityElem.Attributes["originY"] = entity.Origin.Y;
 
-				foreach(var opt in entity.Info.Options.Keys) {
+                foreach (var opt in entity.Info.Options.Keys) {
                     var val = entity.Get(opt);
-                    if(val != null)
+                    if (val != null)
                         entityElem.Attributes[opt] = val;
-				}
+                }
 
-				foreach(var node in entity.Nodes) {
-					Element n = new Element();
+                foreach (var node in entity.Nodes) {
+                    Element n = new Element();
                     n.Attributes = new Dictionary<string, object>();
                     n.Attributes["x"] = node.X - X * 8;
                     n.Attributes["y"] = node.Y - Y * 8;
@@ -396,14 +395,14 @@ namespace Snowberry.Editor {
                 entitiesElement.Children.Add(entityElem);
             }
 
-			Element triggersElement = new Element();
+            Element triggersElement = new Element();
             triggersElement.Attributes = new Dictionary<string, object>();
             triggersElement.Name = "triggers";
             triggersElement.Children = new List<Element>();
             ret.Children.Add(triggersElement);
 
-            foreach(var tigger in Triggers) {
-				Element triggersElem = new Element();
+            foreach (var tigger in Triggers) {
+                Element triggersElem = new Element();
                 triggersElem.Name = tigger.Name;
                 triggersElem.Children = new List<Element>();
                 triggersElem.Attributes = new Dictionary<string, object>();
@@ -414,14 +413,14 @@ namespace Snowberry.Editor {
                 triggersElem.Attributes["originX"] = tigger.Origin.X;
                 triggersElem.Attributes["originY"] = tigger.Origin.Y;
 
-                foreach(var opt in tigger.Info.Options.Keys) {
+                foreach (var opt in tigger.Info.Options.Keys) {
                     var val = tigger.Get(opt);
-                    if(val != null)
+                    if (val != null)
                         triggersElem.Attributes[opt] = val;
                 }
 
-                foreach(var node in tigger.Nodes) {
-					Element n = new Element();
+                foreach (var node in tigger.Nodes) {
+                    Element n = new Element();
                     n.Attributes = new Dictionary<string, object>();
                     n.Attributes["x"] = node.X - X * 8;
                     n.Attributes["y"] = node.Y - Y * 8;
@@ -431,11 +430,11 @@ namespace Snowberry.Editor {
                 triggersElement.Children.Add(triggersElem);
             }
 
-			Element fgDecalsElem = new Element();
+            Element fgDecalsElem = new Element();
             fgDecalsElem.Name = "fgdecals";
             fgDecalsElem.Children = new List<Element>();
             ret.Children.Add(fgDecalsElem);
-			foreach(var decal in FgDecals) {
+            foreach (var decal in FgDecals) {
                 Element decalElem = new Element();
                 decalElem.Attributes = new Dictionary<string, object>();
                 decalElem.Attributes["x"] = decal.Position.X;
@@ -450,7 +449,7 @@ namespace Snowberry.Editor {
             bgDecalsElem.Name = "bgdecals";
             bgDecalsElem.Children = new List<Element>();
             ret.Children.Add(bgDecalsElem);
-            foreach(var decal in BgDecals) {
+            foreach (var decal in BgDecals) {
                 Element decalElem = new Element();
                 decalElem.Attributes = new Dictionary<string, object>();
                 decalElem.Attributes["x"] = decal.Position.X;
@@ -462,15 +461,15 @@ namespace Snowberry.Editor {
             }
 
             StringBuilder fgTiles = new StringBuilder();
-			for(int y = 0; y < fgTileMap.Rows; y++) {
-                for(int x = 0; x < fgTileMap.Columns; x++) {
+            for (int y = 0; y < fgTileMap.Rows; y++) {
+                for (int x = 0; x < fgTileMap.Columns; x++) {
                     fgTiles.Append(fgTileMap[x, y]);
                 }
                 fgTiles.Append("\n");
             }
             StringBuilder bgTiles = new StringBuilder();
-            for(int y = 0; y < bgTileMap.Rows; y++) {
-                for(int x = 0; x < bgTileMap.Columns; x++) {
+            for (int y = 0; y < bgTileMap.Rows; y++) {
+                for (int x = 0; x < bgTileMap.Columns; x++) {
                     bgTiles.Append(bgTileMap[x, y]);
                 }
                 bgTiles.Append("\n");
@@ -482,7 +481,7 @@ namespace Snowberry.Editor {
             fgElem.Attributes["innerText"] = fgTiles.ToString();
             ret.Children.Add(fgElem);
 
-			Element bgElem = new Element();
+            Element bgElem = new Element();
             bgElem.Attributes = new Dictionary<string, object>();
             bgElem.Name = "bg";
             bgElem.Attributes["innerText"] = bgTiles.ToString();
@@ -493,16 +492,16 @@ namespace Snowberry.Editor {
 
         public void AddEntity(Entity e) {
             AllEntities.Add(e);
-            if(e is Plugin_Trigger)
+            if (e is Plugin_Trigger)
                 Triggers.Add(e);
             else
                 Entities.Add(e);
-			if(e.Tracked) {
+            if (e.Tracked) {
                 Type tracking = e.GetType();
-                if(!TrackedEntities.ContainsKey(tracking))
+                if (!TrackedEntities.ContainsKey(tracking))
                     TrackedEntities[tracking] = new List<Entity>();
                 TrackedEntities[tracking].Add(e);
-			}
+            }
         }
 
         public void RemoveEntity(Entity e) {
@@ -510,17 +509,17 @@ namespace Snowberry.Editor {
             Entities.Remove(e);
             Triggers.Remove(e);
             Type tracking = e.GetType();
-            if(e.Tracked && TrackedEntities.ContainsKey(tracking)) {
-				TrackedEntities[tracking].Remove(e);
-				if(TrackedEntities[tracking].Count == 0)
+            if (e.Tracked && TrackedEntities.ContainsKey(tracking)) {
+                TrackedEntities[tracking].Remove(e);
+                if (TrackedEntities[tracking].Count == 0)
                     TrackedEntities.Remove(tracking);
-			}
-		}
+            }
+        }
 
         public void MarkTrackedEntityDirty(Entity e) {
-			if(e.Tracked) {
+            if (e.Tracked) {
                 DirtyTrackedEntities[e.GetType()] = true;
-			}
+            }
         }
     }
 }

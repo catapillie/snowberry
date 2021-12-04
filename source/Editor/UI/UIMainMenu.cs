@@ -1,9 +1,9 @@
-﻿using Monocle;
+﻿using Celeste;
 using Microsoft.Xna.Framework;
-using Celeste;
+using Microsoft.Xna.Framework.Input;
+using Monocle;
 using System;
 using System.Linq;
-using Microsoft.Xna.Framework.Input;
 
 namespace Snowberry.Editor.UI {
     public class UIMainMenu : UIElement {
@@ -241,11 +241,13 @@ namespace Snowberry.Editor.UI {
                 Add(levelScrollPane);
                 levelScrollPane.Width = Width;
 
-                static bool lvlMatcher(UILevelRibbon entry, string term)
-                    => entry.Text.ToLower().Contains(term.ToLower());
+                static bool lvlMatcher(UILevelRibbon entry, string term) {
+                    return entry.Text.ToLower().Contains(term.ToLower());
+                }
 
-                static bool lvlMatcherByMod(UILevelRibbon entry, string term)
-                    => entry.Name.ToLower().Contains(term.ToLower());
+                static bool lvlMatcherByMod(UILevelRibbon entry, string term) {
+                    return entry.Name.ToLower().Contains(term.ToLower());
+                }
 
                 string infonone = Dialog.Clean("SNOWBERRY_MAINMENU_LOADSEARCHBAR_NONE");
                 string infoone = Dialog.Clean("SNOWBERRY_MAINMENU_LOADSEARCHBAR_ONE");
@@ -417,7 +419,7 @@ namespace Snowberry.Editor.UI {
                     }
                 },
             };
-            
+
             load = new UIButton(mainmenuload, Fonts.Regular, 5, 4) {
                 OnPress = () => {
                     if (state == States.Load) {
@@ -431,7 +433,7 @@ namespace Snowberry.Editor.UI {
                     }
                 },
             };
-            
+
             exit = new UIButton(Dialog.Clean("SNOWBERRY_MAINMENU_EXIT"), Fonts.Regular, 10, 4) {
                 FG = Util.Colors.White,
                 BG = Util.Colors.Red,
@@ -467,7 +469,8 @@ namespace Snowberry.Editor.UI {
             });
 
             Add(confirm = new UIConfirmMessage() {
-                Width = width, Height = height,
+                Width = width,
+                Height = height,
             });
         }
 
@@ -503,7 +506,7 @@ namespace Snowberry.Editor.UI {
             buttons.Position.X = (int)Math.Round((Width - buttons.Width) / 2 - Width / 3 * loadEase + Width / 3 * createEase);
 
             levelSelector.Position.X = (int)Math.Round(buttons.Position.X + buttons.Width + 24 - levelSelector.Width * (1 - loadEase));
-            levelSelector.Visible = stateLerp[2] != 0f; 
+            levelSelector.Visible = stateLerp[2] != 0f;
         }
 
         public override void Render(Vector2 position = default) {

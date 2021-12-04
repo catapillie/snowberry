@@ -24,8 +24,8 @@ namespace Snowberry.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            
-            GFX.Game[$"objects/spring/00"].DrawJustified(Position, new Vector2(0.5f, 1), Color.White, 1, Dir switch{
+
+            GFX.Game[$"objects/spring/00"].DrawJustified(Position, new Vector2(0.5f, 1), Color.White, 1, Dir switch {
                 Spring.Orientations.Floor => 0,
                 Spring.Orientations.WallLeft => (float)Math.PI / 2f,
                 Spring.Orientations.WallRight => -(float)Math.PI / 2f,

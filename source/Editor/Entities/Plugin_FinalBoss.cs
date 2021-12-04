@@ -11,9 +11,9 @@ namespace Snowberry.Editor.Entities {
         [Option("cameraLockY")] public bool CameraLockY = true;
         [Option("canChangeMusic")] public bool CanChangeMusic = true;
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             MTexture baddy = GFX.Game["characters/badelineBoss/charge00"];
@@ -25,7 +25,7 @@ namespace Snowberry.Editor.Entities {
 
         public override void HQRender() {
             base.HQRender();
-            
+
             Vector2 prev = Position;
             foreach (Vector2 node in Nodes) {
                 DrawUtil.DottedLine(prev, node, Color.Red * 0.5f, 8, 4);

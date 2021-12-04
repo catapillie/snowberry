@@ -1,8 +1,8 @@
 ﻿using Celeste;
 using Celeste.Mod;
-using Snowberry.Editor;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
+using Snowberry.Editor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,12 +34,12 @@ namespace Snowberry {
                 typeof(Editor.Editor).GetMethod("HookSessionGetAreaData", BindingFlags.Static | BindingFlags.NonPublic)
             );
 
-			On.Celeste.Editor.MapEditor.ctor += UsePlaytestMap;
+            On.Celeste.Editor.MapEditor.ctor += UsePlaytestMap;
             On.Celeste.MapData.StartLevel += DontCrashOnEmptyPlaytestLevel;
-			On.Celeste.LevelEnter.Routine += DontEnterPlaytestMap;
+            On.Celeste.LevelEnter.Routine += DontEnterPlaytestMap;
         }
 
-		public override void LoadContent(bool firstLoad) {
+        public override void LoadContent(bool firstLoad) {
             base.LoadContent(firstLoad);
 
             LoadModules();
@@ -52,7 +52,7 @@ namespace Snowberry {
             hook_Session_get_MapData?.Dispose();
 
             On.Celeste.Editor.MapEditor.ctor -= UsePlaytestMap;
-			On.Celeste.MapData.StartLevel -= DontCrashOnEmptyPlaytestLevel;
+            On.Celeste.MapData.StartLevel -= DontCrashOnEmptyPlaytestLevel;
             On.Celeste.LevelEnter.Routine -= DontEnterPlaytestMap;
         }
 
@@ -78,19 +78,20 @@ namespace Snowberry {
         }
 
 
-        public static void Log(LogLevel level, string message)
-            => Logger.Log(level, "Snowberry", message);
+        public static void Log(LogLevel level, string message) {
+            Logger.Log(level, "Snowberry", message);
+        }
 
         private void UsePlaytestMap(On.Celeste.Editor.MapEditor.orig_ctor orig, Celeste.Editor.MapEditor self, AreaKey area, bool reloadMapData) {
             orig(self, area, reloadMapData);
             var selfData = new DynamicData(self);
-            if(selfData.Get<Session>("CurrentSession") == Editor.Editor.PlaytestSession) {
+            if (selfData.Get<Session>("CurrentSession") == Editor.Editor.PlaytestSession) {
                 var templates = selfData.Get<List<Celeste.Editor.LevelTemplate>>("levels");
                 templates.Clear();
-                foreach(LevelData level in Editor.Editor.PlaytestMapData.Levels) {
+                foreach (LevelData level in Editor.Editor.PlaytestMapData.Levels) {
                     templates.Add(new Celeste.Editor.LevelTemplate(level));
                 }
-                foreach(Microsoft.Xna.Framework.Rectangle item in Editor.Editor.PlaytestMapData.Filler) {
+                foreach (Microsoft.Xna.Framework.Rectangle item in Editor.Editor.PlaytestMapData.Filler) {
                     templates.Add(new Celeste.Editor.LevelTemplate(item.X, item.Y, item.Width, item.Height));
                 }
             }
@@ -98,7 +99,7 @@ namespace Snowberry {
 
         private LevelData DontCrashOnEmptyPlaytestLevel(On.Celeste.MapData.orig_StartLevel orig, MapData self) {
             // TODO: just add an empty room
-            if(self.Area.SID == "Snowberry/Playtest" && self.Levels.Count == 0) {
+            if (self.Area.SID == "Snowberry/Playtest" && self.Levels.Count == 0) {
                 var empty = new BinaryPacker.Element();
                 empty.Children = new List<BinaryPacker.Element>();
                 empty.Attributes = new Dictionary<string, object>();
@@ -110,7 +111,7 @@ namespace Snowberry {
 
         private System.Collections.IEnumerator DontEnterPlaytestMap(On.Celeste.LevelEnter.orig_Routine orig, LevelEnter self) {
             var session = new DynamicData(self).Get<Session>("session");
-            if(session.Area.SID == "Snowberry/Playtest" && session != Editor.Editor.PlaytestSession && string.IsNullOrEmpty(LevelEnter.ErrorMessage)) {
+            if (session.Area.SID == "Snowberry/Playtest" && session != Editor.Editor.PlaytestSession && string.IsNullOrEmpty(LevelEnter.ErrorMessage)) {
                 return CantEnterRoutine(self);
             } else
                 return orig(self);

@@ -16,6 +16,8 @@ namespace Snowberry {
             public static readonly Color CloudLightGray = Calc.HexToColor("5c646b");
         }
 
-        public static int Bit(this bool b) => b ? 1 : 0;
+        public static int Bit(this bool b) {
+            return b ? 1 : 0;
+        }
     }
 }

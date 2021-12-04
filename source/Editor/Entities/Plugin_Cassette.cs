@@ -6,10 +6,10 @@ namespace Snowberry.Editor.Entities {
     [Plugin("cassette")]
     public class Plugin_Cassette : Entity {
 
-		public override int MinNodes => 2;
-		public override int MaxNodes => 2;
+        public override int MinNodes => 2;
+        public override int MaxNodes => 2;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
             GFX.Game["collectables/cassette/idle00"].DrawCentered(Position);
         }

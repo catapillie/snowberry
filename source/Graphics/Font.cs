@@ -28,8 +28,9 @@ namespace Snowberry {
             LineHeight = lineHeight;
         }
 
-        public void Draw(string str, Vector2 position, Vector2 scale, Color color)
-            => Draw(str, position, scale, Vector2.Zero, color);
+        public void Draw(string str, Vector2 position, Vector2 scale, Color color) {
+            Draw(str, position, scale, Vector2.Zero, color);
+        }
 
         public void Draw(string str, Vector2 position, Vector2 scale, Vector2 justify, Color color) {
             if (justify != Vector2.Zero)
@@ -58,7 +59,7 @@ namespace Snowberry {
 
         public void Draw(string str, Vector2 position, Vector2 scale, Vector2 justify, Color[] colorByChar) {
             if (justify != Vector2.Zero)
-              position -= Measure(str) * scale * justify;
+                position -= Measure(str) * scale * justify;
 
             position = Calc.Round(position);
             float startX = position.X;
@@ -81,11 +82,13 @@ namespace Snowberry {
             }
         }
 
-        public void Draw(FormattedText text, Vector2 position, Vector2 scale, params object[] values)
-            => Draw(text.Format(out Color[] colors, values), position, scale, Vector2.Zero, colors);
+        public void Draw(FormattedText text, Vector2 position, Vector2 scale, params object[] values) {
+            Draw(text.Format(out Color[] colors, values), position, scale, Vector2.Zero, colors);
+        }
 
-        public void Draw(FormattedText text, Vector2 position, Vector2 scale, Vector2 justify, params object[] values)
-            => Draw(text.Format(out Color[] colors, values), position, scale, justify, colors);
+        public void Draw(FormattedText text, Vector2 position, Vector2 scale, Vector2 justify, params object[] values) {
+            Draw(text.Format(out Color[] colors, values), position, scale, justify, colors);
+        }
 
         public Vector2 Measure(char c) {
             if (glyphs.TryGetValue(c, out Glyph g))

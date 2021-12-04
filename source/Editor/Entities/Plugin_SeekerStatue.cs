@@ -1,11 +1,6 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Snowberry.Editor.Entities {
     [Plugin("seekerStatue")]
@@ -23,8 +18,8 @@ namespace Snowberry.Editor.Entities {
                 prev = node;
             }
         }
-		public static void AddPlacements() {
-			Placements.Create("Seeker Statue", "seekerStatue");
-		}
+        public static void AddPlacements() {
+            Placements.Create("Seeker Statue", "seekerStatue");
+        }
     }
 }

@@ -9,9 +9,9 @@ namespace Snowberry.Editor.Entities {
 
         private bool noDash;
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Initialize() {
+        public override void Initialize() {
             base.Initialize();
             noDash = Name == "memorialTextController";
         }

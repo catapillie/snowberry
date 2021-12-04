@@ -10,10 +10,10 @@ namespace Snowberry.Editor.Entities {
         [Option("speed")] public float Speed = 1.0f;
         [Option("notCoreMode")] public bool NotCoreMode = false;
 
-		public override int MinNodes => 1;
-		public override int MaxNodes => -1;
+        public override int MinNodes => 1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             Vector2 start = Position;

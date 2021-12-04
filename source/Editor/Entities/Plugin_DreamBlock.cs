@@ -15,27 +15,27 @@ namespace Snowberry.Editor.Entities {
         public override int MaxNodes => 1;
 
         public MTexture[] ParticleTextures = new MTexture[4]
-			{
-				GFX.Game["objects/dreamblock/particles"].GetSubtexture(14, 0, 7, 7),
-				GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7),
-				GFX.Game["objects/dreamblock/particles"].GetSubtexture(0, 0, 7, 7),
-				GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7)
+            {
+                GFX.Game["objects/dreamblock/particles"].GetSubtexture(14, 0, 7, 7),
+                GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7),
+                GFX.Game["objects/dreamblock/particles"].GetSubtexture(0, 0, 7, 7),
+                GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7)
 
             };
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             Draw.Rect(Position, Width, Height, Color.Black * 0.25f);
-            
+
             if (Editor.FancyRender) {
                 int numParticles = (int)(Width / 8f * (Height / 8f) * 0.7f);
-				for(int i = 0; i < numParticles; i++) {
+                for (int i = 0; i < numParticles; i++) {
                     var pos = new Vector2(Calc.Random.NextFloat(Width), Calc.Random.NextFloat(Height));
                     var layer = Calc.Random.Choose(0, 1, 1, 2, 2, 2);
                     var timeOffset = Calc.Random.NextFloat();
                     Color colour = layer switch {
-						0 => Calc.Random.Choose(Calc.HexToColor("FFEF11"), Calc.HexToColor("FF00D0"), Calc.HexToColor("08a310")),
+                        0 => Calc.Random.Choose(Calc.HexToColor("FFEF11"), Calc.HexToColor("FF00D0"), Calc.HexToColor("08a310")),
                         1 => Calc.Random.Choose(Calc.HexToColor("5fcde4"), Calc.HexToColor("7fb25e"), Calc.HexToColor("E0564C")),
                         2 => Calc.Random.Choose(Calc.HexToColor("5b6ee1"), Calc.HexToColor("CC3B3B"), Calc.HexToColor("7daa64")),
                         _ => Color.LightGray * (0.5f + layer / 2f * 0.5f)
@@ -45,7 +45,7 @@ namespace Snowberry.Editor.Entities {
                     pos = PutInside(pos);
                     MTexture mTexture;
                     int animTimer = 0; // todo: animated entities?
-                    switch(layer) {
+                    switch (layer) {
                         case 0: {
                                 int num2 = (int)((timeOffset * 4f + animTimer) % 4f);
                                 mTexture = ParticleTextures[3 - num2];
@@ -61,7 +61,7 @@ namespace Snowberry.Editor.Entities {
                             break;
                     }
 
-                    if(pos.X >= X + 2f && pos.Y >= Y + 2f && pos.X < X + Width - 2f && pos.Y < Y + Height- 2f) {
+                    if (pos.X >= X + 2f && pos.Y >= Y + 2f && pos.X < X + Width - 2f && pos.Y < Y + Height - 2f) {
                         mTexture.DrawCentered(pos, colour);
                     }
                 }
@@ -75,18 +75,18 @@ namespace Snowberry.Editor.Entities {
                 Draw.Rect(new Vector2(X + Width - 2f, Y + Height - 2f), 2f, 2f, Color.White);
             } else
                 Draw.HollowRect(Position, Width, Height, Color.White);
-		}
+        }
 
         private Vector2 PutInside(Vector2 pos) {
-            if(pos.X > X + Width) {
+            if (pos.X > X + Width) {
                 pos.X -= (float)Math.Ceiling((pos.X - (X + Width)) / Width) * Width;
-            } else if(pos.X < X) {
+            } else if (pos.X < X) {
                 pos.X += (float)Math.Ceiling((X - pos.X) / Width) * Width;
             }
 
-            if(pos.Y > Y + Height) {
+            if (pos.Y > Y + Height) {
                 pos.Y -= (float)Math.Ceiling((pos.Y - (Y + Height)) / Height) * Height;
-            } else if(pos.Y < Y) {
+            } else if (pos.Y < Y) {
                 pos.Y += (float)Math.Ceiling((Y - pos.Y) / Height) * Height;
             }
 
@@ -102,9 +102,9 @@ namespace Snowberry.Editor.Entities {
 
             float scaleFactor = 0f;
             int num2 = 16;
-            for(int i = 2; i < num - 2f; i += num2) {
+            for (int i = 2; i < num - 2f; i += num2) {
                 float num3 = MathHelper.Lerp(LineAmplitude(0.2f + offset, i), LineAmplitude((float)Math.PI + offset, i), 0.5f);
-                if((i + num2) >= num) {
+                if ((i + num2) >= num) {
                     num3 = 0f;
                 }
 
@@ -119,7 +119,7 @@ namespace Snowberry.Editor.Entities {
         }
 
         private float LineAmplitude(float seed, float index) {
-            return (float)(Math.Sin((double)(seed + index / 16f) + Math.Sin(seed * 2f + index / 32f) * 6.2831854820251465) + 1.0) * 1.5f;
+            return (float)(Math.Sin(seed + index / 16f + Math.Sin(seed * 2f + index / 32f) * 6.2831854820251465) + 1.0) * 1.5f;
         }
 
         public override void HQRender() {
@@ -143,5 +143,5 @@ namespace Snowberry.Editor.Entities {
         public static void AddPlacements() {
             Placements.Create("Dream Block", "dreamBlock");
         }
-	}
+    }
 }

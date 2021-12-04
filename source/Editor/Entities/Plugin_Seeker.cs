@@ -6,9 +6,9 @@ namespace Snowberry.Editor.Entities {
     [Plugin("seeker")]
     public class Plugin_Seeker : Entity {
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             MTexture seeker = GFX.Game["characters/monsters/predator73"];

@@ -35,7 +35,7 @@ namespace Snowberry.Editor.UI {
         }
 
         public virtual void Render(Vector2 position = default) {
-			if(Background.HasValue) {
+            if (Background.HasValue) {
                 Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
                 Draw.Rect(rect, Background.Value);
             }
@@ -56,8 +56,8 @@ namespace Snowberry.Editor.UI {
         }
 
         public void Add(UIElement element) {
-            if(canModify) {
-                if(element.Parent == null) {
+            if (canModify) {
+                if (element.Parent == null) {
                     children.Add(element);
                     element.Parent = this;
                     element.Initialize();
@@ -73,15 +73,15 @@ namespace Snowberry.Editor.UI {
 
         public void AddBelow(UIElement element) {
             UIElement low = null;
-            foreach(var item in children)
-                if(low == null || item.Position.Y > low.Position.Y) low = item;
+            foreach (var item in children)
+                if (low == null || item.Position.Y > low.Position.Y) low = item;
             Add(element);
             element.Position += new Vector2(0, (low?.Position.Y + low?.Height) ?? 0);
         }
 
         public void AddRight(UIElement element) {
             Add(element);
-            foreach(UIElement child in children)
+            foreach (UIElement child in children)
                 element.Position += new Vector2(child.Width, 0);
         }
 
@@ -96,7 +96,7 @@ namespace Snowberry.Editor.UI {
         }
 
         public void RemoveAll(ICollection<UIElement> elems) {
-			foreach(var item in elems) 
+            foreach (var item in elems)
                 Remove(item);
         }
 
