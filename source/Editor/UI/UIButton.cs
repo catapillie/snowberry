@@ -35,7 +35,7 @@ namespace Snowberry.Editor.UI {
         public Action OnPress, OnRightPress;
 
         private UIButton(int spaceX, int spaceY, int minWidth, int minHeight) {
-            MTexture full = GFX.Gui["editor/button"];
+            MTexture full = GFX.Gui["Snowberry/button"];
             top = full.GetSubtexture(0, 0, 3, 4);
             topFill = full.GetSubtexture(2, 0, 1, 4);
             bottom = full.GetSubtexture(0, 5, 3, 3);
