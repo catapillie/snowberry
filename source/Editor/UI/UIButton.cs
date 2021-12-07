@@ -1,5 +1,7 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
 using Monocle;
 using System;
 
@@ -104,11 +106,12 @@ namespace Snowberry.Editor.UI {
             int mouseY = (int)Editor.Mouse.Screen.Y;
             hovering = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
 
-            if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
+			bool middlePan = Snowberry.Settings.MiddleClickPan;
+			if ((MInput.Mouse.PressedLeftButton || (middlePan && MInput.Mouse.PressedRightButton)) && hovering)
                 pressed = true;
-            else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+            else if (MInput.Mouse.ReleasedLeftButton || (middlePan && MInput.Mouse.ReleasedRightButton)) {
                 if (hovering && pressed) {
-                    if (MInput.Mouse.ReleasedLeftButton)
+                    if (MInput.Mouse.ReleasedLeftButton && (middlePan || !MInput.Keyboard.Check(Keys.LeftAlt)))
                         Pressed();
                     else
                         OnRightPress?.Invoke();

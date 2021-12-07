@@ -23,7 +23,10 @@ namespace Snowberry {
             Instance = this;
         }
 
-        public override void Load() {
+		public override Type SettingsType => typeof(SnowberrySettings);
+        public static SnowberrySettings Settings => (SnowberrySettings)Instance._Settings;
+
+		public override void Load() {
             hook_MapData_orig_Load = new Hook(
                 typeof(MapData).GetMethod("orig_Load", BindingFlags.Instance | BindingFlags.NonPublic),
                 typeof(Editor.Editor).GetMethod("CreatePlaytestMapDataHook", BindingFlags.Static | BindingFlags.NonPublic)

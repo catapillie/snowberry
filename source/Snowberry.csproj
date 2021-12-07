@@ -163,6 +163,7 @@
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\CelesteEverest.cs" />
+    <Compile Include="SnowberrySettings.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>

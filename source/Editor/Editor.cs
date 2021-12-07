@@ -275,8 +275,9 @@ namespace Snowberry.Editor {
             // controls
             bool canClick = ui.CanClickThrough();
 
-            // panning
-            if (MInput.Mouse.CheckRightButton && canClick) {
+			// panning
+			bool middlePan = Snowberry.Settings.MiddleClickPan;
+			if ((middlePan && MInput.Mouse.CheckMiddleButton || !middlePan && MInput.Mouse.CheckRightButton) && canClick) {
                 Vector2 move = lastMousePos - mousePos;
                 if (move != Vector2.Zero)
                     Camera.Position += move / (Camera.Buffer == null ? Camera.Zoom : 1f);

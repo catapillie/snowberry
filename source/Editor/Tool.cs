@@ -376,14 +376,15 @@ namespace Snowberry.Editor {
                 isPainting = false;
             }
 
-            bool left = MInput.Mouse.CheckLeftButton || MInput.Mouse.ReleasedLeftButton;
+            bool middlePan = Snowberry.Settings.MiddleClickPan;
+            bool left = (MInput.Mouse.CheckLeftButton || (middlePan && MInput.Mouse.ReleasedLeftButton)) && (middlePan || !MInput.Keyboard.Check(Keys.LeftAlt));
             bool fg = left ? LeftFg : RightFg;
             int tileset = left ? CurLeftTileset : CurRightTileset;
             bool retile = false;
 
-            if (canClick && (MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)) {
+            if (canClick && (MInput.Mouse.PressedLeftButton || (middlePan && MInput.Mouse.PressedRightButton))) {
                 isPainting = true;
-            } else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+            } else if (MInput.Mouse.ReleasedLeftButton || (middlePan && MInput.Mouse.ReleasedRightButton)) {
                 if (Editor.SelectedRoom != null && canClick && isPainting)
                     for (int x = 0; x < holoFgTileMap.Columns; x++)
                         for (int y = 0; y < holoFgTileMap.Rows; y++)
@@ -401,7 +402,7 @@ namespace Snowberry.Editor {
                 holoFgTileMap = null;
                 holoBgTileMap = null;
                 holoGrid = null;
-            } else if ((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && Editor.SelectedRoom != null) {
+            } else if ((MInput.Mouse.CheckLeftButton || (middlePan && MInput.Mouse.CheckRightButton)) && Editor.SelectedRoom != null) {
                 var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8 - Editor.SelectedRoom.Position.X), (float)Math.Floor(Editor.Mouse.World.Y / 8 - Editor.SelectedRoom.Position.Y));
                 int x = (int)tilePos.X; int y = (int)tilePos.Y;
                 if (Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
@@ -766,8 +767,10 @@ namespace Snowberry.Editor {
             } else
                 area = Rectangle.Empty;
 
-            Placements.Placement selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
-            if ((MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
+            bool middlePan = Snowberry.Settings.MiddleClickPan;
+
+            Placements.Placement selection = (middlePan && (MInput.Mouse.CheckRightButton || (middlePan && MInput.Mouse.ReleasedRightButton)) || !middlePan && MInput.Keyboard.Check(Keys.LeftAlt)) ? curRightSelection : curLeftSelection;
+            if ((MInput.Mouse.ReleasedLeftButton || (middlePan && MInput.Mouse.ReleasedRightButton)) && canClick && selection != null && Editor.SelectedRoom != null && Editor.SelectedRoom.Bounds.Contains((int)Editor.Mouse.World.X / 8, (int)Editor.Mouse.World.Y / 8)) {
                 Entity toAdd = selection.Build(Editor.SelectedRoom);
                 UpdateEntity(toAdd, area);
                 // TODO: find lowest unoccupied ID
@@ -786,9 +789,9 @@ namespace Snowberry.Editor {
             if (preview != null)
                 UpdateEntity(preview, area);
 
-            if (MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton)
+            if (MInput.Mouse.PressedLeftButton || (middlePan && MInput.Mouse.PressedRightButton))
                 lastPress = Editor.Mouse.World;
-            else if (!MInput.Mouse.CheckLeftButton && !MInput.Mouse.CheckRightButton)
+            else if (!MInput.Mouse.CheckLeftButton && !(middlePan && MInput.Mouse.CheckRightButton))
                 lastPress = null;
 
             foreach (var item in placementButtons) {
@@ -808,7 +811,9 @@ namespace Snowberry.Editor {
         }
 
         private void RefreshPreview(bool changedPlacement) {
-            Placements.Placement selection = (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) ? curRightSelection : curLeftSelection;
+            bool middlePan = Snowberry.Settings.MiddleClickPan;
+
+            Placements.Placement selection = (middlePan && (MInput.Mouse.CheckRightButton ||  MInput.Mouse.ReleasedRightButton) || !middlePan && MInput.Keyboard.Check(Keys.LeftAlt)) ? curRightSelection : curLeftSelection;
             if ((preview == null || changedPlacement) && selection != null) {
                 preview = selection.Build(Editor.SelectedRoom);
             } else if (selection == null)
