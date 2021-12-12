@@ -126,7 +126,7 @@ namespace Snowberry.Editor.UI {
                     listLerp = Calc.Approach(listLerp, (selector.anim < n).Bit(), Engine.DeltaTime * 4f);
 
                     if (Visible) {
-                        if (!Instance.confirm.Shown && MInput.Mouse.PressedLeftButton && hover) {
+                        if (!Instance.confirm.Shown && hover && ConsumeLeftClick()) {
                             if (dropdown) {
                                 if (!HoveringChildren()) {
                                     openLerp = open.Bit();
@@ -137,7 +137,7 @@ namespace Snowberry.Editor.UI {
                                 pressing = true;
                             }
                         }
-                        if (MInput.Mouse.ReleasedLeftButton && pressing || Instance.confirm.Shown) {
+                        if (pressing && ConsumeLeftClick(pressed: false, released: true) || Instance.confirm.Shown) {
                             pressing = false;
                             if (hover) {
                                 if (MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down)

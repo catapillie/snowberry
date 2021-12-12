@@ -108,6 +108,7 @@ namespace Snowberry.Editor {
 
         public Vector2 mousePos, lastMousePos;
         public Vector2 worldClick;
+        public static bool MouseClicked = false;
 
         public Map Map { get; private set; }
 
@@ -288,6 +289,7 @@ namespace Snowberry.Editor {
             Mouse.Screen = mouseVec / 2;
             Mouse.World = Calc.Round(Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse));
 
+            MouseClicked = false;
             ui.Update();
 
             // room & filler select

@@ -119,10 +119,18 @@ namespace Snowberry.Editor.UI {
             if (MInput.Mouse.CheckLeftButton) {
                 bool click = MInput.Mouse.PressedLeftButton;
 
-                if (click)
-                    Selected = inside;
+                if (click) {
+                    // don't require consuming the click to deselect, but do require it to select
+                    if(inside) {
+                        if(ConsumeLeftClick()) {
+                            Selected = true;
+                        }
+                    } else {
+                        Selected = false;
+                    }
+				}
 
-                if (Selected) {
+				if (Selected) {
                     int i, d = mouseX - (int)position.X + 1;
 
                     for (i = 0; i < widthAtIndex.Length - 1; i++)

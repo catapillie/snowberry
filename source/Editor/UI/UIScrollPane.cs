@@ -54,8 +54,15 @@ namespace Snowberry.Editor.UI {
         }
 
         public override void Update(Vector2 position = default) {
+			bool hovered = Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y);
+
+            // pretend that the mouse has already been clicked if the mouse is outside of the scroll pane's bounds
+            bool mouseClicked = Editor.MouseClicked;
+            Editor.MouseClicked = !hovered || mouseClicked;
             base.Update(position);
-            if (Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y)) {
+            Editor.MouseClicked = mouseClicked;
+
+			if (hovered) {
                 int wheel = (MInput.Mouse.WheelDelta);
                 var points = ScrollPoints(13);
                 if (wheel > 0 && points.X < 0)

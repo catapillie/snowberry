@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
 using Monocle;
 using System.Collections.Generic;
 
@@ -24,9 +26,13 @@ namespace Snowberry.Editor.UI {
 
         public virtual void Update(Vector2 position = default) {
             canModify = false;
-            foreach (UIElement element in children)
-                element.Update(position + element.Position);
-            canModify = true;
+            // The last child is rendered last, on top of everything else, and should be the first to consume mouse clicks.
+			for(int i = children.Count - 1; i >= 0; i--) {
+				UIElement element = children[i];
+				element.Update(position + element.Position);
+			}
+
+			canModify = true;
             children.RemoveAll(e => e == null);
             toRemove.ForEach(a => children.Remove(a));
             toRemove.Clear();
@@ -106,6 +112,32 @@ namespace Snowberry.Editor.UI {
 
         public bool CanClickThrough() {
             return !GrabsClick && !children.Exists(a => !a.CanClickThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
+        }
+
+        private bool ConsumeClick() {
+            if(!Editor.MouseClicked) {
+                Editor.MouseClicked = true;
+                return true;
+            }
+            return false;
+        }
+
+        protected bool ConsumeLeftClick(bool pressed = true, bool held = false, bool released = false) {
+			if((!pressed || MInput.Mouse.PressedLeftButton) && (!held || MInput.Mouse.CheckLeftButton) && (!released || MInput.Mouse.ReleasedLeftButton)) {
+                return ConsumeClick();
+            }
+            return false;
+        }
+
+        protected bool ConsumeAltClick(bool pressed = true, bool held = false, bool released = false) {
+            if(Snowberry.Settings.MiddleClickPan) {
+                if((!pressed || MInput.Mouse.PressedRightButton) && (!held || MInput.Mouse.CheckRightButton) && (!released || MInput.Mouse.ReleasedRightButton)) {
+                    return ConsumeClick();
+				}
+                return false;
+            } else {
+                return (MInput.Keyboard.Check(Keys.LeftAlt) || MInput.Keyboard.Check(Keys.RightAlt)) && ConsumeLeftClick(pressed, held, released);
+            }
         }
 
         public static UIElement Regroup(params UIElement[] elems) {
