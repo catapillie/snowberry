@@ -11,9 +11,9 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            string type = Fragile ? "fragile" : "cloud";
+            string type = Fragile ? "cloudFragile" : "cloud";
             string suffix = (Editor.From?.Mode ?? AreaMode.Normal) == AreaMode.Normal ? "" : "Remix";
-            GFX.Game[$"objects/clouds/{type}{suffix}00"].DrawCentered(Position);
+            FromSprite(type + suffix, "idle")?.DrawCentered(Position);
         }
 
         public static void AddPlacements() {

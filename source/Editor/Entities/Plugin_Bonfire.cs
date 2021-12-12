@@ -9,11 +9,11 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            GFX.Game[Mode switch {
-                "lit" => "objects/campfire/fire08",
-                "smoking" => "objects/campfire/smoking04",
-                _ => "objects/campfire/fire00",
-            }].DrawJustified(Position, new Vector2(0.5f, 1.0f));
+            FromSprite("campfire", Mode switch {
+                "lit" => "burn",
+                "smoking" => "smoking",
+                _ => "idle",
+            })?.DrawJustified(Position, new Vector2(0.5f, 1.0f));
         }
 
         public static void AddPlacements() {

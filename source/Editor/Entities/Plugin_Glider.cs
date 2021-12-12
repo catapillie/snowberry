@@ -1,5 +1,4 @@
-﻿using Celeste;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 
@@ -12,7 +11,7 @@ namespace Snowberry.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            GFX.Game["objects/glider/idle0"].DrawOutlineCentered(Position);
+            FromSprite("glider", "idle")?.DrawOutlineCentered(Position);
             if (Bubble) {
                 for (int i = 0; i < 24; i++) {
                     Draw.Point(Position + PlatformAdd(i), PlatformColor(i));

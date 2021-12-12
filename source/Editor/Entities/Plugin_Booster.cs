@@ -10,7 +10,7 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            GFX.Game[$"objects/booster/{(Red ? "boosterRed" : "booster")}00"].DrawOutlineCentered(Position);
+            FromSprite(Red ? "boosterRed" : "booster", "loop")?.DrawOutlineCentered(Position);
         }
 
         public static void AddPlacements() {

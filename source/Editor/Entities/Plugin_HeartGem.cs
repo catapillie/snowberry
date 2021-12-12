@@ -12,12 +12,12 @@ namespace Snowberry.Editor.Entities {
             base.Render();
 
             string texture = Room.Map.From.Mode switch {
-                AreaMode.Normal => "collectables/heartGem/0/00",
-                AreaMode.BSide => "collectables/heartGem/1/00",
-                AreaMode.CSide => "collectables/heartGem/2/00",
-                _ => "collectables/heartGem/3/00",
+                AreaMode.Normal => "heartgem0",
+                AreaMode.BSide => "heartgem1",
+                AreaMode.CSide => "heartgem2",
+                _ => "heartgem3",
             };
-            GFX.Game[Fake ? "collectables/heartGem/3/00" : texture].DrawCentered(Position);
+            FromSprite(Fake ? "heartgem3" : texture, "idle")?.DrawCentered(Position);
         }
 
         public static void AddPlacements() {

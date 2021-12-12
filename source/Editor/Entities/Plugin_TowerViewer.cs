@@ -1,5 +1,4 @@
-﻿using Celeste;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Snowberry.Editor.Entities {
@@ -13,12 +12,12 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            MTexture tower = GFX.Game["objects/lookout/lookout05"];
-            tower.DrawJustified(Position, new Vector2(0.5f, 1.0f));
+            MTexture tower = FromSprite("lookout", "idle");
+            tower?.DrawJustified(Position, new Vector2(0.5f, 1.0f));
 
             Vector2 prev = Position;
             foreach (Vector2 node in Nodes) {
-                tower.DrawJustified(node, new Vector2(0.5f, 1.0f));
+                tower?.DrawJustified(node, new Vector2(0.5f, 1.0f));
                 Draw.Line(prev, node, Color.White * 0.5f);
                 prev = node;
             }

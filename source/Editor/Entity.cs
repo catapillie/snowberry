@@ -1,5 +1,8 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
+
+using Monocle;
+
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
@@ -125,6 +128,13 @@ namespace Snowberry.Editor {
         public virtual void Render() { }
         public virtual void RenderBefore() { }
         public virtual void HQRender() { }
+
+        private static readonly Sprite carrier = new Sprite(GFX.SpriteBank.Atlas, "strawberry");
+        public static MTexture FromSprite(string spriteName, string animName) {
+            GFX.SpriteBank.CreateOn(carrier, spriteName);
+            carrier.Play(animName);
+            return carrier.Texture;
+        }
 
         #region Entity Instantiating
 

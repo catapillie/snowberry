@@ -1,5 +1,4 @@
-﻿using Celeste;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Snowberry.Editor.Entities {
     [Plugin("torch")]
@@ -9,7 +8,7 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            GFX.Game[$"objects/temple/{(Lit ? "litTorch" : "torch")}03"].DrawCentered(Position);
+            (Lit ? FromSprite("litTorch", "on") : FromSprite("torch", "off"))?.DrawCentered(Position);
         }
 
         public static void AddPlacements() {

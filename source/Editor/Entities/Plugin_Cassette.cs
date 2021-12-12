@@ -1,5 +1,4 @@
-﻿using Celeste;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Snowberry.Editor.Entities {
@@ -11,7 +10,7 @@ namespace Snowberry.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            GFX.Game["collectables/cassette/idle00"].DrawCentered(Position);
+            FromSprite("cassette", "idle")?.DrawCentered(Position);
         }
 
         public override void HQRender() {

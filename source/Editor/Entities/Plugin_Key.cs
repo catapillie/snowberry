@@ -1,11 +1,9 @@
-﻿using Celeste;
-
-namespace Snowberry.Editor.Entities {
+﻿namespace Snowberry.Editor.Entities {
     [Plugin("key")]
     public class Plugin_Key : Entity {
         public override void Render() {
             base.Render();
-            GFX.Game["collectables/key/idle00"].DrawCentered(Position);
+            FromSprite("key", "idle")?.DrawCentered(Position);
         }
 
         public static void AddPlacements() {
