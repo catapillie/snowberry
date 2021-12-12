@@ -1,9 +1,15 @@
 ﻿using Celeste;
 using Celeste.Mod;
+using Celeste.Mod.Meta;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
+
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml;
 
 namespace Snowberry.Editor {
 
@@ -31,16 +37,20 @@ namespace Snowberry.Editor {
 
         internal Map(MapData data)
             : this(data.Filename) {
-            foreach (LevelData roomData in data.Levels)
-                Rooms.Add(new Room(roomData, this));
-            foreach (Rectangle filler in data.Filler)
-                Fillers.Add(filler);
+
             var playtestData = AreaData.Get("Snowberry/Playtest");
             var targetData = AreaData.Get(data.Area);
             AreaKey playtestKey = playtestData.ToKey();
             From = playtestKey;
-            Editor.CopyMapMeta(targetData, playtestData);
 
+            Editor.CopyMapMeta(targetData, playtestData);
+            SetupGraphics(targetData.Meta);
+
+            foreach (LevelData roomData in data.Levels)
+                Rooms.Add(new Room(roomData, this));
+            foreach (Rectangle filler in data.Filler)
+                Fillers.Add(filler);
+            
             // load stylegrounds
             if (data.Foreground != null && data.Foreground.Children != null) {
                 foreach (var item in data.Foreground.Children) {
@@ -274,6 +284,63 @@ namespace Snowberry.Editor {
             style.Name = "Style";
             style.Children = new List<Element>() { /*bgStylegrounds ?? new Element(), fgStylegrounds ?? new Element()*/ };
             return map;
+        }
+
+        // Setup autotilers, animated tiles, and the Graphics atlas, based on LevelLoader
+        private void SetupGraphics(MapMeta meta) {
+            string text = meta?.BackgroundTiles;
+            if(string.IsNullOrEmpty(text)) {
+                text = Path.Combine("Graphics", "BackgroundTiles.xml");
+            }
+
+            GFX.BGAutotiler = new Autotiler(text);
+            text = meta?.ForegroundTiles;
+            if(string.IsNullOrEmpty(text)) {
+                text = Path.Combine("Graphics", "ForegroundTiles.xml");
+            }
+
+            GFX.FGAutotiler = new Autotiler(text);
+            text = meta?.AnimatedTiles;
+            if(string.IsNullOrEmpty(text)) {
+                text = Path.Combine("Graphics", "AnimatedTiles.xml");
+            }
+
+            GFX.AnimatedTilesBank = new AnimatedTilesBank();
+            foreach(XmlElement item in Calc.LoadContentXML(text)["Data"]) {
+                if(item != null) {
+                    GFX.AnimatedTilesBank.Add(item.Attr("name"), item.AttrFloat("delay", 0f), item.AttrVector2("posX", "posY", Vector2.Zero), item.AttrVector2("origX", "origY", Vector2.Zero), GFX.Game.GetAtlasSubtextures(item.Attr("path")));
+                }
+            }
+
+            GFX.SpriteBank = new SpriteBank(GFX.Game, Path.Combine("Graphics", "Sprites.xml"));
+            text = meta?.Sprites;
+            if(!string.IsNullOrEmpty(text)) {
+                SpriteBank spriteBank = GFX.SpriteBank;
+                foreach(KeyValuePair<string, SpriteData> spriteDatum in new SpriteBank(GFX.Game, getModdedSpritesXml(text)).SpriteData) {
+                    string key = spriteDatum.Key;
+                    SpriteData value = spriteDatum.Value;
+                    if(spriteBank.SpriteData.TryGetValue(key, out SpriteData value2)) {
+                        IDictionary animations = value2.Sprite.GetAnimations();
+                        foreach(DictionaryEntry item2 in (IDictionary)value.Sprite.GetAnimations()) {
+                            animations[item2.Key] = item2.Value;
+                        }
+
+                        value2.Sources.AddRange(value.Sources);
+                        value2.Sprite.Stop();
+                        if(value.Sprite.CurrentAnimationID != "") {
+                            value2.Sprite.Play(value.Sprite.CurrentAnimationID);
+                        }
+                    } else {
+                        spriteBank.SpriteData[key] = value;
+                    }
+                }
+            }
+        }
+
+        private XmlDocument getModdedSpritesXml(string path) {
+            // TODO: exclude vanillaa copy/pastes like Everest does
+            XmlDocument modSpritesXml = Calc.LoadContentXML(path);
+            return modSpritesXml;
         }
     }
 }

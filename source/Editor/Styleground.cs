@@ -1,4 +1,7 @@
 ﻿
+using Celeste;
+using Celeste.Mod;
+
 using Microsoft.Xna.Framework;
 
 using Monocle;
@@ -37,9 +40,9 @@ namespace Snowberry.Editor {
 
         public bool FlipY;
 
-        public HashSet<string> OnlyIn;
+        public string OnlyIn;
 
-        public HashSet<string> ExcludeFrom;
+        public string ExcludeFrom;
 
         public string Flag;
 
@@ -63,11 +66,11 @@ namespace Snowberry.Editor {
         public bool IsVisible(Room room) {
             string roomName = room?.Name ?? "";
 
-            if (ExcludeFrom != null && ExcludeFrom.Any(k => MatchRoomName(k, roomName))) {
+            if (ExcludeFrom != null && MatchRoomName(ExcludeFrom, roomName)) {
                 return false;
             }
 
-            if (OnlyIn != null && !OnlyIn.Any(k => MatchRoomName(k, roomName))) {
+            if (OnlyIn != null && !MatchRoomName(OnlyIn, roomName)) {
                 return false;
             }
 
@@ -75,8 +78,16 @@ namespace Snowberry.Editor {
         }
 
         public static bool MatchRoomName(string predicate, string roomName) {
-            // TODO: wildcard matching
-            return Regex.IsMatch(roomName, predicate);
+            string[] array = predicate.Split(',');
+            foreach(string text in array) {
+                if(text.Equals(roomName)) {
+                    return true;
+                } else if(text.Contains("*")) {
+                    string pattern = "^" + Regex.Escape(text).Replace("\\*", ".*") + "$";
+                    return Regex.IsMatch(roomName, pattern);
+                }
+            }
+            return false;
         }
 
         public static Styleground Create(string name, Map map, Element data, Element applyData = null) {
@@ -176,7 +187,7 @@ namespace Snowberry.Editor {
                         exclude = applyData.Attr("exclude");
 
                     if (exclude != null)
-                        styleground.ExcludeFrom = new HashSet<string>(exclude.Split(','));
+                        styleground.ExcludeFrom = exclude;
 
                     string only = null;
                     if (data.HasAttr("only"))
@@ -185,7 +196,7 @@ namespace Snowberry.Editor {
                         only = applyData.Attr("only");
 
                     if (only != null)
-                        styleground.OnlyIn = new HashSet<string>(only.Split(','));
+                        styleground.OnlyIn = only;
 
                     string flag = null;
                     if (data.HasAttr("flag"))
