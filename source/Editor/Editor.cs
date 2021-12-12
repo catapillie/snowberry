@@ -199,6 +199,8 @@ namespace Snowberry.Editor {
                         Audio.SetMusic(null);
                         Audio.SetAmbience(null);
 
+                        SaveData.InitializeDebugMode();
+
                         LevelEnter.Go(new Session(From.Value), true);
                     }
                 };
@@ -209,6 +211,8 @@ namespace Snowberry.Editor {
                 OnPress = () => {
                     Audio.SetMusic(null);
                     Audio.SetAmbience(null);
+
+                    SaveData.InitializeDebugMode();
 
                     generatePlaytestMapData = true;
                     PlaytestMapData = new MapData(Map.From);
