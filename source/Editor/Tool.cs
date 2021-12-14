@@ -7,6 +7,7 @@ using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Snowberry.Editor.UI.Menus;
 
 namespace Snowberry.Editor {
 
@@ -120,12 +121,9 @@ namespace Snowberry.Editor {
 			var panel = new UIElement() {
 				Width = 80
 			};
-			panel.AddBelow(new UISelectionPanel.UIOption(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_FOREGROUND"), new UICheckBox(-1, fg) {
-				OnPress = val => fg = val
-			}), Vector2.UnitY * 4);
-			panel.AddBelow(new UISelectionPanel.UIOption(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND"), new UICheckBox(-1, bg) {
-				OnPress = val => bg = val
-			}), Vector2.UnitY * 4);
+
+			panel.AddBelow(UIPluginOptionList.BoolOption(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_FOREGROUND"), fg, val => fg = val), Vector2.UnitY * 4);
+			panel.AddBelow(UIPluginOptionList.BoolOption(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND"), bg, val => bg = val), Vector2.UnitY * 4);
 			return panel;
 		}
 

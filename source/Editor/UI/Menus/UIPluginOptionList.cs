@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Reflection;
 
 namespace Snowberry.Editor.UI.Menus {
     public class UIPluginOptionList : UIElement {
@@ -39,59 +38,89 @@ namespace Snowberry.Editor.UI.Menus {
             foreach (var option in Plugin.Info.Options) {
                 object value = option.Value.GetValue(Plugin);
                 if (option.Value.FieldType == typeof(bool)) {
-                    Add(BoolOption(option.Key, (bool)value, Plugin, option.Value, l));
+                    UIOption ui;
+                    Add(ui = BoolOption(option.Key, (bool)value, Plugin));
+                    ui.Position.Y = l;
                     l += spacing;
                 } else if (option.Value.FieldType == typeof(Color)) {
-                    Add(ColorOption(option.Key, (Color)value, Plugin, option.Value, l));
+                    UIOption ui;
+                    Add(ui = ColorOption(option.Key, (Color)value, Plugin));
+                    ui.Position.Y = l;
                     l += 90;
-                } else if (option.Value.FieldType == typeof(string)) {
-                    Add(StringOption(option.Key, value?.ToString() ?? "", Plugin, option.Value, l));
-                    l += spacing;
                 } else if (option.Value.FieldType == typeof(int)) {
-                    Add(LiteralValueOption<int>(option.Key, value.ToString(), Plugin, option.Value, l));
+                    UIOption ui;
+                    Add(ui = LiteralValueOption<int>(option.Key, value.ToString(), Plugin));
+                    ui.Position.Y = l;
                     l += spacing;
                 } else if (option.Value.FieldType == typeof(float)) {
-                    Add(LiteralValueOption<float>(option.Key, value.ToString(), Plugin, option.Value, l));
+                    UIOption ui;
+                    Add(ui = LiteralValueOption<float>(option.Key, value.ToString(), Plugin));
+                    ui.Position.Y = l;
+                    l += spacing;
+                } else {
+                    UIOption ui;
+                    Add(ui = StringOption(option.Key, value?.ToString() ?? "", Plugin));
+                    ui.Position.Y = l;
                     l += spacing;
                 }
+                Height = l;
             }
-            Height = l;
         }
 
-        private UIOption StringOption(string name, string value, Plugin plugin, FieldInfo field, int y) {
+        public static UIOption StringOption(string name, string value, Action<string> onChange) {
             var checkbox = new UITextField(Fonts.Regular, 80, value) {
-                OnInputChange = str => field.SetValue(plugin, str),
+                OnInputChange = str => onChange(str),
             };
-            return new UIOption(name, checkbox) {
-                Position = new Vector2(0, y)
-            };
+            return new UIOption(name, checkbox);
         }
 
-        private UIOption LiteralValueOption<T>(string name, string value, Plugin plugin, FieldInfo field, int y) {
+        public static UIOption StringOption(string name, string value, Plugin plugin) {
+            var checkbox = new UITextField(Fonts.Regular, 80, value) {
+                OnInputChange = str => plugin.Set(name, str),
+            };
+            return new UIOption(name, checkbox);
+        }
+
+        public static UIOption LiteralValueOption<T>(string name, string value, Action<T> onChange) {
             var checkbox = new UIValueTextField<T>(Fonts.Regular, 80, value) {
-                OnValidInputChange = v => field.SetValue(plugin, v),
+                OnValidInputChange = v => onChange(v),
             };
-            return new UIOption(name, checkbox) {
-                Position = new Vector2(0, y)
-            };
+            return new UIOption(name, checkbox);
         }
 
-        private UIOption BoolOption(string name, bool value, Plugin plugin, FieldInfo field, int y) {
+        public static UIOption LiteralValueOption<T>(string name, string value, Plugin plugin) {
+            var checkbox = new UIValueTextField<T>(Fonts.Regular, 80, value) {
+                OnValidInputChange = v => plugin.Set(name, v),
+            };
+            return new UIOption(name, checkbox);
+        }
+
+        public static UIOption BoolOption(string name, bool value, Action<bool> onChange) {
             var checkbox = new UICheckBox(-1, value) {
-                OnPress = b => field.SetValue(plugin, b),
+                OnPress = b => onChange(b),
             };
-            return new UIOption(name, checkbox) {
-                Position = new Vector2(0, y)
-            };
+            return new UIOption(name, checkbox);
         }
 
-        private UIOption ColorOption(string name, Color value, Plugin plugin, FieldInfo field, int y) {
+        public static UIOption BoolOption(string name, bool value, Plugin plugin) {
+            var checkbox = new UICheckBox(-1, value) {
+                OnPress = b => plugin.Set(name, b),
+            };
+            return new UIOption(name, checkbox);
+        }
+
+        public static UIOption ColorOption(string name, Color value, Action<Color> onChange) {
             var colorpicker = new UIColorPicker(100, 80, 16, 12, value) {
-                OnColorChange = color => field.SetValue(plugin, color),
+                OnColorChange = color => onChange(color),
             };
-            return new UIOption(name, colorpicker) {
-                Position = new Vector2(0, y)
+            return new UIOption(name, colorpicker);
+        }
+
+        public static UIOption ColorOption(string name, Color value, Plugin plugin) {
+            var colorpicker = new UIColorPicker(100, 80, 16, 12, value) {
+                OnColorChange = color => plugin.Set(name, color),
             };
+            return new UIOption(name, colorpicker);
         }
     }
 }
