@@ -19,38 +19,26 @@ namespace Snowberry.Editor.UI {
         }
 
         public override void Render(Vector2 position = default) {
-            Draw.SpriteBatch.End();
-
             Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
+            DrawUtil.WithinScissorRectangle(rect, () => {
+                base.Render(position);
 
-            Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = rect;
-
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-            base.Render(position);
-
-            // this is extremely stupid
-            // todo: make this not extremely stupid
-            if (ShowScrollBar) {
-                UIElement low = null, high = null;
-                foreach (var item in children) {
-                    if (low == null || item.Position.Y > low.Position.Y) low = item;
-                    if (high == null || item.Position.Y < high.Position.Y) high = item;
+                // this is extremely stupid
+                // todo: make this not extremely stupid
+                if (ShowScrollBar) {
+                    UIElement low = null, high = null;
+                    foreach (var item in children) {
+                        if (low == null || item.Position.Y > low.Position.Y) low = item;
+                        if (high == null || item.Position.Y < high.Position.Y) high = item;
+                    }
+                    if (high != null && low != null) {
+                        var scrollPoints = new Vector2(high.Position.Y + TopPadding + 13, low.Position.Y + low.Height + 13 + BottomPadding);
+                        var scrollSize = Math.Abs(scrollPoints.X - scrollPoints.Y);
+                        var offset = position.Y - scrollPoints.X;
+                        Draw.Rect(position + new Vector2(Width - 4, (offset / scrollSize) * (Height + 40)), 2, 40, Color.DarkCyan);
+                    }
                 }
-                if (high != null && low != null) {
-                    var scrollPoints = new Vector2(high.Position.Y + TopPadding + 13, low.Position.Y + low.Height + 13 + BottomPadding);
-                    var scrollSize = Math.Abs(scrollPoints.X - scrollPoints.Y);
-                    var offset = position.Y - scrollPoints.X;
-                    Draw.Rect(position + new Vector2(Width - 4, (offset / scrollSize) * (Height + 40)), 2, 40, Color.DarkCyan);
-                }
-            }
-            Draw.SpriteBatch.End();
-            Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
+            });
         }
 
         public override void Update(Vector2 position = default) {

@@ -123,9 +123,6 @@ namespace Snowberry.Editor {
         internal void Render(Editor.BufferCamera camera) {
             Rectangle viewRect = camera.ViewRect;
 
-            Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-
             List<Room> visibleRooms = new List<Room>();
             foreach (Room room in Rooms) {
                 Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
@@ -135,38 +132,18 @@ namespace Snowberry.Editor {
                 }
             }
 
-            foreach (var styleground in BGStylegrounds) {
-                foreach (Room room in visibleRooms) {
-                    if (styleground.IsVisible(room)) {
-                        Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = room.ScissorRect;
-                        BlendState blend = styleground.Additive ? BlendState.Additive : BlendState.AlphaBlend;
-                        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-                        styleground.Render();
-                        Draw.SpriteBatch.End();
-                    }
-                }
-            }
+            foreach (var styleground in BGStylegrounds)
+                foreach (Room room in visibleRooms)
+                    if (styleground.IsVisible(room))
+                        DrawUtil.WithinScissorRectangle(room.ScissorRect, styleground.Render, camera.Matrix, nested: false, styleground.Additive);
 
-            foreach (Room room in visibleRooms) {
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-                room.Render(viewRect);
-                Draw.SpriteBatch.End();
-            }
+            foreach (Room room in visibleRooms)
+                DrawUtil.WithinScissorRectangle(room.ScissorRect, () => room.Render(viewRect), camera.Matrix, nested: false);
 
-            foreach (var styleground in FGStylegrounds) {
-                foreach (Room room in visibleRooms) {
-                    if (styleground.IsVisible(room)) {
-                        Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = room.ScissorRect;
-                        BlendState blend = styleground.Additive ? BlendState.Additive : BlendState.AlphaBlend;
-                        Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, blend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-                        styleground.Render();
-                        Draw.SpriteBatch.End();
-                    }
-                }
-            }
-
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
+            foreach (var styleground in FGStylegrounds)
+                foreach (Room room in visibleRooms)
+                    if (styleground.IsVisible(room))
+                        DrawUtil.WithinScissorRectangle(room.ScissorRect, styleground.Render, camera.Matrix, nested: false, styleground.Additive);
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
             for (int i = 0; i < Fillers.Count; i++) {
