@@ -6,9 +6,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 namespace Snowberry.Editor {
@@ -179,8 +181,8 @@ namespace Snowberry.Editor {
                 data.Levels.Add(new LevelData(room.CreateLevelData()));
             foreach (var filler in Fillers)
                 data.Filler.Add(filler);
-            Snowberry.Log(LogLevel.Info, "meta: " + data.Meta);
-            // TODO: set stylegrounds
+            data.Foreground = GenerateStylegroundsElement(false);
+            data.Background = GenerateStylegroundsElement(true);
 
             // bounds
             int num = int.MaxValue;
@@ -228,43 +230,106 @@ namespace Snowberry.Editor {
         }
 
         public Element Export() {
-            Element map = new Element();
-            map.Children = new List<Element>();
+			Element map = new Element {
+				Children = new List<Element>()
+			};
 
-            // children:
-            //   levels w/ levels as children
-            Element levels = new Element();
-            levels.Name = "levels";
-            levels.Children = new List<Element>();
-            foreach (var room in Rooms)
-                levels.Children.Add(room.CreateLevelData());
-            map.Children.Add(levels);
+			// children:
+			//   levels w/ levels as children
+			Element levels = new Element {
+				Name = "levels",
+				Children = new List<Element>()
+			};
+			foreach(var room in Rooms)
+				levels.Children.Add(room.CreateLevelData());
+			map.Children.Add(levels);
 
-            //   Filler w/ children w/ x,y,w,h
-            Element fillers = new Element();
-            fillers.Name = "Filler";
-            fillers.Children = new List<Element>();
-            foreach (var filler in Fillers) {
-                Element fill = new Element();
-                fill.Attributes = new Dictionary<string, object>() {
-                    { "x", filler.X },
-                    { "y", filler.Y },
-                    { "w", filler.Width },
-                    { "h", filler.Height }
-                };
-                fillers.Children.Add(fill);
-            }
-            map.Children.Add(fillers);
+			//   Filler w/ children w/ x,y,w,h
+			Element fillers = new Element {
+				Name = "Filler",
+				Children = new List<Element>()
+			};
+			foreach(var filler in Fillers) {
+				Element fill = new Element {
+					Attributes = new Dictionary<string, object>() {
+						["x"] = filler.X,
+						["y"] = filler.Y,
+						["w"] = filler.Width,
+						["h"] = filler.Height,
+					}
+				};
+				fillers.Children.Add(fill);
+			}
+			map.Children.Add(fillers);
 
-            //   style: w/ optional color, Backgrounds child & Foregrounds child
-            Element style = new Element();
-            style.Name = "Style";
-            style.Children = new List<Element>() { /*bgStylegrounds ?? new Element(), fgStylegrounds ?? new Element()*/ };
-            return map;
-        }
+			//   style: w/ optional color, Backgrounds child & Foregrounds child
+			Element style = new Element {
+				Name = "Style",
+				Attributes = new(),
+				Children = new()
+			};
 
-        // Setup autotilers, animated tiles, and the Graphics atlas, based on LevelLoader
-        private void SetupGraphics(MapMeta meta) {
+			Element fgStyles = GenerateStylegroundsElement(false);
+			Element bgStyles = GenerateStylegroundsElement(true);
+
+			style.Children.Add(fgStyles);
+			style.Children.Add(bgStyles);
+			map.Children.Add(style);
+
+			return map;
+		}
+
+		private Element GenerateStylegroundsElement(bool bg) {
+			Element styles = new Element {
+				Name = bg ? "Backgrounds" : "Foregrounds",
+				Children = new()
+			};
+
+			foreach(var styleground in bg ? BGStylegrounds : FGStylegrounds) {
+				Element elem = new Element() {
+					Name = styleground.Name,
+					Attributes = new() {
+                        ["tag"] = styleground.Tags.Aggregate("", (x, y) => x + ";" + y),
+                        ["x"] = styleground.Position.X,
+                        ["y"] = styleground.Position.Y,
+                        ["scrollx"] = styleground.Scroll.X,
+                        ["scrolly"] = styleground.Scroll.Y,
+                        ["speedx"] = styleground.Speed.X,
+                        ["speedy"] = styleground.Speed.Y,
+                        ["color"] = BitConverter.ToString(new byte[] { styleground.Color.R, styleground.Color.G, styleground.Color.B }).Replace("-", string.Empty),
+                        ["alpha"] = styleground.Color.A / 255f,
+                        ["flipx"] = styleground.FlipX,
+                        ["flipy"] = styleground.FlipY,
+                        ["loopx"] = styleground.LoopX,
+                        ["loopy"] = styleground.LoopY,
+                        ["wind"] = styleground.WindMultiplier,
+                        ["exclude"] = styleground.ExcludeFrom,
+                        ["only"] = styleground.OnlyIn,
+                        ["flag"] = styleground.Flag,
+                        ["notflag"] = styleground.NotFlag,
+                        ["always"] = styleground.ForceFlag,
+                        ["instantIn"] = styleground.InstantIn,
+                        ["instantOut"] = styleground.InstantOut,
+                        //["fadex"] = fg.FadeX,
+                    }
+				};
+                
+				if(styleground.DreamingOnly.HasValue)
+                    elem.Attributes["dreaming"] = styleground.DreamingOnly.Value;
+				
+				foreach(var opt in styleground.Info.Options.Keys) {
+					var val = styleground.Get(opt);
+					if(val != null)
+						elem.Attributes[opt] = val;
+				}
+				styles.Children.Add(elem);
+			}
+
+			return styles;
+		}
+
+		// Setup autotilers, animated tiles, and the Graphics atlas, based on LevelLoader
+		private void SetupGraphics(MapMeta meta) {
             string text = meta?.BackgroundTiles;
             if(string.IsNullOrEmpty(text)) {
                 text = Path.Combine("Graphics", "BackgroundTiles.xml");

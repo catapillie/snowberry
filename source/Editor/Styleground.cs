@@ -40,15 +40,15 @@ namespace Snowberry.Editor {
 
         public bool FlipY;
 
-        public string OnlyIn;
+        public string OnlyIn = "*";
 
-        public string ExcludeFrom;
+        public string ExcludeFrom = "";
 
-        public string Flag;
+        public string Flag = "";
 
-        public string NotFlag;
+        public string NotFlag = "";
 
-        public string ForceFlag;
+        public string ForceFlag = "";
 
         public bool InstantIn = true;
 
