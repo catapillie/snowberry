@@ -153,8 +153,10 @@ namespace Snowberry.Editor.Tools {
         public override void Update(bool canClick) {
             for (int i = 0; i < StylegroundButtons.Count; i++) {
                 UIButton item = StylegroundButtons[i];
-                if (i == SelectedStyleground) {
+                if(i == SelectedStyleground) {
                     item.BG = item.HoveredBG = item.PressedBG = LeftSelectedBtnBg;
+				} else if(Stylegrounds[item].IsVisible(Editor.SelectedRoom)) {
+                    item.BG = item.HoveredBG = item.PressedBG = Color.Lerp(BothSelectedBtnBg, Color.Black, 0.5f);
                 } else {
                     item.ResetBgColors();
                 }
