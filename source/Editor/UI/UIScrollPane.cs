@@ -21,39 +21,27 @@ namespace Snowberry.Editor.UI {
         }
 
         public override void Render(Vector2 position = default) {
-			Draw.SpriteBatch.End();
+            Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
+            DrawUtil.WithinScissorRectangle(rect, () => {
+                base.Render(position + ScrollOffset());
 
-			Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
-
-			Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
-			Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-			Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = rect;
-
-			Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-			base.Render(position + ScrollOffset());
-
-			// this is extremely stupid
-			// todo: make this not extremely stupid
-			if(ShowScrollBar) {
-				UIElement low = null, high = null;
-				foreach(var item in Children) {
-					if(low == null || item.Position.Y > low.Position.Y) low = item;
-					if(high == null || item.Position.Y < high.Position.Y) high = item;
-				}
-				if(high != null && low != null) {
-					var scrollPoints = ScrollPoints(13);
-					var scrollSize = Math.Abs(scrollPoints.X - scrollPoints.Y);
-					var offset = position.Y - scrollPoints.X;
-					Draw.Rect(position + new Vector2(Width - 4, (offset / scrollSize) * (Height + 40)), 2, 40, Color.DarkCyan);
-				}
-			}
-			Draw.SpriteBatch.End();
-			Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
-			Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
-			Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
-		}
+                // this is extremely stupid
+                // todo: make this not extremely stupid
+                if(ShowScrollBar) {
+                    UIElement low = null, high = null;
+                    foreach(var item in Children) {
+                        if(low == null || item.Position.Y > low.Position.Y) low = item;
+                        if(high == null || item.Position.Y < high.Position.Y) high = item;
+                    }
+                    if(high != null && low != null) {
+                        var scrollPoints = ScrollPoints(13);
+                        var scrollSize = Math.Abs(scrollPoints.X - scrollPoints.Y);
+                        var offset = position.Y - scrollPoints.X;
+                        Draw.Rect(position + new Vector2(Width - 4, (offset / scrollSize) * (Height + 40)), 2, 40, Color.DarkCyan);
+                    }
+                }
+            });
+        }
 
 		private Vector2 ScrollOffset() {
 			return (Vertical ? Vector2.UnitY : Vector2.UnitX) * Scroll;

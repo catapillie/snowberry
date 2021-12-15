@@ -237,8 +237,6 @@ namespace Snowberry.Editor {
         }
 
         internal void Render(Rectangle viewRect) {
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = ScissorRect;
-
             Vector2 offset = Position * 8;
 
             Draw.Rect(offset, Width * 8, Height * 8, Color.White * 0.1f);
