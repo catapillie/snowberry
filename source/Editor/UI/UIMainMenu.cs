@@ -97,7 +97,7 @@ namespace Snowberry.Editor.UI {
 
                 protected override void Initialize() {
                     base.Initialize();
-                    foreach (UIElement child in children) {
+                    foreach (UIElement child in Children) {
                         if (child is UILevelRibbon lvl) {
                             lvl.FG = FG;
                             lvl.BG = BG;
@@ -107,7 +107,7 @@ namespace Snowberry.Editor.UI {
                 }
 
                 private bool HoveringChildren() {
-                    foreach (UIElement child in children)
+                    foreach (UIElement child in Children)
                         if (child is UILevelRibbon lvl && lvl.hover)
                             return true;
                     return false;
@@ -166,7 +166,7 @@ namespace Snowberry.Editor.UI {
                     base.Render(position);
 
                     if (dropdown) {
-                        foreach (UIElement child in children)
+                        foreach (UIElement child in Children)
                             if (child is UILevelRibbon lvl)
                                 lvl.Render(from + lvl.Position);
                         Draw.Rect(new Vector2(from.X, position.Y + Height + H + 2), Parent.Width, h - H, Util.Colors.DarkGray);

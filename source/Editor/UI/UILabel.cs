@@ -8,7 +8,7 @@ namespace Snowberry.Editor.UI {
         public Func<string> Value { get; private set; }
         private readonly Font font;
         public Color FG = Calc.HexToColor("f0f0f0");
-        public bool Underline = false;
+        public bool Underline = false, Strikethrough = false;
 
         public UILabel(Func<string> text) : this(Fonts.Regular, (int)Fonts.Regular.Measure(text()).X, text) { }
 
@@ -29,6 +29,8 @@ namespace Snowberry.Editor.UI {
             font.Draw(Value(), position, Vector2.One, FG);
             if (Underline)
                 Draw.Rect(position + Vector2.UnitY * Height, Width, 1, FG);
+            if (Strikethrough)
+                Draw.Rect(position + Vector2.UnitY * (Height / 2), Width, 1, Color.Lerp(FG, Color.Black, 0.25f));
         }
     }
 }

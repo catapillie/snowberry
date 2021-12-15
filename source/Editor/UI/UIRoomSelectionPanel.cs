@@ -1,6 +1,9 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
+
+using Snowberry.Editor.Tools;
+
 using System;
 using System.Text.RegularExpressions;
 using static Snowberry.Editor.UI.UISelectionPanel;

@@ -36,6 +36,7 @@ namespace Snowberry.Editor.UI {
 			mid;
 
 		public Action OnPress, OnRightPress;
+		public bool Underline = false, Strikethrough = false;
 
 		private UIButton(int spaceX, int spaceY, int minWidth, int minHeight) {
 			MTexture full = GFX.Gui["Snowberry/button"];
@@ -100,6 +101,18 @@ namespace Snowberry.Editor.UI {
 			SetSize(icoWidth + 6, icoHeight + 3);
 		}
 
+		public void ResetBgColors() {
+			BG = DefaultBG;
+			HoveredBG = DefaultHoveredBG;
+			PressedBG = DefaultPressedBG;
+		}
+
+		public void ResetFgColors() {
+			FG = DefaultFG;
+			HoveredFG = DefaultHoveredFG;
+			PressedFG = DefaultPressedFG;
+		}
+
 		public override void Update(Vector2 position = default) {
 			base.Update();
 
@@ -150,9 +163,14 @@ namespace Snowberry.Editor.UI {
 
 			Vector2 at = position + new Vector2(3 + space.X, press + space.Y);
 			Color fg = Color.Lerp(hovering ? HoveredFG : FG, PressedFG, lerp);
-			if(text != null && font != null)
+			if(text != null && font != null) {
 				font.Draw(text, at, Vector2.One, fg);
-			else icon?.Invoke(at, fg);
+				Vector2 textArea = font.Measure(this.text);
+				if (Underline)
+					Draw.Rect(at + new Vector2(-2, textArea.Y), textArea.X + 4, 1, FG);
+				if (Strikethrough)
+					Draw.Rect(at + new Vector2(-2, textArea.Y / 2 + 1), textArea.X + 4, 1, Color.Lerp(FG, Color.Black, 0.25f));
+			} else icon?.Invoke(at, fg);
 		}
 	}
 }
