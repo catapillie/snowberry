@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Input;
 
 using Monocle;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,17 +27,17 @@ namespace Snowberry.Editor.UI {
 
         public string Tag = "";
 
-        public Rectangle Bounds => new Rectangle((int)(Position.X + (Parent?.Bounds.X ?? 0)), (int)(Position.Y + (Parent?.Bounds.Y ?? 0)), Width, Height);
+        public Rectangle Bounds => new Rectangle((int)(Position.X + (Parent?.Bounds.X ?? 0) + (Parent?.BoundsOffset().X ?? 0)), (int)(Position.Y + (Parent?.Bounds.Y ?? 0) + (Parent?.BoundsOffset().Y ?? 0)), Width, Height);
 
         public virtual void Update(Vector2 position = default) {
             canModify = false;
             // The last child is rendered last, on top of everything else, and should be the first to consume mouse clicks.
-			for(int i = Children.Count - 1; i >= 0; i--) {
-				UIElement element = Children[i];
-				element.Update(position + element.Position);
-			}
+            for(int i = Children.Count - 1; i >= 0; i--) {
+                UIElement element = Children[i];
+                element.Update(position + element.Position);
+            }
 
-			canModify = true;
+            canModify = true;
             Children.RemoveAll(e => e == null);
             toRemove.ForEach(a => Children.Remove(a));
             toRemove.Clear();
@@ -44,13 +46,13 @@ namespace Snowberry.Editor.UI {
         }
 
         public virtual void Render(Vector2 position = default) {
-            if (Background.HasValue) {
+            if(Background.HasValue) {
                 Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
                 Draw.Rect(rect, Background.Value);
             }
-            if (RenderChildren)
-                foreach (UIElement element in Children)
-                    if (element.Visible)
+            if(RenderChildren)
+                foreach(UIElement element in Children)
+                    if(element.Visible)
                         element.Render(position + element.Position);
         }
 
@@ -58,15 +60,19 @@ namespace Snowberry.Editor.UI {
 
         protected virtual void OnDestroy() { }
 
+        public virtual string Tooltip() => null;
+
+        public virtual Vector2 BoundsOffset() => Vector2.Zero;
+
         public void Destroy() {
-            foreach (UIElement element in Children)
+            foreach(UIElement element in Children)
                 element?.Destroy();
             OnDestroy();
         }
 
         public void Add(UIElement element) {
-            if (canModify) {
-                if (element.Parent == null) {
+            if(canModify) {
+                if(element.Parent == null) {
                     Children.Add(element);
                     element.Parent = this;
                     element.Initialize();
@@ -82,8 +88,8 @@ namespace Snowberry.Editor.UI {
 
         public void AddBelow(UIElement element) {
             UIElement low = null;
-            foreach (var item in Children)
-                if (low == null || item.Position.Y > low.Position.Y) low = item;
+            foreach(var item in Children)
+                if(low == null || item.Position.Y > low.Position.Y) low = item;
             Add(element);
             element.Position += new Vector2(0, (low?.Position.Y + low?.Height) ?? 0);
         }
@@ -102,7 +108,7 @@ namespace Snowberry.Editor.UI {
         }
 
         public void Clear() {
-            foreach (UIElement element in Children)
+            foreach(UIElement element in Children)
                 element?.Destroy();
             Children.Clear();
         }
@@ -116,16 +122,35 @@ namespace Snowberry.Editor.UI {
         }
 
         public void RemoveAll(ICollection<UIElement> elems) {
-            foreach (var item in elems)
+            foreach(var item in elems)
                 Remove(item);
         }
 
+        public T HoveredChildProperty<T>(Func<UIElement, T> getter, T ignore = default){
+			if(!Equals(getter(this), ignore)) {
+                return getter(this);
+			}
+			foreach(var child in Children) {
+				if(child.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y)) {
+                    var p = child.HoveredChildProperty(getter, ignore);
+					if(!Equals(p, ignore)) {
+                        return p;
+					}
+				}
+			}
+            return ignore;
+        }
+
         public bool CanScrollThrough() {
-            return !GrabsScroll && !Children.Exists(a => !a.CanScrollThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
+            return !HoveredChildProperty(k => k.GrabsScroll, false);
         }
 
         public bool CanClickThrough() {
-            return !GrabsClick && !Children.Exists(a => !a.CanClickThrough() && a.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y));
+            return !HoveredChildProperty(k => k.GrabsScroll, false);
+        }
+
+        public string HoveredTooltip() {
+            return HoveredChildProperty(k => k.Tooltip(), null);
         }
 
         private bool ConsumeClick() {
@@ -171,6 +196,8 @@ namespace Snowberry.Editor.UI {
 
             return null;
         }
+
+        
 
         public static UIElement Regroup(params UIElement[] elems) {
             UIElement group = new UIElement();

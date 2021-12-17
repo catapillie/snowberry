@@ -64,6 +64,10 @@ namespace Snowberry.Editor.UI {
 			Height = Height == 0 ? Parent?.Height ?? 0 : Height;
         }
 
+		public override Vector2 BoundsOffset() {
+			return ScrollOffset();
+		}
+
 		public void ScrollBy(int dir, float amount) {
             var points = ScrollPoints(13);
             if(dir > 0 && points.X < 0)

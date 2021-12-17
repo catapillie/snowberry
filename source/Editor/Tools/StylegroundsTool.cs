@@ -7,7 +7,6 @@ using Monocle;
 using Snowberry.Editor.UI;
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Snowberry.Editor.Tools {
 	public class StylegroundsTool : Tool {

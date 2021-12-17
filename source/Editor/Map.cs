@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
+using Snowberry.Editor.Stylegrounds;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,18 +64,12 @@ namespace Snowberry.Editor {
                         if (item.Children != null) {
                             foreach (var child in item.Children) {
                                 Styleground styleground = Styleground.Create(child.Name.ToLower(), this, child, item);
-                                if (styleground != null)
-                                    FGStylegrounds.Add(styleground);
-                                else
-                                    Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                                FGStylegrounds.Add(styleground);
                             }
                         }
                     } else {
                         Styleground styleground = Styleground.Create(name, this, item);
-                        if (styleground != null)
-                            FGStylegrounds.Add(styleground);
-                        else
-                            Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                        FGStylegrounds.Add(styleground);
                     }
                 }
             }
@@ -86,23 +82,17 @@ namespace Snowberry.Editor {
                         if (item.Children != null) {
                             foreach (var child in item.Children) {
                                 Styleground styleground = Styleground.Create(child.Name.ToLower(), this, child, item);
-                                if (styleground != null)
-                                    BGStylegrounds.Add(styleground);
-                                else
-                                    Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                                BGStylegrounds.Add(styleground);
                             }
                         }
                     } else {
                         Styleground styleground = Styleground.Create(name, this, item);
-                        if (styleground != null)
-                            BGStylegrounds.Add(styleground);
-                        else
-                            Snowberry.Log(LogLevel.Info, $"Missing styleground plugin for: {name}.");
+                        BGStylegrounds.Add(styleground);
                     }
                 }
             }
 
-            Snowberry.Log(LogLevel.Info, $"Loaded {FGStylegrounds.Count} foreground stylegrounds and {BGStylegrounds.Count} background stylegrounds.");
+            Snowberry.Log(LogLevel.Info, $"Loaded {FGStylegrounds.Count} foreground and {BGStylegrounds.Count} background stylegrounds.");
         }
 
         internal Room GetRoomAt(Point at) {
@@ -322,6 +312,11 @@ namespace Snowberry.Editor {
 					if(val != null)
 						elem.Attributes[opt] = val;
 				}
+
+				if(styleground is Plugin_Other placeholder)
+					foreach(string opt in placeholder.Attrs.Keys)
+                        elem.Attributes[opt] = placeholder.Attrs[opt];
+
 				styles.Children.Add(elem);
 			}
 

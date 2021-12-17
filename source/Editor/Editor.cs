@@ -348,6 +348,15 @@ namespace Snowberry.Editor {
 
             ui.Render();
 
+            // Tooltip rendering
+            var tooltip = ui.HoveredTooltip();
+			if(tooltip != null) {
+                var tooltipArea = Fonts.Regular.Measure(tooltip);
+                var at = Mouse.Screen.Round() - new Vector2(0, tooltipArea.Y + 6);
+                Draw.Rect(at, tooltipArea.X + 8, tooltipArea.Y + 6, Color.Black * 0.4f);
+                Fonts.Regular.Draw(tooltip, at + new Vector2(4, 3), Vector2.One, Color.White);
+			}
+
             Draw.SpriteBatch.End();
 
             #endregion

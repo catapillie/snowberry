@@ -89,4 +89,9 @@ namespace Snowberry {
             }
         }
     }
+
+	internal class UnkownPluginInfo : PluginInfo {
+
+		public UnkownPluginInfo(string name) : base(name, typeof(Plugin), null, CelesteEverest.INSTANCE) {}
+	}
 }
