@@ -83,6 +83,7 @@
     <Compile Include="Editor\Stylegrounds\Plugin_Planets.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Snow.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Starfield.cs" />
+    <Compile Include="Editor\UI\UIDropdown.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="SnowberryModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />
