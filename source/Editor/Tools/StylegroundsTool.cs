@@ -7,6 +7,9 @@ using Monocle;
 using Snowberry.Editor.UI;
 
 using System.Collections.Generic;
+using System.Linq;
+
+using static Snowberry.Editor.UI.UISelectionPanel;
 
 namespace Snowberry.Editor.Tools {
 	public class StylegroundsTool : Tool {
@@ -31,7 +34,7 @@ namespace Snowberry.Editor.Tools {
                 TopPadding = 15,
                 Background = null,
                 Width = 180,
-                Height = 205,
+                Height = 165,
                 Tag = "stylegrounds_list"
             };
 
@@ -66,7 +69,10 @@ namespace Snowberry.Editor.Tools {
                 int copy = i;
                 UIButton element = new UIButton(styleground.Title(), Fonts.Regular, 4, 2) {
                     Position = new Vector2(10, i * 20 + 60),
-                    OnPress = () => { SelectedStyleground = copy; }
+                    OnPress = () => {
+                        SelectedStyleground = copy;
+                        AddStylegroundInfo(panel.NestedChildWithTag<UIElement>("stylegrounds_info"));
+                    }
                 };
                 stylegrounds.Add(element);
                 StylegroundButtons.Add(element);
@@ -85,9 +91,18 @@ namespace Snowberry.Editor.Tools {
             stylegrounds.Position = new Vector2(0, 5);
             panel.Add(stylebg);
 
-            UIElement optionsPanel = new UIElement();
-            optionsPanel.AddRight(Add = new UIButton("+", Fonts.Regular, 4, 4) {
+            UIElement optionsPanel = new();
+            optionsPanel.AddRight(Add = new UIButton("+ \uF036", Fonts.Regular, 4, 4) {
                 // add new styleground
+                OnPress = () => {
+                    Editor.Instance.ToolPanel.Add(new UIDropdown(Fonts.Regular, PluginInfo.Stylegrounds.Keys.Select(k => new UIDropdown.DropdownEntry(k, () => { }) {
+                        BG = BothSelectedBtnBg,
+                        HoveredBG = Color.Lerp(BothSelectedBtnBg, Color.Black, 0.25f),
+                        PressedBG = Color.Lerp(BothSelectedBtnBg, Color.Black, 0.5f)
+                    }).ToArray()) {
+                        Position = (Add.GetBoundsPos() + Vector2.UnitY * (Add.Height + 2)) - Editor.Instance.ToolPanel.GetBoundsPos()
+                    });
+                }
             }, new Vector2(4));
 
             optionsPanel.AddRight(Delete = new UIButton("-", Fonts.Regular, 4, 4) {
@@ -114,9 +129,28 @@ namespace Snowberry.Editor.Tools {
                 }
             }, new Vector2(4));
 
+            optionsPanel.Height = optionsPanel.Children.Select(k => k.Height).Max() + 8;
             panel.AddBelow(optionsPanel);
 
+            UIElement stylegroundInfo = new() {
+                Tag = "stylegrounds_info",
+                Width = 175,
+                Position = new Vector2(5, 0)
+            };
+            
+            panel.AddBelow(stylegroundInfo);
+            AddStylegroundInfo(stylegroundInfo);
             return panel;
+        }
+
+        private void AddStylegroundInfo(UIElement panel) {
+            panel.Clear();
+            var styleground = Stylegrounds[SelectedButton()];
+            panel.Add(new UIOption("Only In", new UITextField(Fonts.Regular, 120, styleground.OnlyIn)));
+            panel.AddBelow(new UIOption("Not In", new UITextField(Fonts.Regular, 120, styleground.ExcludeFrom)));
+            panel.AddBelow(new UIOption("Flag", new UITextField(Fonts.Regular, 120, styleground.Flag)));
+            panel.AddBelow(new UIOption("Not Flag", new UITextField(Fonts.Regular, 120, styleground.NotFlag)));
+            panel.AddBelow(new UIOption("Force Flag", new UITextField(Fonts.Regular, 120, styleground.ForceFlag)));
         }
 
 		private void MoveStyleground(int by) {

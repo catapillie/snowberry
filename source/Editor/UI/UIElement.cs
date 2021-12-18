@@ -197,7 +197,9 @@ namespace Snowberry.Editor.UI {
             return null;
         }
 
-        
+        public Vector2 GetBoundsPos() {
+            return new Vector2(Bounds.X, Bounds.Y);
+        }
 
         public static UIElement Regroup(params UIElement[] elems) {
             UIElement group = new UIElement();

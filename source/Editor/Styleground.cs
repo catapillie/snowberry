@@ -86,7 +86,9 @@ namespace Snowberry.Editor {
                     return true;
                 } else if(text.Contains("*")) {
                     string pattern = "^" + Regex.Escape(text).Replace("\\*", ".*") + "$";
-                    return Regex.IsMatch(roomName, pattern);
+					if(Regex.IsMatch(roomName, pattern)) {
+                        return true;
+					}
                 }
             }
             return false;

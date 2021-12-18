@@ -85,10 +85,14 @@ namespace Snowberry.Editor.UI {
 				if(ConsumeAltClick(pressed: false, released: true)) {
 					entries[pressIdx].OnAlternatePress?.Invoke();
 					pressIdx = -1;
+					RemoveSelf();
 				} else if(ConsumeLeftClick(pressed: false, released: true)) {
 					entries[pressIdx].OnPress?.Invoke();
 					pressIdx = -1;
+					RemoveSelf();
 				}
+			} else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
+				RemoveSelf();
 			}
 
 			for(int i = 0; i < lerps.Count(); i++) {
@@ -123,9 +127,11 @@ namespace Snowberry.Editor.UI {
 				font.Draw(entry.Label, ePos + new Vector2(4 + press, 5), Vector2.One, fg);
 			}
 			// draw bottom
-			bottom.Draw(new Vector2(position.X, position.Y + Height + 12), Vector2.Zero, defaultColor);
-			bottomFill.Draw(new Vector2(position.X + 3, position.Y + Height + 12), Vector2.Zero, defaultColor, new Vector2(Width - 6, 1));
-			bottom.Draw(new Vector2(position.X + Width, position.Y + Height + 12), Vector2.Zero, defaultColor, new Vector2(-1, 1));
+			defaultColor = ColorForEntry(entries.Count - 1);
+			var h2 = YPosFor(entries.Count) + 4;
+			bottom.Draw(new Vector2(position.X, position.Y + h2), Vector2.Zero, defaultColor);
+			bottomFill.Draw(new Vector2(position.X + 3, position.Y + h2), Vector2.Zero, defaultColor, new Vector2(Width - 6, 1));
+			bottom.Draw(new Vector2(position.X + Width, position.Y + h2), Vector2.Zero, defaultColor, new Vector2(-1, 1));
 		}
 
 		public Color ColorForEntry(int index) {
