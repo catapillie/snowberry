@@ -20,6 +20,7 @@ namespace Snowberry.Editor {
                 Entity e = Entity.Create(EntityName, room);
                 foreach (var item in Defaults)
                     e.Set(item.Key, item.Value);
+                e.UpdatePostPlacement(this);
                 return e;
             }
         }

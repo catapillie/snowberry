@@ -39,13 +39,11 @@ namespace Snowberry {
 				LuaPluginInfo info = new LuaPluginInfo(plugin.Key, plugin.Value);
 				PluginInfo.Entities[plugin.Key] = info;
 
-
 				Dictionary<string, object> options = new();
 				LuaTable placements = plugin.Value["placements"] as LuaTable;
 				if(placements.Keys.OfType<string>().Any(k => k.Equals("data"))) {
 					LuaTable data = placements["data"] as LuaTable;
 					foreach(var item in data.Keys.OfType<string>()) {
-						//options[item] = new LuaEntityOption(item, data[item].GetType());
 						options[item] = data[item];
 					}
 				}
