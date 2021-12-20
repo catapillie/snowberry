@@ -15,8 +15,11 @@ namespace Snowberry.Editor.Entities {
 	public class LuaEntity : Entity{
 
 		private LuaTable plugin;
+
 		private int defaultWidth = -1, defaultHeight = -1;
 		private int minNodes = 0, maxNodes = 0;
+		private Vector2 justify = Vector2.One * 0.5f;
+
 		public Dictionary<string, object> Values = new();
 
 		public LuaEntity(string name, PluginInfo info, LuaTable plugin) {
@@ -27,6 +30,10 @@ namespace Snowberry.Editor.Entities {
 			if(plugin["nodeLimits"] is LuaTable limits) {
 				minNodes = (int)Float(limits, 1, 0);
 				maxNodes = (int)Float(limits, 2, 0);
+			}
+
+			if(plugin["justification"] is LuaTable justification) {
+				justify = new Vector2(Float(justification, 1, 0.5f), Float(justification, 2, 0.5f));
 			}
 		}
 
@@ -49,7 +56,7 @@ namespace Snowberry.Editor.Entities {
 			base.Render();
 			
 			if(CallOrGet("texture") is string texture) {
-				GFX.Game[texture].DrawCentered(Center);
+				GFX.Game[texture].DrawJustified(Center, justify);
 			}
 			
 			if(plugin["fillColor"] is LuaTable fill) {

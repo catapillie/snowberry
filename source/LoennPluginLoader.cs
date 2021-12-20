@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,18 +21,52 @@ namespace Snowberry {
 	internal class LoennPluginLoader {
 
 		internal static void LoadEntities() {
+			Snowberry.Log(LogLevel.Info, $"Trying to load Loenn plugins where possible.");
+
 			Dictionary<string, LuaTable> plugins = new();
+
+			// load all loenn helpers first, and replace "require" calls with a direct getter
+			try {
+				// TODO: this sucks. do this in get.
+				Dictionary<string, object> requires = new() {
+					["mods"] = Everest.LuaLoader.Require("LoennHelpers/mods"),
+
+					//["consts.object_depths"] = Everest.LuaLoader.Require("LoennHelpers/consts/object_depths"),
+					//["consts.xna_colors"] = Everest.LuaLoader.Require("LoennHelpers/consts/xna_colors"),
+
+					//["structs.rectangle"] = Everest.LuaLoader.Require("LoennHelpers/structs/rectangle"),
+
+					["get"] = Everest.LuaLoader.Context.DoString("return function(self, x) return self[x] end").FirstOrDefault() as LuaFunction
+				};
+				Everest.LuaLoader.Context["snowberryRequires"] = WrapTable(requires);
+				requires["utils"] = Everest.LuaLoader.Require("LoennHelpers/utils");
+				Everest.LuaLoader.Context["snowberryRequires"] = WrapTable(requires);
+			} catch (Exception e) {
+				Snowberry.Log(LogLevel.Info, e.ToString());
+				return;
+			}
 
 			foreach(var asset in Everest.Content.Mods
 										.SelectMany(k => k.List) 
 										.Where(k => k.Type == typeof(AssetTypeLua))
 										.Where(k => k.PathVirtual.StartsWith("Loenn/entities/"))) {
+				Snowberry.Log(LogLevel.Info, $"Trying to load Loenn plugin at \"{asset.PathVirtual}\"");
 				try {
-					LuaTable pluginTable = Everest.LuaLoader.Require(asset.PathVirtual) as LuaTable;
-					plugins[(string)pluginTable["name"]] = pluginTable;
-					Snowberry.Log(LogLevel.Info, $"Found Loenn plugin for \"{pluginTable["name"]}\"");
-				} catch {
-					Snowberry.Log(LogLevel.Warn, $"Could not load Loenn plugin at \"{asset.PathVirtual}\"");
+					string text;
+					using(var reader = new StreamReader(asset.Stream)) {
+						text = reader.ReadToEnd();
+					}
+					// replace "require(X)" with "snowberryRequires:get(X)"
+					text = text.Replace("require(", "snowberryRequires:get(");
+
+					object[] pluginTables = Everest.LuaLoader.Context.DoString(text, asset.PathVirtual);
+					foreach(var p in pluginTables) {
+						var pluginTable = p as LuaTable;
+						plugins[(string)pluginTable["name"]] = pluginTable;
+						Snowberry.Log(LogLevel.Info, $"Loaded Loenn plugin for \"{pluginTable["name"]}\"");
+					}
+				} catch(Exception e) {
+					Snowberry.Log(LogLevel.Warn, $"Failed to load Loenn plugin at \"{asset.PathVirtual}\": {e}");
 				}
 			}
 
@@ -49,6 +84,17 @@ namespace Snowberry {
 				}
 				Placements.Create("Loenn: " + plugin.Key, plugin.Key, options);
 			}
+		}
+
+		private static LuaTable EmptyTable() {
+			return Everest.LuaLoader.Context.DoString("return {}").FirstOrDefault() as LuaTable;
+		}
+
+		private static LuaTable WrapTable(IDictionary<string, object> dict) {
+			var table = EmptyTable();
+			foreach(var pair in dict)
+				table[pair.Key] = pair.Value;
+			return table;
 		}
 	}
 }
