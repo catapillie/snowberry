@@ -59,20 +59,20 @@ namespace Snowberry.Editor.UI {
 
                 int l = 3 * spacing;
                 foreach (var option in entity.Info.Options) {
-                    object value = option.Value.GetValue(entity);
-                    if (option.Value.FieldType == typeof(bool)) {
+                    object value = option.Value.Get(entity);
+                    if (option.Value.Type() == typeof(bool)) {
                         Add(BoolOption(option.Key, (bool)value, entity, option.Value, l));
                         l += spacing;
-                    } else if (option.Value.FieldType == typeof(Color)) {
+                    } else if (option.Value.Type() == typeof(Color)) {
                         Add(ColorOption(option.Key, (Color)value, entity, option.Value, l));
                         l += 90;
-                    } else if (option.Value.FieldType == typeof(string)) {
+                    } else if (option.Value.Type() == typeof(string)) {
                         Add(StringOption(option.Key, value?.ToString() ?? "", entity, option.Value, l));
                         l += spacing;
-                    } else if (option.Value.FieldType == typeof(int)) {
+                    } else if (option.Value.Type() == typeof(int)) {
                         Add(LiteralValueOption<int>(option.Key, value.ToString(), entity, option.Value, l));
                         l += spacing;
-                    } else if (option.Value.FieldType == typeof(float)) {
+                    } else if (option.Value.Type() == typeof(float)) {
                         Add(LiteralValueOption<float>(option.Key, value.ToString(), entity, option.Value, l));
                         l += spacing;
                     }
@@ -81,36 +81,36 @@ namespace Snowberry.Editor.UI {
                 Height = l + 8;
             }
 
-            private UIOption StringOption(string name, string value, Entity entity, FieldInfo field, int y) {
+            private UIOption StringOption(string name, string value, Entity entity, PluginOption field, int y) {
                 var checkbox = new UITextField(Fonts.Regular, 80, value) {
-                    OnInputChange = str => field.SetValue(entity, str),
+                    OnInputChange = str => field.Set(entity, str),
                 };
                 return new UIOption(name, checkbox) {
                     Position = new Vector2(0, y)
                 };
             }
 
-            private UIOption LiteralValueOption<T>(string name, string value, Entity entity, FieldInfo field, int y) {
+            private UIOption LiteralValueOption<T>(string name, string value, Entity entity, PluginOption field, int y) {
                 var checkbox = new UIValueTextField<T>(Fonts.Regular, 80, value) {
-                    OnValidInputChange = v => field.SetValue(entity, v),
+                    OnValidInputChange = v => field.Set(entity, v),
                 };
                 return new UIOption(name, checkbox) {
                     Position = new Vector2(0, y)
                 };
             }
 
-            private UIOption BoolOption(string name, bool value, Entity entity, FieldInfo field, int y) {
+            private UIOption BoolOption(string name, bool value, Entity entity, PluginOption field, int y) {
                 var checkbox = new UICheckBox(-1, value) {
-                    OnPress = b => field.SetValue(entity, b),
+                    OnPress = b => field.Set(entity, b),
                 };
                 return new UIOption(name, checkbox) {
                     Position = new Vector2(0, y)
                 };
             }
 
-            private UIOption ColorOption(string name, Color value, Entity entity, FieldInfo field, int y) {
+            private UIOption ColorOption(string name, Color value, Entity entity, PluginOption field, int y) {
                 var colorpicker = new UIColorPicker(100, 80, 16, 12, value) {
-                    OnColorChange = color => field.SetValue(entity, color),
+                    OnColorChange = color => field.Set(entity, color),
                 };
                 return new UIOption(name, colorpicker) {
                     Position = new Vector2(0, y)

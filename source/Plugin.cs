@@ -28,10 +28,10 @@ namespace Snowberry {
 
         // overriden by generic plugins
         public virtual void Set(string option, object value) {
-            if (Info.Options.TryGetValue(option, out FieldInfo f)) {
-                object v = value is string str ? RawToObject(f.FieldType, str) : value;
+            if (Info.Options.TryGetValue(option, out PluginOption f)) {
+                object v = value is string str ? RawToObject(f.Type(), str) : value;
                 try {
-                    f.SetValue(this, v);
+                    f.Set(this, v);
                 } catch (ArgumentException e) {
                     Snowberry.Log(LogLevel.Warn, "Tried to set field " + option + " to an invalid value " + v);
                     Snowberry.Log(LogLevel.Warn, e.ToString());
@@ -40,8 +40,8 @@ namespace Snowberry {
         }
 
         public virtual object Get(string option) {
-            if (Info.Options.TryGetValue(option, out FieldInfo f))
-                return ObjectToRaw(f.GetValue(this));
+            if (Info.Options.TryGetValue(option, out PluginOption f))
+                return ObjectToRaw(f.Get(this));
             return null;
         }
 

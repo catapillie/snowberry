@@ -56,6 +56,9 @@
       <HintPath>..\..\..\MonoMod.Utils.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NLua">
+      <HintPath>..\..\..\NLua.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -68,6 +71,7 @@
     <Compile Include="BinaryExporter.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="Editor\Decal.cs" />
+    <Compile Include="Editor\Entities\LuaEntity.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Other.cs" />
     <Compile Include="Editor\Tools\DecalSelectionTool.cs" />
     <Compile Include="Editor\Tools\PlacementTool.cs" />
@@ -84,6 +88,8 @@
     <Compile Include="Editor\Stylegrounds\Plugin_Snow.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Starfield.cs" />
     <Compile Include="Editor\UI\UIDropdown.cs" />
+    <Compile Include="LoennPluginLoader.cs" />
+    <Compile Include="Modules\LoennSupport.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="SnowberryModule.cs" />
     <Compile Include="Editor\Entities\Plugin_BadelineBoost.cs" />

@@ -1,5 +1,11 @@
 ﻿using Celeste.Mod;
+
+using NLua;
+
 using Snowberry.Editor;
+using Snowberry.Editor.Entities;
+using Snowberry.Modules;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,29 +21,32 @@ namespace Snowberry {
         private readonly string name;
         private readonly ConstructorInfo ctor;
 
-        public readonly ReadOnlyDictionary<string, FieldInfo> Options;
+		private readonly ReadOnlyDictionary<string, PluginOption> options;
 
-        public readonly SnowberryModule Module;
+		public readonly SnowberryModule Module;
 
-        public PluginInfo(string name, Type t, ConstructorInfo ctor, SnowberryModule module) {
+        // virtual for missing plugins and lua plugins
+		public virtual ReadOnlyDictionary<string, PluginOption> Options => options;
+
+		public PluginInfo(string name, Type t, ConstructorInfo ctor, SnowberryModule module) {
             this.name = name;
             this.ctor = ctor;
             Module = module;
 
-            Dictionary<string, FieldInfo> options = new();
+            Dictionary<string, PluginOption> options = new();
             foreach (FieldInfo f in t.GetFields()) {
                 if (f.GetCustomAttribute<OptionAttribute>() is OptionAttribute option) {
                     if (option.Name == null || option.Name == string.Empty) {
                         Snowberry.Log(LogLevel.Warn, $"'{f.Name}' ({f.FieldType.Name}) from plugin '{name}' was ignored because it had a null or empty option name!");
                         continue;
                     } else if (!options.ContainsKey(option.Name))
-                        options.Add(option.Name, f);
+                        options.Add(option.Name, new FieldOption(f, option.Name));
                 }
             }
-            Options = new ReadOnlyDictionary<string, FieldInfo>(options);
+            this.options = new ReadOnlyDictionary<string, PluginOption>(options);
         }
 
-        public T Instantiate<T>() where T : Plugin {
+        public virtual T Instantiate<T>() where T : Plugin {
             T plugin = (T)ctor.Invoke(new object[] { });
             plugin.Info = this;
             plugin.Name = name;
@@ -93,5 +102,107 @@ namespace Snowberry {
 	internal class UnkownPluginInfo : PluginInfo {
 
 		public UnkownPluginInfo(string name) : base(name, typeof(Plugin), null, CelesteEverest.INSTANCE) {}
+	}
+
+	internal class LuaPluginInfo : PluginInfo {
+
+        private readonly LuaTable plugin;
+        private readonly string name;
+
+        private readonly ReadOnlyDictionary<string, PluginOption> options;
+
+        public LuaPluginInfo(string name, LuaTable plugin) : base(name, typeof(LuaEntity), null, LoennSupport.INSTANCE ?? new LoennSupport()) {
+            this.plugin = plugin;
+            this.name = name;
+
+            Dictionary<string, PluginOption> options = new();
+            // if placements is a table of tables, check all placements, else directly get options
+            LuaTable placements = plugin["placements"] as LuaTable;
+			if(placements.Keys.OfType<string>().Any(k => k.Equals("data"))) {
+                LuaTable data = placements["data"] as LuaTable;
+				foreach(var item in data.Keys.OfType<string>()) {
+                    options[item] = new LuaEntityOption(item, data[item].GetType());
+                }
+            }
+            // check for field information that specifies more specific type info
+            this.options = new ReadOnlyDictionary<string, PluginOption>(options);
+        }
+
+		public override T Instantiate<T>() {
+			if(typeof(T).IsAssignableFrom(typeof(LuaEntity))) {
+                return new LuaEntity(name, this, plugin) as T;
+			}
+            return null;
+		}
+
+		public override ReadOnlyDictionary<string, PluginOption> Options => options;
+	}
+
+    public interface PluginOption {
+
+        object Get(Plugin from);
+
+        void Set(Plugin on, object value);
+
+        Type Type();
+
+        string Key();
+    }
+
+	public class FieldOption : PluginOption {
+
+        private readonly FieldInfo field;
+        private readonly string key;
+
+        public FieldOption(FieldInfo field, string key) {
+            this.field = field;
+            this.key = key;
+        }
+
+		public string Key() {
+            return key;
+		}
+
+		public void Set(Plugin on, object value) {
+			field.SetValue(on, value);
+		}
+
+		public Type Type() {
+            return field.FieldType;
+		}
+
+		object PluginOption.Get(Plugin from) {
+            return field.GetValue(from);
+		}
+	}
+
+	public class LuaEntityOption : PluginOption {
+
+        private readonly string key;
+        private readonly Type type;
+
+        public LuaEntityOption(string key, Type type) {
+            this.key = key;
+            this.type = type;
+        }
+
+		public object Get(Plugin from) {
+			if(from is LuaEntity e)
+                return e.Values[key];
+            return null;
+		}
+
+		public string Key() {
+			return key;
+		}
+
+		public void Set(Plugin on, object value) {
+            if(on is LuaEntity e)
+                e.Values[key] = value;
+		}
+
+		public Type Type() {
+			return type;
+		}
 	}
 }

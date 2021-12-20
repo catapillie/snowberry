@@ -3,6 +3,8 @@ using Celeste.Mod;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using Snowberry.Editor;
+using Snowberry.Modules;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +48,7 @@ namespace Snowberry {
             base.LoadContent(firstLoad);
 
             LoadModules();
+            LoennPluginLoader.LoadEntities();
 
             Fonts.Load();
         }
@@ -65,6 +68,10 @@ namespace Snowberry {
             foreach (EverestModule module in Everest.Modules) {
                 Assembly asm = module.GetType().Assembly;
                 foreach (Type type in asm.GetTypesSafe().Where(t => !t.IsAbstract && typeof(SnowberryModule).IsAssignableFrom(t))) {
+                    
+                    if(type == typeof(LoennSupport)) // TODO: an explicit form on the module type itself would be better
+                        continue;
+
                     ConstructorInfo ctor = type.GetConstructor(new Type[] { });
                     if (ctor != null) {
                         SnowberryModule editorModule = (SnowberryModule)ctor.Invoke(new object[] { });
