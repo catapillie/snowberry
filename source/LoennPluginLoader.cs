@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Celeste.Mod;
 
 using NLua;
+using NLua.Exceptions;
 
 using Snowberry.Editor;
 
@@ -18,29 +19,18 @@ namespace Snowberry {
 	 *	Some scripts reference no libraries and only return a table.
 	 *	Common Love2D and Loenn libraries will have to be provided by us, while mod libraries are packaged as part of the mod.
 	 */
-	internal class LoennPluginLoader {
+	public class LoennPluginLoader {
 
 		internal static void LoadEntities() {
 			Snowberry.Log(LogLevel.Info, $"Trying to load Loenn plugins where possible.");
 
 			Dictionary<string, LuaTable> plugins = new();
 
-			// load all loenn helpers first, and replace "require" calls with a direct getter
 			try {
-				// TODO: this sucks. do this in get.
-				Dictionary<string, object> requires = new() {
-					["mods"] = Everest.LuaLoader.Require("LoennHelpers/mods"),
-
-					//["consts.object_depths"] = Everest.LuaLoader.Require("LoennHelpers/consts/object_depths"),
-					//["consts.xna_colors"] = Everest.LuaLoader.Require("LoennHelpers/consts/xna_colors"),
-
-					//["structs.rectangle"] = Everest.LuaLoader.Require("LoennHelpers/structs/rectangle"),
-
-					["get"] = Everest.LuaLoader.Context.DoString("return function(self, x) return self[x] end").FirstOrDefault() as LuaFunction
-				};
-				Everest.LuaLoader.Context["snowberryRequires"] = WrapTable(requires);
-				requires["utils"] = Everest.LuaLoader.Require("LoennHelpers/utils");
-				Everest.LuaLoader.Context["snowberryRequires"] = WrapTable(requires);
+				if(Everest.LuaLoader.Context["snowberrySetupRequire"] is not true) {
+					Everest.LuaLoader.Context.DoString("loennLoader = require(\"#Snowberry.LoennPluginLoader\") table.insert(package.searchers, function(name) return loennLoader.EverestRequire(name) end)");//("package.path = \"Loenn/?.lua;LoennHelpers/?.lua;\" .. package.path");
+					Everest.LuaLoader.Context["snowberrySetupRequire"] = true;
+				}
 			} catch (Exception e) {
 				Snowberry.Log(LogLevel.Info, e.ToString());
 				return;
@@ -56,8 +46,6 @@ namespace Snowberry {
 					using(var reader = new StreamReader(asset.Stream)) {
 						text = reader.ReadToEnd();
 					}
-					// replace "require(X)" with "snowberryRequires:get(X)"
-					text = text.Replace("require(", "snowberryRequires:get(");
 
 					object[] pluginTables = Everest.LuaLoader.Context.DoString(text, asset.PathVirtual);
 					foreach(var p in pluginTables) {
@@ -95,6 +83,34 @@ namespace Snowberry {
 			foreach(var pair in dict)
 				table[pair.Key] = pair.Value;
 			return table;
+		}
+
+		public static object EverestRequire(string name) {
+			// name could be "mods", "structs.rectangle", "libraries.jautils", etc
+			Snowberry.Log(LogLevel.Info, "Trying to load " + name);
+
+			// TODO: just put our helpers in Loenn
+			if(name.StartsWith("LoennHelpers/LoennHelpers/") || name.StartsWith("LoennHelpers/Loenn/") || name.StartsWith("Loenn/LoennHelpers/") || name.StartsWith("Loenn/Loenn/")) {
+				return "\n\tAlready a Loenn library reference: " + name;
+			}
+
+			try {
+				LuaFunction h = Everest.LuaLoader.Context.DoString("return function() return require(\"Loenn/" + name.Replace(".", "/") + "\") end").FirstOrDefault() as LuaFunction;
+				if(h.Call().FirstOrDefault() is not null) return h;
+			} catch(LuaScriptException e) {
+				if(!e.ToString().Contains("not found:")) 
+					Snowberry.Log(LogLevel.Warn, $"Failed to load at {name}: {e}");
+			}
+
+			try {
+				LuaFunction h = Everest.LuaLoader.Context.DoString("return function() return require(\"LoennHelpers/" + name.Replace(".", "/") + "\") end").FirstOrDefault() as LuaFunction;
+				if(h.Call().FirstOrDefault() is not null) return h;
+			} catch(LuaScriptException e) {
+				if(!e.ToString().Contains("not found:"))
+					Snowberry.Log(LogLevel.Warn, $"Failed to load at {name}: {e}");
+			}
+
+			return "\n\tCould not find Loenn library: " + name;
 		}
 	}
 }

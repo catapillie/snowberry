@@ -9,7 +9,7 @@ function modHandler.simpleSplit(input, sep)
 end
 
 function modHandler.requireFromPlugin(lib, modName)
-    local libPrefix
+    --[[local libPrefix
 
     if modName then
         -- TODO: find mod by name
@@ -28,7 +28,8 @@ function modHandler.requireFromPlugin(lib, modName)
         return result
     else
         -- TODO: warn
-    end
+    end]]--
+    return require(lib)
 end
 
 return modHandler
