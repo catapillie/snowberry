@@ -118,13 +118,22 @@ namespace Snowberry {
             Dictionary<string, PluginOption> options = new();
             // if placements is a table of tables, check all placements, else directly get options
             LuaTable placements = plugin["placements"] as LuaTable;
-			if(placements.Keys.OfType<string>().Any(k => k.Equals("data"))) {
+            if(placements.Keys.OfType<string>().Any(k => k.Equals("data"))) {
                 LuaTable data = placements["data"] as LuaTable;
-				foreach(var item in data.Keys.OfType<string>()) {
+                foreach(var item in data.Keys.OfType<string>())
                     options[item] = new LuaEntityOption(item, data[item].GetType());
-                }
+            } else if(placements.Keys.Count >= 1 && placements[1] is LuaTable) {
+                for(int i = 1; i < placements.Keys.Count + 1; i++) {
+                    LuaTable ptable = placements[i] as LuaTable;
+					if(ptable == null)
+                        continue;
+					if(ptable["data"] is LuaTable data)
+						foreach(var item in data.Keys.OfType<string>())
+							options[item] = new LuaEntityOption(item, data[item].GetType());
+				}
             }
-            // check for field information that specifies more specific type info
+
+            // TODO: check for field information that specifies more specific type info
             this.options = new ReadOnlyDictionary<string, PluginOption>(options);
         }
 
@@ -187,9 +196,7 @@ namespace Snowberry {
         }
 
 		public object Get(Plugin from) {
-			if(from is LuaEntity e)
-                return e.Values[key];
-            return null;
+			return from is LuaEntity e && e.Values.TryGetValue(key, out var value) ? value : null;
 		}
 
 		public string Key() {

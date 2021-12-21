@@ -31,7 +31,6 @@ namespace Snowberry.Editor.Entities {
 				minNodes = (int)Float(limits, 1, 0);
 				maxNodes = (int)Float(limits, 2, 0);
 			}
-			Snowberry.Log(LogLevel.Info, $"nmin:{minNodes}; nmax:{maxNodes};");
 
 			if(plugin["justification"] is LuaTable justification) {
 				justify = new Vector2(Float(justification, 1, 0.5f), Float(justification, 2, 0.5f));
@@ -45,7 +44,6 @@ namespace Snowberry.Editor.Entities {
 			if(placement.Defaults.ContainsKey("height") && placement.Defaults["height"] is long height) {
 				defaultHeight = (int)height;
 			}
-			Snowberry.Log(LogLevel.Info, $"w:{defaultWidth}; h:{defaultHeight};");
 		}
 
 		public override int MinNodes => minNodes;
@@ -57,19 +55,22 @@ namespace Snowberry.Editor.Entities {
 		public override void Render() {
 			base.Render();
 			
-			if(CallOrGet("texture") is string texture) {
+			if(CallOrGet<string>("texture") is string texture) {
 				GFX.Game[texture].DrawJustified(Center, justify);
 			}
-			
-			if(plugin["fillColor"] is LuaTable fill) {
+
+			if(CallOrGet<LuaTable>("color") is LuaTable c) { // seems to be the same as fillColor???
+				Draw.Rect(Position, Width, Height, Color(c));
+			}
+			if(CallOrGet<LuaTable>("fillColor") is LuaTable fill) {
 				Draw.Rect(Position, Width, Height, Color(fill));
 			}
-			if(plugin["borderColor"] is LuaTable border) {
+			if(CallOrGet<LuaTable>("borderColor") is LuaTable border) {
 				Draw.HollowRect(Position, Width, Height, Color(border));
 			}
 
 			foreach(var node in Nodes) {
-				if(CallOrGet("nodeTexture") is string nodeTexture) {
+				if(CallOrGet<string>("nodeTexture") is string nodeTexture) {
 					GFX.Game[nodeTexture].DrawCentered(node);
 				}
 			}
@@ -97,13 +98,13 @@ namespace Snowberry.Editor.Entities {
 			return new Color(Float(from, 1), Float(from, 2), Float(from, 3), Float(from, 4));
 		}
 
-		private string CallOrGet(string name, string orElse = null) {
+		private T CallOrGet<T>(string name, T orElse = default) where T : class {
 			LuaTable entity = WrapEntity();
-			if(plugin[name] is string s) {
+			if(plugin[name] is T s) {
 				return s;
 			} else if(plugin[name] is LuaFunction f) {
 				try {
-					return (f.Call(EmptyTable(), entity).FirstOrDefault() as string) ?? orElse;
+					return (f.Call(EmptyTable(), entity).FirstOrDefault() as T) ?? orElse;
 				} catch {
 					return orElse;
 				}
