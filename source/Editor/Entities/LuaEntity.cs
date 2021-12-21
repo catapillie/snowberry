@@ -31,6 +31,7 @@ namespace Snowberry.Editor.Entities {
 				minNodes = (int)Float(limits, 1, 0);
 				maxNodes = (int)Float(limits, 2, 0);
 			}
+			Snowberry.Log(LogLevel.Info, $"nmin:{minNodes}; nmax:{maxNodes};");
 
 			if(plugin["justification"] is LuaTable justification) {
 				justify = new Vector2(Float(justification, 1, 0.5f), Float(justification, 2, 0.5f));
@@ -38,12 +39,13 @@ namespace Snowberry.Editor.Entities {
 		}
 
 		public override void UpdatePostPlacement(Placements.Placement placement) {
-			if(placement.Defaults.ContainsKey("width") && placement.Defaults["width"] is int width) {
-				defaultWidth = width;
+			if(placement.Defaults.ContainsKey("width") && (placement.Defaults["width"] is long width)) {
+				defaultWidth = (int)width;
 			}
-			if(placement.Defaults.ContainsKey("height") && placement.Defaults["height"] is int height) {
-				defaultHeight = height;
+			if(placement.Defaults.ContainsKey("height") && placement.Defaults["height"] is long height) {
+				defaultHeight = (int)height;
 			}
+			Snowberry.Log(LogLevel.Info, $"w:{defaultWidth}; h:{defaultHeight};");
 		}
 
 		public override int MinNodes => minNodes;
@@ -76,10 +78,14 @@ namespace Snowberry.Editor.Entities {
 		private static float Float(LuaTable from, int index, float def = 1f) {
 			if(from.Keys.Count >= index) { // 1-indexed
 				object value = from[index];
-				if(value is float f) {
+				if(value is float f)
 					return f;
-				} else if(value is int i)
+				else if(value is int i)
 					return i;
+				else if(value is long l)
+					return l;
+				else if(value is double d)
+					return (float)d;
 				else if(value is string s)
 					return float.Parse(s);
 				else return def;

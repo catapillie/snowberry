@@ -89,7 +89,7 @@ namespace Snowberry {
 			// name could be "mods", "structs.rectangle", "libraries.jautils", etc
 			Snowberry.Log(LogLevel.Info, "Trying to load " + name);
 
-			// TODO: just put our helpers in Loenn
+			// TODO: just put our helpers in Loenn/
 			if(name.StartsWith("LoennHelpers/LoennHelpers/") || name.StartsWith("LoennHelpers/Loenn/") || name.StartsWith("Loenn/LoennHelpers/") || name.StartsWith("Loenn/Loenn/")) {
 				return "\n\tAlready a Loenn library reference: " + name;
 			}
