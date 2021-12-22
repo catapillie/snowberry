@@ -87,6 +87,10 @@ namespace Snowberry {
             Modules = modules.ToArray();
         }
 
+        // for debugging
+        public static void Log(object message) {
+            Log(LogLevel.Info, message == null ? "null" : message.ToString());
+        }
 
         public static void Log(LogLevel level, string message) {
             Logger.Log(level, "Snowberry", message);

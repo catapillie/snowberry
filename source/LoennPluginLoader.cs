@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Celeste;
 using Celeste.Mod;
+
+using Monocle;
 
 using NLua;
 using NLua.Exceptions;
@@ -147,6 +150,24 @@ namespace Snowberry {
 			}
 
 			return "\n\tCould not find Loenn library: " + name;
+		}
+
+		public static object LuaGetImage(string textureName, string atlasName) {
+			var meta = EmptyTable();
+
+			atlasName ??= "game";
+
+			// Not sure if Loenn uses the same format, but we render these so we can pick whatever format we like
+			meta["image"] = textureName;
+			meta["atlas"] = atlasName;
+
+			Atlas atlas = atlasName.ToLowerInvariant().Equals("gui") ? GFX.Gui : atlasName.ToLowerInvariant().Equals("misc") ? GFX.Misc : GFX.Game;
+			MTexture texture = atlas[textureName];
+			meta["width"] = meta["realWidth"] = texture.Width;
+			meta["height"] = meta["realHeight"] = texture.Height;
+			meta["offsetX"] = meta["offsetY"] = 0;
+
+			return meta;
 		}
 	}
 }

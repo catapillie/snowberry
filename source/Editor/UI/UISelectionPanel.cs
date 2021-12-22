@@ -12,9 +12,6 @@ namespace Snowberry.Editor.UI {
             public UIOption(string name, UIElement input, string tooltip = default) {
                 Input = input;
                 this.tooltip = tooltip;
-				if(tooltip != null) {
-                    Snowberry.Log(Celeste.Mod.LogLevel.Info, tooltip);
-				}
 
                 UILabel label;
                 Add(label = new UILabel($"{name} : ") {

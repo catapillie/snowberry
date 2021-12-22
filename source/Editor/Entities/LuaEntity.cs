@@ -29,7 +29,7 @@ namespace Snowberry.Editor.Entities {
 			Info = info;
 			this.plugin = plugin;
 
-			if(plugin["nodeLimits"] is LuaTable limits) {
+			if(CallOrGet<LuaTable>("nodeLimits") is LuaTable limits) {
 				minNodes = (int)Float(limits, 1, 0);
 				maxNodes = (int)Float(limits, 2, 0);
 			}
@@ -65,14 +65,35 @@ namespace Snowberry.Editor.Entities {
 			}
 
 			if(CallOrGet<LuaTable>("color") is LuaTable c) { // seems to be the same as fillColor???
-				Draw.Rect(Position, Width, Height, Color(c));
+				Draw.Rect(Position, Width, Height, TableColor(c));
 			}
 			if(CallOrGet<LuaTable>("fillColor") is LuaTable fill) {
-				Draw.Rect(Position, Width, Height, Color(fill));
+				Draw.Rect(Position, Width, Height, TableColor(fill));
 			}
 			if(CallOrGet<LuaTable>("borderColor") is LuaTable border) {
-				Draw.HollowRect(Position, Width, Height, Color(border));
+				Draw.HollowRect(Position, Width, Height, TableColor(border));
 			}
+
+			if(CallOrGetAll("sprite") is object[] sprites)
+				foreach(var item in sprites) {
+					if(item is LuaTable sprite) {
+						foreach(var k in sprite.Keys) {
+							if(sprite[k] is LuaTable sp && sp["meta"] is LuaTable meta && meta["image"] is string image && meta["atlas"] is string atlasName) {
+								Atlas atlas = atlasName.ToLowerInvariant().Equals("gui") ? GFX.Gui : atlasName.ToLowerInvariant().Equals("misc") ? GFX.Misc : GFX.Game;
+								MTexture tex = atlas[image];
+								int x = X, y = Y;
+								float sX = Float(sp, "scaleX"), sY = Float(sp, "scaleY");
+								Color color = Color.White;
+
+								if(sp["x"] is int spX) { x = spX; }
+								if(sp["y"] is int spY) { x = spY; }
+								if(sp["color"] is LuaTable ct) { color = TableColor(ct); }
+
+								tex.DrawJustified(new Vector2(x, y), justify, color, new Vector2(sX, sY));
+							}
+						}
+					}
+				}
 
 			foreach(var node in Nodes) {
 				if(CallOrGet<string>("nodeTexture") is string nodeTexture) {
@@ -81,8 +102,23 @@ namespace Snowberry.Editor.Entities {
 			}
 		}
 
-		private static float Float(LuaTable from, int index, float def = 1f) {
-			if(from.Keys.Count >= index) { // 1-indexed
+		protected override Rectangle[] Select() {
+			/*if(CallOrGetAll("selection") is object[] selections) {
+				List<LuaTable> checking = new();
+				if(selections.Length > 0 && selections[0] is LuaTable t)
+					checking.Add(t);
+				if(selections.Length > 1 && selections[1] is object[] nodes)
+					foreach(var item in nodes)
+						if(item is LuaTable t2)
+							checking.Add(t2);
+				return checking.Select(k => new Rectangle((int)Float(k, "x", X), (int)Float(k, "y", Y), (int)Float(k, "width", 8), (int)Float(k, "height", 8)) ).ToArray();
+			}*/
+
+			return base.Select();
+		}
+
+		private static float Float<T>(LuaTable from, T index, float def = 1f) {
+			if(from.Keys.OfType<T>().Any(k => k.Equals(index))) {
 				object value = from[index];
 				if(value is float f)
 					return f;
@@ -99,24 +135,29 @@ namespace Snowberry.Editor.Entities {
 				return def;
 		}
 
-		private static Color Color(LuaTable from) {
+		private static Color TableColor(LuaTable from) {
 			return new Color(Float(from, 1), Float(from, 2), Float(from, 3), Float(from, 4));
 		}
 
 		private T CallOrGet<T>(string name, T orElse = default) where T : class {
+			return CallOrGetAll(name, orElse).FirstOrDefault() as T;
+		}
+
+		private object[] CallOrGetAll(string name, object orElse = default) {
 			LuaTable entity = WrapEntity();
 			if(entity == null)
-				return orElse;
-			if(plugin[name] is T s) {
-				return s;
-			} else if(plugin[name] is LuaFunction f) {
+				return new object[] { orElse };
+			if(plugin[name] is LuaFunction f) {
 				try {
-					return (f.Call(EmptyTable(), entity).FirstOrDefault() as T) ?? orElse;
+					return (f.Call(EmptyTable(), entity, EmptyTable())) ?? new object[] { orElse };
 				} catch {
-					return orElse;
+					return new object[] { orElse };
 				}
 			}
-			return orElse;
+			else if(plugin[name] is object s) {
+				return new object[] { s };
+			} else
+				return new object[] { orElse };
 		}
 
 		private static LuaTable EmptyTable() {
