@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Celeste;
@@ -44,6 +45,9 @@ namespace Snowberry.Editor.Entities {
 			if(placement.Defaults.ContainsKey("height") && placement.Defaults["height"] is long height) {
 				defaultHeight = (int)height;
 			}
+			foreach(var option in Info.Options)
+				if(!Values.ContainsKey(option.Key))
+					Values[option.Key] = ((LuaPluginInfo)Info).Defaults.TryGetValue(option.Key, out var val) ? val : Default(option.Value.Type());
 		}
 
 		public override int MinNodes => minNodes;
@@ -131,6 +135,29 @@ namespace Snowberry.Editor.Entities {
 			table["height"] = Height;
 
 			return table;
+		}
+
+		private object Default(Type t) {
+			if(t == typeof(string))
+				return "";
+			else if(t.IsEnum)
+				return t.GetEnumValues().GetValue(0);
+			else if(t == typeof(int))
+				return 0;
+			else if(t == typeof(short))
+				return (short)0;
+			else if(t == typeof(byte))
+				return (byte)0;
+			else if(t == typeof(long))
+				return (long)0;
+			else if(t == typeof(float))
+				return (float)0;
+			else if(t == typeof(double))
+				return (double)0;
+			else if(t == typeof(bool))
+				return (bool)false;
+			else
+				return null;
 		}
 	}
 }

@@ -111,11 +111,14 @@ namespace Snowberry {
 
         private readonly ReadOnlyDictionary<string, PluginOption> options;
 
+        public readonly ReadOnlyDictionary<string, object> Defaults;
+
         public LuaPluginInfo(string name, LuaTable plugin) : base(name, typeof(LuaEntity), null, LoennSupport.INSTANCE ?? new LoennSupport()) {
             this.plugin = plugin;
             this.name = name;
 
             Dictionary<string, PluginOption> options = new();
+            Dictionary<string, object> defaults = new();
             // if placements is a table of tables, check all placements, else directly get options
             LuaTable placements = plugin["placements"] as LuaTable;
             if(placements.Keys.OfType<string>().Any(k => k.Equals("data"))) {
@@ -124,17 +127,22 @@ namespace Snowberry {
                     options[item] = new LuaEntityOption(item, data[item].GetType());
             } else if(placements.Keys.Count >= 1 && placements[1] is LuaTable) {
                 for(int i = 1; i < placements.Keys.Count + 1; i++) {
-                    LuaTable ptable = placements[i] as LuaTable;
-					if(ptable == null)
-                        continue;
+					if(placements[i] is not LuaTable ptable)
+						continue;
 					if(ptable["data"] is LuaTable data)
 						foreach(var item in data.Keys.OfType<string>())
 							options[item] = new LuaEntityOption(item, data[item].GetType());
 				}
-            }
+				if(placements["default"] is LuaTable defData)
+                    foreach(var item in defData.Keys.OfType<string>()) {
+						options[item] = new LuaEntityOption(item, defData[item].GetType());
+                        defaults[item] = defData[item];
+                    }
+			}
 
             // TODO: check for field information that specifies more specific type info
             this.options = new ReadOnlyDictionary<string, PluginOption>(options);
+            this.Defaults = new ReadOnlyDictionary<string, object>(defaults);
         }
 
 		public override T Instantiate<T>() {

@@ -355,41 +355,46 @@ namespace Snowberry.Editor {
 				Name = "entities",
 				Children = new List<Element>()
 			};
-			ret.Children = new List<Element>();
-            ret.Children.Add(entitiesElement);
+			ret.Children = new List<Element> {
+				entitiesElement
+			};
 
-            foreach (var entity in Entities) {
-				Element entityElem = new Element {
-					Name = entity.Name,
-					Children = new List<Element>(),
-					Attributes = new Dictionary<string, object> {
-						["id"] = entity.EntityID,
-						["x"] = entity.X - X * 8,
-						["y"] = entity.Y - Y * 8,
-						["width"] = entity.Width,
-						["height"] = entity.Height,
-						["originX"] = entity.Origin.X,
-						["originY"] = entity.Origin.Y
-					}
-				};
+			foreach (var entity in Entities) {
+                try {
+                    Element entityElem = new Element {
+                        Name = entity.Name,
+                        Children = new List<Element>(),
+                        Attributes = new Dictionary<string, object> {
+                            ["id"] = entity.EntityID,
+                            ["x"] = entity.X - X * 8,
+                            ["y"] = entity.Y - Y * 8,
+                            ["width"] = entity.Width,
+                            ["height"] = entity.Height,
+                            ["originX"] = entity.Origin.X,
+                            ["originY"] = entity.Origin.Y
+                        }
+                    };
 
-				foreach (var opt in entity.Info.Options.Keys) {
-                    var val = entity.Get(opt);
-                    if (val != null)
-                        entityElem.Attributes[opt] = val;
+                    foreach(var opt in entity.Info.Options.Keys) {
+                        var val = entity.Get(opt);
+                        if(val != null)
+                            entityElem.Attributes[opt] = val;
+                    }
+
+                    foreach(var node in entity.Nodes) {
+                        Element n = new Element {
+                            Attributes = new Dictionary<string, object> {
+                                ["x"] = node.X - X * 8,
+                                ["y"] = node.Y - Y * 8
+                            }
+                        };
+                        entityElem.Children.Add(n);
+                    }
+
+                    entitiesElement.Children.Add(entityElem);
+                } catch(Exception e) {
+                    Snowberry.Log(LogLevel.Error, $"Could not create instance of entity {entity.Name}: {e}");
                 }
-
-                foreach (var node in entity.Nodes) {
-					Element n = new Element {
-						Attributes = new Dictionary<string, object> {
-							["x"] = node.X - X * 8,
-							["y"] = node.Y - Y * 8
-						}
-					};
-					entityElem.Children.Add(n);
-                }
-
-                entitiesElement.Children.Add(entityElem);
             }
 
 			Element triggersElement = new Element {
