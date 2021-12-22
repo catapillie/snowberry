@@ -377,7 +377,8 @@ namespace Snowberry.Editor {
 
                     foreach(var opt in entity.Info.Options.Keys) {
                         var val = entity.Get(opt);
-                        if(val != null)
+                        // check that we don't overwrite any of the above (e.g. from a LuaEntity)
+                        if(val != null && !(opt.Equals("id") || opt.Equals("x") || opt.Equals("y") || opt.Equals("width") || opt.Equals("height") || opt.Equals("originX") || opt.Equals("originY")))
                             entityElem.Attributes[opt] = val;
                     }
 
