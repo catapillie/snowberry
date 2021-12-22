@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 using NLua;
+using NLua.Exceptions;
 
 namespace Snowberry.Editor.Entities {
 
@@ -104,6 +105,8 @@ namespace Snowberry.Editor.Entities {
 
 		private T CallOrGet<T>(string name, T orElse = default) where T : class {
 			LuaTable entity = WrapEntity();
+			if(entity == null)
+				return orElse;
 			if(plugin[name] is T s) {
 				return s;
 			} else if(plugin[name] is LuaFunction f) {
@@ -117,22 +120,29 @@ namespace Snowberry.Editor.Entities {
 		}
 
 		private static LuaTable EmptyTable() {
-			return Everest.LuaLoader.Context.DoString("return {}").FirstOrDefault() as LuaTable;
+			try {
+				return Everest.LuaLoader.Context.DoString("return {}").FirstOrDefault() as LuaTable;
+			} catch(LuaScriptException) { // that can stack overflow. somehow???????
+				return null;
+			}
 		}
 
 		private static LuaTable WrapTable(IDictionary<string, object> dict) {
 			var table = EmptyTable();
-			foreach(var pair in dict)
-				table[pair.Key] = pair.Value;
+			if(table != null)
+				foreach(var pair in dict)
+					table[pair.Key] = pair.Value;
 			return table;
 		}
 
 		private LuaTable WrapEntity() {
 			LuaTable table = WrapTable(Values);
 
-			table["name"] = Name;
-			table["width"] = Width;
-			table["height"] = Height;
+			if(table != null) {
+				table["name"] = Name;
+				table["width"] = Width;
+				table["height"] = Height;
+			}
 
 			return table;
 		}

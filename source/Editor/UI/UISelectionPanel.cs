@@ -7,9 +7,14 @@ namespace Snowberry.Editor.UI {
     public class UISelectionPanel : UIScrollPane {
         public class UIOption : UIElement {
             public readonly UIElement Input;
+            private readonly string tooltip;
 
-            public UIOption(string name, UIElement input) {
+            public UIOption(string name, UIElement input, string tooltip = default) {
                 Input = input;
+                this.tooltip = tooltip;
+				if(tooltip != null) {
+                    Snowberry.Log(Celeste.Mod.LogLevel.Info, tooltip);
+				}
 
                 UILabel label;
                 Add(label = new UILabel($"{name} : ") {
@@ -25,7 +30,11 @@ namespace Snowberry.Editor.UI {
                 Width = w + (input?.Width ?? 0);
                 Height = Math.Max(Fonts.Regular.LineHeight, input?.Height ?? 0);
             }
-        }
+
+			public override string Tooltip() {
+				return tooltip;
+			}
+		}
 
         public class UIEntry : UIElement {
             private readonly UILabel label;
@@ -85,7 +94,7 @@ namespace Snowberry.Editor.UI {
                 var checkbox = new UITextField(Fonts.Regular, 80, value) {
                     OnInputChange = str => field.Set(entity, str),
                 };
-                return new UIOption(name, checkbox) {
+                return new UIOption(name, checkbox, field.Tooltip()) {
                     Position = new Vector2(0, y)
                 };
             }
@@ -94,7 +103,7 @@ namespace Snowberry.Editor.UI {
                 var checkbox = new UIValueTextField<T>(Fonts.Regular, 80, value) {
                     OnValidInputChange = v => field.Set(entity, v),
                 };
-                return new UIOption(name, checkbox) {
+                return new UIOption(name, checkbox, field.Tooltip()) {
                     Position = new Vector2(0, y)
                 };
             }
@@ -103,7 +112,7 @@ namespace Snowberry.Editor.UI {
                 var checkbox = new UICheckBox(-1, value) {
                     OnPress = b => field.Set(entity, b),
                 };
-                return new UIOption(name, checkbox) {
+                return new UIOption(name, checkbox, field.Tooltip()) {
                     Position = new Vector2(0, y)
                 };
             }

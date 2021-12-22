@@ -351,10 +351,14 @@ namespace Snowberry.Editor {
             // Tooltip rendering
             var tooltip = ui.HoveredTooltip();
 			if(tooltip != null) {
-                var tooltipArea = Fonts.Regular.Measure(tooltip);
-                var at = Mouse.Screen.Round() - new Vector2(0, tooltipArea.Y + 6);
-                Draw.Rect(at, tooltipArea.X + 8, tooltipArea.Y + 6, Color.Black * 0.4f);
-                Fonts.Regular.Draw(tooltip, at + new Vector2(4, 3), Vector2.One, Color.White);
+				string[] array = tooltip.Split(new string[] { "\\n" }, StringSplitOptions.None);
+				for(int i = 0; i < array.Length; i++) {
+					string line = array[i];
+					var tooltipArea = Fonts.Regular.Measure(line);
+                    var at = Mouse.Screen.Round() - new Vector2((tooltipArea.X + 8), (tooltipArea.Y + 6) * (i + 1));
+                    Draw.Rect(at, tooltipArea.X + 8, tooltipArea.Y + 6, Color.Black * 0.8f);
+                    Fonts.Regular.Draw(line, at + new Vector2(4, 3), Vector2.One, Color.White);
+                }
 			}
 
             Draw.SpriteBatch.End();

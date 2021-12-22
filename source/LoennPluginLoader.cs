@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Celeste.Mod;
 
@@ -21,14 +19,16 @@ namespace Snowberry {
 	 */
 	public class LoennPluginLoader {
 
+		public static Dictionary<string, KeyValuePair<string, string>> LoennText = new();
+
 		internal static void LoadEntities() {
-			Snowberry.Log(LogLevel.Info, $"Trying to load Loenn plugins where possible.");
+			Snowberry.Log(LogLevel.Info, "Trying to load Loenn plugins where possible.");
 
 			Dictionary<string, LuaTable> plugins = new();
 
 			try {
 				if(Everest.LuaLoader.Context["snowberrySetupRequire"] is not true) {
-					Everest.LuaLoader.Context.DoString("loennLoader = require(\"#Snowberry.LoennPluginLoader\") table.insert(package.searchers, function(name) return loennLoader.EverestRequire(name) end)");//("package.path = \"Loenn/?.lua;LoennHelpers/?.lua;\" .. package.path");
+					Everest.LuaLoader.Context.DoString("loennLoader = require(\"#Snowberry.LoennPluginLoader\") table.insert(package.searchers, function(name) return loennLoader.EverestRequire(name) end)");
 					Everest.LuaLoader.Context["snowberrySetupRequire"] = true;
 				}
 			} catch (Exception e) {
@@ -40,7 +40,6 @@ namespace Snowberry {
 										.SelectMany(k => k.List) 
 										.Where(k => k.Type == typeof(AssetTypeLua))
 										.Where(k => k.PathVirtual.StartsWith("Loenn/entities/"))) {
-				Snowberry.Log(LogLevel.Info, $"Trying to load Loenn plugin at \"{asset.PathVirtual}\"");
 				try {
 					string text;
 					using(var reader = new StreamReader(asset.Stream)) {
@@ -58,10 +57,32 @@ namespace Snowberry {
 				}
 			}
 
+			if(plugins.Count > 0) {
+				// TODO: support loading other language files
+				string textFileName = "en_gb";
+				foreach(var asset in Everest.Content.Mods
+										.SelectMany(k => k.List)
+										.Where(k => k.PathVirtual.StartsWith("Loenn/lang/" + textFileName))) {
+					string text;
+					using(var reader = new StreamReader(asset.Stream)) {
+						text = reader.ReadToEnd();
+					}
+
+					foreach(var entry in text.Split('\n').Select(k => k.Split('#')[0])) {
+						if(!string.IsNullOrWhiteSpace(entry)) {
+							var split = entry.Split('=');
+							if(split.Length == 2 && !string.IsNullOrWhiteSpace(split[0]) && !string.IsNullOrWhiteSpace(split[1])) {
+								LoennText[split[0]] = new KeyValuePair<string, string>(split[1].Trim(), asset.Source.Mod.Name);
+							}
+						}
+					}
+				}
+				Snowberry.Log(LogLevel.Info, $"Loaded {LoennText.Count} dialog entries from {textFileName} language files for Loenn plugins.");
+			}
+
 			foreach(var plugin in plugins) {
 				LuaPluginInfo info = new LuaPluginInfo(plugin.Key, plugin.Value);
 				PluginInfo.Entities[plugin.Key] = info;
-
 				
 				LuaTable placements = plugin.Value["placements"] as LuaTable;
 
@@ -71,7 +92,9 @@ namespace Snowberry {
 					foreach(var item in data.Keys.OfType<string>()) {
 						options[item] = data[item];
 					}
-					Placements.Create("Loenn: " + plugin.Key, plugin.Key, options);
+					string placementName = placements["name"] as string ?? "";
+					placementName = LoennText.TryGetValue($"entities.{plugin.Key}.placements.name.{placementName}", out var name) ? $"{name.Key} ({name.Value})" : "Loenn: " + plugin.Key;
+					Placements.Create(placementName, plugin.Key, options);
 				} else if(placements.Keys.Count >= 1 && placements[1] is LuaTable) {
 					for(int i = 1; i < placements.Keys.Count + 1; i++) {
 						Dictionary<string, object> options = new();
@@ -79,7 +102,9 @@ namespace Snowberry {
 							foreach(var item in data.Keys.OfType<string>()) {
 								options[item] = data[item];
 							}
-							Placements.Create($"Loenn: {plugin.Key} :: {ptable["name"]}", plugin.Key, options);
+							string placementName = ptable["name"] as string ?? "";
+							placementName = LoennText.TryGetValue($"entities.{plugin.Key}.placements.name.{placementName}", out var name) ? $"{name.Key} ({name.Value})" : $"Loenn: {plugin.Key} :: {ptable["name"]}";
+							Placements.Create(placementName, plugin.Key, options);
 						}
 					}
 				}
@@ -99,9 +124,8 @@ namespace Snowberry {
 
 		public static object EverestRequire(string name) {
 			// name could be "mods", "structs.rectangle", "libraries.jautils", etc
-			Snowberry.Log(LogLevel.Info, "Trying to load " + name);
 
-			// TODO: just put our helpers in Loenn/
+			// TODO: just put our helpers in Loenn/ ?
 			if(name.StartsWith("LoennHelpers/LoennHelpers/") || name.StartsWith("LoennHelpers/Loenn/") || name.StartsWith("Loenn/LoennHelpers/") || name.StartsWith("Loenn/Loenn/")) {
 				return "\n\tAlready a Loenn library reference: " + name;
 			}

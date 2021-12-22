@@ -124,18 +124,18 @@ namespace Snowberry {
             if(placements.Keys.OfType<string>().Any(k => k.Equals("data"))) {
                 LuaTable data = placements["data"] as LuaTable;
                 foreach(var item in data.Keys.OfType<string>())
-                    options[item] = new LuaEntityOption(item, data[item].GetType());
+                    options[item] = new LuaEntityOption(item, data[item].GetType(), name);
             } else if(placements.Keys.Count >= 1 && placements[1] is LuaTable) {
                 for(int i = 1; i < placements.Keys.Count + 1; i++) {
 					if(placements[i] is not LuaTable ptable)
 						continue;
 					if(ptable["data"] is LuaTable data)
 						foreach(var item in data.Keys.OfType<string>())
-							options[item] = new LuaEntityOption(item, data[item].GetType());
+							options[item] = new LuaEntityOption(item, data[item].GetType(), name);
 				}
 				if(placements["default"] is LuaTable defData)
                     foreach(var item in defData.Keys.OfType<string>()) {
-						options[item] = new LuaEntityOption(item, defData[item].GetType());
+						options[item] = new LuaEntityOption(item, defData[item].GetType(), name);
                         defaults[item] = defData[item];
                     }
 			}
@@ -164,6 +164,8 @@ namespace Snowberry {
         Type Type();
 
         string Key();
+
+        string Tooltip();
     }
 
 	public class FieldOption : PluginOption {
@@ -191,16 +193,23 @@ namespace Snowberry {
 		object PluginOption.Get(Plugin from) {
             return field.GetValue(from);
 		}
+
+        public string Tooltip() {
+            return null;
+        }
 	}
 
 	public class LuaEntityOption : PluginOption {
 
         private readonly string key;
         private readonly Type type;
+        private readonly string tooltip;
 
-        public LuaEntityOption(string key, Type type) {
+        public LuaEntityOption(string key, Type type, string entityName) {
             this.key = key;
             this.type = type;
+
+            tooltip = LoennPluginLoader.LoennText.TryGetValue($"entities.{entityName}.attributes.description.{key}", out var k) ? k.Key : null;
         }
 
 		public object Get(Plugin from) {
@@ -219,5 +228,9 @@ namespace Snowberry {
 		public Type Type() {
 			return type;
 		}
+
+        public string Tooltip() {
+            return tooltip;
+        }
 	}
 }
