@@ -142,7 +142,7 @@ namespace Snowberry.Editor {
             Map map = null;
             if(data != null)
             {
-                Module.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
+                Snowberry.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
                 map = new Map(data);
             }
             FadeWipe wipe = new FadeWipe(Engine.Scene, false, delegate
@@ -155,7 +155,7 @@ namespace Snowberry.Editor {
         }
 
         private void MenuUI() {
-            ui.Add(new UIMainMenu(uiBuffer.Width, uiBuffer.Height, fadeIn));
+            ui.Add(new UIMainMenu(uiBuffer.Width, uiBuffer.Height));
         }
 
         private void MappingUI() {

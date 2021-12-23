@@ -1,3 +1,5 @@
+# *** Celeste Menu ***
+	EDITOR_MAINMENU= Snowberry
 # *** Main Menu ***
 
 	SNOWBERRY_MAINMENU_YES=						oui
