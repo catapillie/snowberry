@@ -1,6 +1,6 @@
-- Name: LevelEditorMod
+- Name: Snowberry
   Version: 1.0.0
-  DLL: LevelEditorMod/bin/Debug/LevelEditorMod.dll
+  DLL: source/bin/Debug/Snowberry.dll
   Dependencies:
     - Name: Everest
       Version: 1.3070.0
