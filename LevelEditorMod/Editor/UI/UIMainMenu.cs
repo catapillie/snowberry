@@ -109,9 +109,11 @@ namespace LevelEditorMod.Editor.UI {
         }
 
         public enum States {
-            Start, Create, Load, Exiting,
+            Start, Create, Load, Exiting
         }
         private States state = States.Start;
+        private int fadeIn;
+        private float fadeTimer;
         private readonly float[] stateLerp = new float[4] { 1f, 0f, 0f, 0f };
 
         private readonly UIRibbon authors, version;
@@ -121,7 +123,7 @@ namespace LevelEditorMod.Editor.UI {
 
         private float fade;
 
-        public UIMainMenu(int width, int height) {
+        public UIMainMenu(int width, int height, bool fadeIn = false) {
             Width = width;
             Height = height;
 
@@ -168,31 +170,62 @@ namespace LevelEditorMod.Editor.UI {
             Add(version = new UIRibbon($"ver{Module.Instance.Metadata.VersionString}") {
                 Position = new Vector2(0, 22),
             });
-            Add(authors = new UIRibbon($"by catapillie, leppa") {
+            Add(authors = new UIRibbon($"by catapillie, leppa, and viv") {
                 Position = new Vector2(0, 8),
             });
+            this.fadeIn = fadeIn ? 2 : 0;
+            if (fadeIn)
+            {
+                stateLerp[0] = 0f;
+                fadeTimer = 0.125f;
+            }
         }
 
         public override void Update(Vector2 position = default) {
             base.Update(position);
-
-            for (int i = 0; i < stateLerp.Length; i++)
-                stateLerp[i] = Calc.Approach(stateLerp[i], ((int)state == i).Bit(), Engine.DeltaTime * 2f);
-
-            switch (state) {
-                case States.Exiting:
-                    fade = Calc.Approach(fade, 1f, Engine.DeltaTime * 2f);
-                    if (fade == 1f) {
-                        if (SaveData.Instance == null) {
-                            SaveData.InitializeDebugMode();
-                            SaveData.Instance.CurrentSession_Safe = new Session(AreaKey.Default);
-                        }
-                        Engine.Scene = new OverworldLoader(Overworld.StartMode.MainMenu);
+            //If we're fading in we dont want the ability to click yet, so we delay this.
+            if (fadeIn != 0)
+            {
+                if(fadeIn == 2)
+                {
+                    fadeTimer -= Engine.DeltaTime;
+                    if(fadeTimer <= 0)
+                    {
+                        fadeTimer = 0;
+                        fadeIn = 1;
                     }
-                    break;
+                }
+                if (fadeIn == 1)
+                {
+                    stateLerp[0] = Calc.Approach(stateLerp[0], 1, Engine.DeltaTime * 2f);
+                    if(stateLerp[0] == 1)
+                    {
+                        fadeIn = 0;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < stateLerp.Length; i++)
+                    stateLerp[i] = Calc.Approach(stateLerp[i], ((int)state == i).Bit(), Engine.DeltaTime * 2f);
+                switch (state)
+                {
+                    case States.Exiting:
+                        fade = Calc.Approach(fade, 1f, Engine.DeltaTime * 2f);
+                        if (fade == 1f)
+                        {
+                            if (SaveData.Instance == null)
+                            {
+                                SaveData.InitializeDebugMode();
+                                SaveData.Instance.CurrentSession_Safe = new Session(AreaKey.Default);
+                            }
+                            Engine.Scene = new OverworldLoader(Overworld.StartMode.MainMenu);
+                        }
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
 
             float startEase = 1 - Ease.CubeInOut(stateLerp[0]);

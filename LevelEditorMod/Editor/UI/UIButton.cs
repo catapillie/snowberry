@@ -24,7 +24,7 @@ namespace LevelEditorMod.Editor.UI {
             top, bottom,
             topFill, bottomFill,
             mid;
-
+        public bool active = true; //Whether or not the Button is able to be pressed. Currently implemented poorly.
         public Action OnPress, OnRightPress;
 
         private UIButton(int spaceX, int spaceY, int minWidth, int minHeight) {
@@ -91,21 +91,25 @@ namespace LevelEditorMod.Editor.UI {
 
             int mouseX = (int)Editor.Mouse.Screen.X;
             int mouseY = (int)Editor.Mouse.Screen.Y;
-            hovering = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
+            if (active)
+            {
+                hovering = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
 
-            if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
-                pressed = true;
-            else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton) {
-                if(hovering && pressed) {
-					if(MInput.Mouse.ReleasedLeftButton)
-                        Pressed();
-                    else
-                        OnRightPress?.Invoke();
-				}
+                if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
+                    pressed = true;
+                else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton)
+                {
+                    if (hovering && pressed)
+                    {
+                        if (MInput.Mouse.ReleasedLeftButton)
+                            Pressed();
+                        else
+                            OnRightPress?.Invoke();
+                    }
 
-				pressed = false;
+                    pressed = false;
+                }
             }
-
             lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
         }
 

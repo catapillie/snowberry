@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace LevelEditorMod.Editor {
     public class Editor : Scene {
@@ -90,6 +91,8 @@ namespace LevelEditorMod.Editor {
 
         private static readonly Color bg = Calc.HexToColor("060607");
 
+        private bool fadeIn = false;
+
         private Camera camera;
 
         public Vector2 mousePos, lastMousePos;
@@ -129,8 +132,27 @@ namespace LevelEditorMod.Editor {
             Engine.Scene = new Editor(map);
         }
 
+        internal static void OpenFancy(MapData data)
+        {
+            Audio.Stop(Audio.CurrentAmbienceEventInstance);
+            Audio.Stop(Audio.CurrentMusicEventInstance);
+            Map map = null;
+            if(data != null)
+            {
+                Module.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
+                map = new Map(data);
+            }
+            FadeWipe wipe = new FadeWipe(Engine.Scene, false, delegate
+            {
+                Editor e = new Editor(map);
+                e.fadeIn = true;
+                Engine.Scene = e;
+            })
+            { Duration = 0.85f } ;
+        }
+
         private void MenuUI() {
-            ui.Add(new UIMainMenu(uiBuffer.Width, uiBuffer.Height));
+            ui.Add(new UIMainMenu(uiBuffer.Width, uiBuffer.Height, fadeIn));
         }
 
         private void MappingUI() {
