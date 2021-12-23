@@ -57,6 +57,7 @@ namespace Snowberry {
             On.Celeste.Editor.MapEditor.ctor -= UsePlaytestMap;
 			On.Celeste.MapData.StartLevel -= DontCrashOnEmptyPlaytestLevel;
             On.Celeste.LevelEnter.Routine -= DontEnterPlaytestMap;
+            Everest.Events.MainMenu.OnCreateButtons -= MainMenu_OnCreateButtons;
         }
 
         private static void LoadModules() {
@@ -79,15 +80,6 @@ namespace Snowberry {
 
             Modules = modules.ToArray();
         }
-
-        public override void Unload() {
-            hook_MapData_orig_Load?.Dispose();
-            hook_Session_get_MapData?.Dispose();
-            On.Celeste.Editor.MapEditor.ctor -= UsePlaytestMap;
-            Everest.Events.MainMenu.OnCreateButtons -= MainMenu_OnCreateButtons;
-        }
-
-        
         
         private void MainMenu_OnCreateButtons(OuiMainMenu menu, System.Collections.Generic.List<MenuButton> buttons)
         {
