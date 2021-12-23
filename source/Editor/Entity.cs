@@ -122,7 +122,7 @@ namespace Snowberry.Editor {
             List<Rectangle> ret = new List<Rectangle>();
             ret.Add(new Rectangle(Width < 6 ? X - 3 : X, Height < 6 ? Y - 3 : Y, Width < 6 ? 6 : Width, Height < 6 ? 6 : Height));
             foreach (var node in nodes) {
-                ret.Add(new Rectangle((int)node.X - 3, (int)node.Y - 3, 6, 6));
+                ret.Add(new Rectangle((int)node.X - 4, (int)node.Y - 4, 8, 8));
             }
             return ret.ToArray();
         }

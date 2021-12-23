@@ -6,6 +6,7 @@ using Celeste;
 using Celeste.Mod;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 using Monocle;
 
@@ -18,9 +19,17 @@ namespace Snowberry.Editor.Entities {
 
 		private LuaTable plugin;
 
+		// setup when placed
 		private int defaultWidth = -1, defaultHeight = -1;
 		private int minNodes = 0, maxNodes = 0;
 		private Vector2 justify = Vector2.One * 0.5f;
+
+		// refreshed when modified
+		Color? color, fillColor, borderColor;
+		List<SpriteWithPos> sprites;
+		string texture, nodeTexture;
+		Rectangle[] selects;
+		bool initialized = false;
 
 		public Dictionary<string, object> Values = new();
 
@@ -28,6 +37,8 @@ namespace Snowberry.Editor.Entities {
 			Name = name;
 			Info = info;
 			this.plugin = plugin;
+
+			Tracked = true;
 
 			if(CallOrGet<LuaTable>("nodeLimits") is LuaTable limits) {
 				minNodes = (int)Float(limits, 1, 0);
@@ -59,21 +70,88 @@ namespace Snowberry.Editor.Entities {
 
 		public override void Render() {
 			base.Render();
-			
-			if(CallOrGet<string>("texture") is string texture) {
+
+			if(!initialized || Room.DirtyTrackedEntities.ContainsKey(typeof(LuaEntity)) && Room.DirtyTrackedEntities[typeof(LuaEntity)]) {
+				color = (CallOrGet<LuaTable>("color") is LuaTable c) ? TableColor(c) : null;
+				fillColor = (CallOrGet<LuaTable>("fillColor") is LuaTable f) ? TableColor(f) : null;
+				borderColor = (CallOrGet<LuaTable>("borderColor") is LuaTable b) ? TableColor(b) : null;
+
+				sprites = Sprites();
+
+				texture = CallOrGet<string>("texture");
+				nodeTexture = CallOrGet<string>("nodeTexture");
+
+				selects = MakeSelections();
+
+				initialized = true;
+			}
+
+			if(texture != null) {
 				GFX.Game[texture].DrawJustified(Center, justify);
 			}
 
-			if(CallOrGet<LuaTable>("color") is LuaTable c) { // seems to be the same as fillColor???
-				Draw.Rect(Position, Width, Height, TableColor(c));
-			}
-			if(CallOrGet<LuaTable>("fillColor") is LuaTable fill) {
-				Draw.Rect(Position, Width, Height, TableColor(fill));
-			}
-			if(CallOrGet<LuaTable>("borderColor") is LuaTable border) {
-				Draw.HollowRect(Position, Width, Height, TableColor(border));
+			if(fillColor is Color fill) {
+				Draw.Rect(Position, Width, Height, fill);
+				if(borderColor is Color border)
+					Draw.HollowRect(Position, Width, Height, border);
+			} else if(color is Color c) {
+				Draw.Rect(Position, Width, Height, c);
 			}
 
+			foreach(var sprite in sprites) {
+				sprite.texture.DrawJustified(Center + sprite.pos, justify, sprite.color, sprite.scale);
+			}
+
+			if(nodeTexture != null)
+				foreach(var node in Nodes)
+					GFX.Game[nodeTexture].DrawCentered(node);
+		}
+
+		protected override Rectangle[] Select() {
+			return selects ?? new Rectangle[0];
+		}
+
+		protected Rectangle[] MakeSelections() {
+			if(CallOrGetAll("selection") is object[] selections && selections.Length > 0 && selections[0] is LuaTable t) {
+				List<LuaTable> checking = new();
+				checking.Add(t); // TODO: this is never called???
+
+				if(selections.Length > 1 && selections[1] is object[] nodes)
+					foreach(var item in nodes)
+						if(item is LuaTable t2)
+							checking.Add(t2);
+				return checking.Select(k => new Rectangle((int)Float(k, "x", X), (int)Float(k, "y", Y), (int)Float(k, "width", 8), (int)Float(k, "height", 8)) ).ToArray();
+			} else {
+				List<Rectangle> ret = new();
+				MTexture nodeTexture = null;
+				if(CallOrGet<string>("texture") is string tex) {
+					MTexture texture = GFX.Game[tex];
+					nodeTexture = texture;
+					ret.Add(RectOnPos(Center, texture));
+				} else if(Sprites() is List<SpriteWithPos> sprites && sprites.Count > 0) {
+					ret.Add(RectOnPos(Center, sprites[0].texture));
+				} else
+					ret.Add(new Rectangle(X, Y, Width < 8 ? 8 : Width, Height < 8 ? 8 : Height));
+				
+				if(CallOrGet<string>("nodeTexture") is string nodeTex)
+					nodeTexture = GFX.Game[nodeTex];
+
+				foreach(var n in Nodes)
+					if(nodeTexture != null)
+						ret.Add(RectOnPos(n, nodeTexture));
+					else
+						ret.Add(new Rectangle((int)(n.X - 4), (int)(n.Y - 4), 8, 8));
+
+				return ret.ToArray();
+			}
+
+			Rectangle RectOnPos(Vector2 pos, MTexture texture) {
+				return new Rectangle((int)(pos.X - justify.X * texture.Width), (int)(pos.Y - justify.Y * texture.Height), texture.Width, texture.Height);
+			}
+		}
+
+		private List<SpriteWithPos> Sprites() {
+			List<SpriteWithPos> ret = new();
 			if(CallOrGetAll("sprite") is object[] sprites)
 				foreach(var item in sprites) {
 					if(item is LuaTable sprite) {
@@ -89,35 +167,19 @@ namespace Snowberry.Editor.Entities {
 								if(sp["y"] is int spY) { x = spY; }
 								if(sp["color"] is LuaTable ct) { color = TableColor(ct); }
 
-								tex.DrawJustified(new Vector2(x, y), justify, color, new Vector2(sX, sY));
+								ret.Add(new SpriteWithPos(tex, new Vector2(x, y) - Center, new Vector2(sX, sY), color));
+								sp.Dispose();
 							}
 						}
+						sprite.Dispose();
 					}
 				}
-
-			foreach(var node in Nodes) {
-				if(CallOrGet<string>("nodeTexture") is string nodeTexture) {
-					GFX.Game[nodeTexture].DrawCentered(node);
-				}
-			}
-		}
-
-		protected override Rectangle[] Select() {
-			/*if(CallOrGetAll("selection") is object[] selections) {
-				List<LuaTable> checking = new();
-				if(selections.Length > 0 && selections[0] is LuaTable t)
-					checking.Add(t);
-				if(selections.Length > 1 && selections[1] is object[] nodes)
-					foreach(var item in nodes)
-						if(item is LuaTable t2)
-							checking.Add(t2);
-				return checking.Select(k => new Rectangle((int)Float(k, "x", X), (int)Float(k, "y", Y), (int)Float(k, "width", 8), (int)Float(k, "height", 8)) ).ToArray();
-			}*/
-
-			return base.Select();
+			return ret;
 		}
 
 		private static float Float<T>(LuaTable from, T index, float def = 1f) {
+			if(index is int ix) // lua table prefer longs
+				return Float(from, (long)ix, def);
 			if(from.Keys.OfType<T>().Any(k => k.Equals(index))) {
 				object value = from[index];
 				if(value is float f)
@@ -136,7 +198,9 @@ namespace Snowberry.Editor.Entities {
 		}
 
 		private static Color TableColor(LuaTable from) {
-			return new Color(Float(from, 1), Float(from, 2), Float(from, 3), Float(from, 4));
+			Color color1 = new Color(Float(from, 1), Float(from, 2), Float(from, 3), Float(from, 4));
+			from.Dispose();
+			return color1;
 		}
 
 		private T CallOrGet<T>(string name, T orElse = default) where T : class {
@@ -144,26 +208,32 @@ namespace Snowberry.Editor.Entities {
 		}
 
 		private object[] CallOrGetAll(string name, object orElse = default) {
-			LuaTable entity = WrapEntity();
+			using LuaTable entity = WrapEntity();
+			using LuaTable empty = EmptyTable();
 			if(entity == null)
 				return new object[] { orElse };
 			if(plugin[name] is LuaFunction f) {
 				try {
-					return (f.Call(EmptyTable(), entity, EmptyTable())) ?? new object[] { orElse };
+					return (f.Call(empty, entity, empty)) ?? new object[] { orElse };
 				} catch {
 					return new object[] { orElse };
 				}
-			}
-			else if(plugin[name] is object s) {
+			} else if(plugin[name] is object s) {
 				return new object[] { s };
 			} else
 				return new object[] { orElse };
+			
 		}
 
+		private static bool AllocFailed = false;
 		private static LuaTable EmptyTable() {
 			try {
 				return Everest.LuaLoader.Context.DoString("return {}").FirstOrDefault() as LuaTable;
-			} catch(LuaScriptException) { // that can stack overflow. somehow???????
+			} catch(LuaScriptException) { // this can fail after many tables are allocated
+				if(!AllocFailed) {
+					AllocFailed = true;
+					Snowberry.Log(LogLevel.Error, "Failed to allocate empty lua table for Lua entities! Lua entity functionality will be limited. Try restarting the game.");
+				}
 				return null;
 			}
 		}
@@ -209,6 +279,20 @@ namespace Snowberry.Editor.Entities {
 				return (bool)false;
 			else
 				return null;
+		}
+
+		private class SpriteWithPos {
+			public readonly MTexture texture;
+			public readonly Vector2 pos;
+			public readonly Vector2 scale;
+			public readonly Color color;
+
+			public SpriteWithPos(MTexture texture, Vector2 pos, Vector2 scale, Color color) {
+				this.texture = texture;
+				this.pos = pos;
+				this.scale = scale;
+				this.color = color;
+			}
 		}
 	}
 }

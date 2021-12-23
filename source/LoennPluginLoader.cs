@@ -56,7 +56,12 @@ namespace Snowberry {
 						Snowberry.Log(LogLevel.Info, $"Loaded Loenn plugin for \"{pluginTable["name"]}\"");
 					}
 				} catch(Exception e) {
-					Snowberry.Log(LogLevel.Warn, $"Failed to load Loenn plugin at \"{asset.PathVirtual}\": {e}");
+					string ex = e.ToString();
+					if(ex.Contains("error in error handling")) {
+						Snowberry.Log(LogLevel.Error, $"Could not load Loenn plugin at \"{asset.PathVirtual}\" because of internal Lua errors. No more Lua entities will be loaded. Try restarting the game.");
+						break;
+					} else
+						Snowberry.Log(LogLevel.Warn, $"Failed to load Loenn plugin at \"{asset.PathVirtual}\": {ex}");
 				}
 			}
 
