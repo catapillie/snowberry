@@ -1,5 +1,8 @@
 SNOWBERRY_SNOWBERRY={# d12626}Snowberry{#}
 
+# *** Celeste Menu ***
+	EDITOR_MAINMENU= Snowberry
+
 # *** Main Menu ***
 
 	SNOWBERRY_MAINMENU_YES=						yes

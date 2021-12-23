@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using Snowberry.Editor.UI;
 using Snowberry.Editor.UI.Menus;
 
@@ -105,6 +106,7 @@ namespace Snowberry.Editor {
 
         private static readonly Color bg = Calc.HexToColor("060607");
 
+        private bool fadeIn = false;
         public BufferCamera Camera { get; private set; }
 
         public Vector2 mousePos, lastMousePos;
@@ -171,6 +173,25 @@ namespace Snowberry.Editor {
             From = null;
 
             Engine.Scene = new Editor(map);
+        }
+
+        internal static void OpenFancy(MapData data)
+        {
+            Audio.Stop(Audio.CurrentAmbienceEventInstance);
+            Audio.Stop(Audio.CurrentMusicEventInstance);
+            Map map = null;
+            if(data != null)
+            {
+                Snowberry.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
+                map = new Map(data);
+            }
+            FadeWipe wipe = new FadeWipe(Engine.Scene, false, delegate
+            {
+                Editor e = new Editor(map);
+                e.fadeIn = true;
+                Engine.Scene = e;
+            })
+            { Duration = 0.85f } ;
         }
 
         private void MenuUI() {

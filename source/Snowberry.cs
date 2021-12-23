@@ -1,6 +1,7 @@
 ﻿using Celeste;
 using Celeste.Mod;
 using Snowberry.Editor;
+using Microsoft.Xna.Framework;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using System;
@@ -37,6 +38,8 @@ namespace Snowberry {
 			On.Celeste.Editor.MapEditor.ctor += UsePlaytestMap;
             On.Celeste.MapData.StartLevel += DontCrashOnEmptyPlaytestLevel;
 			On.Celeste.LevelEnter.Routine += DontEnterPlaytestMap;
+            Everest.Events.MainMenu.OnCreateButtons += MainMenu_OnCreateButtons;
+            
         }
 
 		public override void LoadContent(bool firstLoad) {
@@ -77,6 +80,46 @@ namespace Snowberry {
             Modules = modules.ToArray();
         }
 
+        public override void Unload() {
+            hook_MapData_orig_Load?.Dispose();
+            hook_Session_get_MapData?.Dispose();
+            On.Celeste.Editor.MapEditor.ctor -= UsePlaytestMap;
+            Everest.Events.MainMenu.OnCreateButtons -= MainMenu_OnCreateButtons;
+        }
+
+        
+        
+        private void MainMenu_OnCreateButtons(OuiMainMenu menu, System.Collections.Generic.List<MenuButton> buttons)
+        {
+            MainMenuSmallButton btn = new MainMenuSmallButton("EDITOR_MAINMENU", "menu/editor", menu, Vector2.Zero, Vector2.Zero, () => {
+                Editor.Editor.OpenFancy(null); //uwu
+            });
+            int c = 2;
+            if (Celeste.Celeste.PlayMode == Celeste.Celeste.PlayModes.Debug) c++;
+            buttons.Insert(c, btn);
+        }
+
+
+        //Currently unused but necessary to determine if Randomizer or other things create a button
+        public static bool TryGetModule(EverestModuleMetadata meta, out EverestModule module)
+        {
+            foreach (EverestModule other in Everest.Modules)
+            {
+                EverestModuleMetadata otherData = other.Metadata;
+                if (otherData.Name != meta.Name)
+                    continue;
+
+                Version version = otherData.Version;
+                if (Everest.Loader.VersionSatisfiesDependency(meta.Version, version))
+                {
+                    module = other;
+                    return true;
+                }
+            }
+
+            module = null;
+            return false;
+        }
 
         public static void Log(LogLevel level, string message)
             => Logger.Log(level, "Snowberry", message);
