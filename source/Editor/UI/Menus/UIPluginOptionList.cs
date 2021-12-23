@@ -46,7 +46,7 @@ namespace Snowberry.Editor.UI.Menus {
                     UIOption ui;
                     Add(ui = ColorOption(option.Key, (Color)value, Plugin));
                     ui.Position.Y = l;
-                    l += 90;
+                    l += 91;
                 } else if (option.Value.FieldType == typeof(int)) {
                     UIOption ui;
                     Add(ui = LiteralValueOption<int>(option.Key, value.ToString(), Plugin));

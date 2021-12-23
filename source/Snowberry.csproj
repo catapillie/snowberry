@@ -153,7 +153,7 @@
     <Compile Include="Editor\UI\UIRibbon.cs" />
     <Compile Include="Editor\UI\UIScrollPane.cs" />
     <Compile Include="Editor\UI\UISearchBar.cs" />
-    <Compile Include="Editor\UI\UISelectionPanel.cs" />
+    <Compile Include="Editor\UI\UIEntitySelection.cs" />
     <Compile Include="Editor\UI\UILabel.cs" />
     <Compile Include="Editor\UI\UIToolbar.cs" />
     <Compile Include="Editor\UI\UIValueTextField.cs" />

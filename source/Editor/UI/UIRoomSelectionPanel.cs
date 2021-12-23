@@ -4,7 +4,7 @@ using Monocle;
 using Snowberry.Editor.UI.Menus;
 using System;
 using System.Text.RegularExpressions;
-using static Snowberry.Editor.UI.UISelectionPanel;
+using static Snowberry.Editor.UI.UIEntitySelection;
 
 namespace Snowberry.Editor.UI {
 

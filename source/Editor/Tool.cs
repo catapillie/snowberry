@@ -39,7 +39,7 @@ namespace Snowberry.Editor {
 		}
 
 		public override UIElement CreatePanel() {
-			return new UISelectionPanel() {
+			return new UIEntitySelection() {
 				Width = 160,
 			};
 		}
@@ -91,7 +91,7 @@ namespace Snowberry.Editor {
 			}
 
 			if((MInput.Mouse.ReleasedLeftButton && canClick) || entitiesRemoved) {
-				if(canSelect && editor.ToolPanel is UISelectionPanel selectionPanel)
+				if(canSelect && editor.ToolPanel is UIEntitySelection selectionPanel)
 					selectionPanel.Display(Editor.SelectedEntities);
 			}
 		}
