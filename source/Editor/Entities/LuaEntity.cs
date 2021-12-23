@@ -23,6 +23,7 @@ namespace Snowberry.Editor.Entities {
 		private int defaultWidth = -1, defaultHeight = -1;
 		private int minNodes = 0, maxNodes = 0;
 		private Vector2 justify = Vector2.One * 0.5f;
+		private string text = null;
 
 		// refreshed when modified
 		Color? color, fillColor, borderColor;
@@ -33,9 +34,10 @@ namespace Snowberry.Editor.Entities {
 
 		public Dictionary<string, object> Values = new();
 
-		public LuaEntity(string name, PluginInfo info, LuaTable plugin) {
+		public LuaEntity(string name, PluginInfo info, LuaTable plugin, bool isTrigger) {
 			Name = name;
 			Info = info;
+			IsTrigger = isTrigger;
 			this.plugin = plugin;
 
 			Tracked = true;
@@ -53,13 +55,18 @@ namespace Snowberry.Editor.Entities {
 		public override void UpdatePostPlacement(Placements.Placement placement) {
 			if(placement.Defaults.ContainsKey("width") && (placement.Defaults["width"] is long width)) {
 				defaultWidth = (int)width;
+			} else if(IsTrigger) {
+				defaultWidth = 8;
 			}
 			if(placement.Defaults.ContainsKey("height") && placement.Defaults["height"] is long height) {
 				defaultHeight = (int)height;
+			} else if(IsTrigger) {
+				defaultHeight = 8;
 			}
 			foreach(var option in Info.Options)
 				if(!Values.ContainsKey(option.Key))
 					Values[option.Key] = ((LuaPluginInfo)Info).Defaults.TryGetValue(option.Key, out var val) ? val : Default(option.Value.Type());
+			text = placement.Name;
 		}
 
 		public override int MinNodes => minNodes;
@@ -105,6 +112,14 @@ namespace Snowberry.Editor.Entities {
 			if(nodeTexture != null)
 				foreach(var node in Nodes)
 					GFX.Game[nodeTexture].DrawCentered(node);
+
+			if(IsTrigger && text != null) {
+				var col = Calc.HexToColor("0c5f7a");
+				Rectangle rect = new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+				Draw.Rect(rect, col * 0.3f);
+				Draw.HollowRect(rect, col);
+				Fonts.Pico8.Draw(text, Center, Vector2.One, Vector2.One * 0.5f, Color.Black);
+			}
 		}
 
 		protected override Rectangle[] Select() {

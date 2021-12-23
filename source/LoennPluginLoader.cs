@@ -28,6 +28,7 @@ namespace Snowberry {
 			Snowberry.Log(LogLevel.Info, "Trying to load Loenn plugins where possible.");
 
 			Dictionary<string, LuaTable> plugins = new();
+			HashSet<string> triggers = new();
 
 			try {
 				if(Everest.LuaLoader.Context["snowberrySetupRequire"] is not true) {
@@ -42,7 +43,7 @@ namespace Snowberry {
 			foreach(var asset in Everest.Content.Mods
 										.SelectMany(k => k.List) 
 										.Where(k => k.Type == typeof(AssetTypeLua))
-										.Where(k => k.PathVirtual.StartsWith("Loenn/entities/"))) {
+										.Where(k => k.PathVirtual.StartsWith("Loenn/entities/") || k.PathVirtual.StartsWith("Loenn/triggers/"))) {
 				try {
 					string text;
 					using(var reader = new StreamReader(asset.Stream)) {
@@ -52,7 +53,10 @@ namespace Snowberry {
 					object[] pluginTables = Everest.LuaLoader.Context.DoString(text, asset.PathVirtual);
 					foreach(var p in pluginTables) {
 						var pluginTable = p as LuaTable;
-						plugins[(string)pluginTable["name"]] = pluginTable;
+						string name = (string)pluginTable["name"];
+						plugins[name] = pluginTable;
+						if(asset.PathVirtual.StartsWith("Loenn/triggers/"))
+							triggers.Add(name);
 						Snowberry.Log(LogLevel.Info, $"Loaded Loenn plugin for \"{pluginTable["name"]}\"");
 					}
 				} catch(Exception e) {
@@ -89,7 +93,8 @@ namespace Snowberry {
 			}
 
 			foreach(var plugin in plugins) {
-				LuaPluginInfo info = new LuaPluginInfo(plugin.Key, plugin.Value);
+				bool isTrigger = triggers.Contains(plugin.Key);
+				LuaPluginInfo info = new LuaPluginInfo(plugin.Key, plugin.Value, isTrigger);
 				PluginInfo.Entities[plugin.Key] = info;
 				
 				LuaTable placements = plugin.Value["placements"] as LuaTable;
@@ -101,7 +106,7 @@ namespace Snowberry {
 						options[item] = data[item];
 					}
 					string placementName = placements["name"] as string ?? "";
-					placementName = LoennText.TryGetValue($"entities.{plugin.Key}.placements.name.{placementName}", out var name) ? $"{name.Key} ({name.Value})" : "Loenn: " + plugin.Key;
+					placementName = LoennText.TryGetValue($"{(isTrigger ? "triggers" : "entities")}.{plugin.Key}.placements.name.{placementName}", out var name) ? $"{name.Key} ({name.Value})" : "Loenn: " + plugin.Key;
 					Placements.Create(placementName, plugin.Key, options);
 				} else if(placements.Keys.Count >= 1 && placements[1] is LuaTable) {
 					for(int i = 1; i < placements.Keys.Count + 1; i++) {

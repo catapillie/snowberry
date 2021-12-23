@@ -421,7 +421,8 @@ namespace Snowberry.Editor {
 
 				foreach (var opt in tigger.Info.Options.Keys) {
                     var val = tigger.Get(opt);
-                    if (val != null)
+                    // thanks lua entity
+                    if (val != null && !(opt.Equals("id") || opt.Equals("x") || opt.Equals("y") || opt.Equals("width") || opt.Equals("height") || opt.Equals("originX") || opt.Equals("originY")))
                         triggersElem.Attributes[opt] = val;
                 }
 
@@ -508,11 +509,11 @@ namespace Snowberry.Editor {
 
         public void AddEntity(Entity e) {
             AllEntities.Add(e);
-            if (e is Plugin_Trigger)
+            if(e.IsTrigger)
                 Triggers.Add(e);
             else
                 Entities.Add(e);
-            if (e.Tracked) {
+            if(e.Tracked) {
                 Type tracking = e.GetType();
                 if (!TrackedEntities.ContainsKey(tracking))
                     TrackedEntities[tracking] = new List<Entity>();

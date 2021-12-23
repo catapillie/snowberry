@@ -23,6 +23,8 @@ namespace Snowberry.Editor {
 
         public bool Tracked { get; protected set; }
 
+        public bool IsTrigger { get; protected set; }
+
         // -1 = not resizable in that direction
         public virtual int MinWidth => -1;
         public virtual int MinHeight => -1;

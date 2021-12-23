@@ -108,14 +108,16 @@ namespace Snowberry {
 
         private readonly LuaTable plugin;
         private readonly string name;
+        private readonly bool isTrigger;
 
         private readonly ReadOnlyDictionary<string, PluginOption> options;
 
         public readonly ReadOnlyDictionary<string, object> Defaults;
 
-        public LuaPluginInfo(string name, LuaTable plugin) : base(name, typeof(LuaEntity), null, LoennSupport.INSTANCE ?? new LoennSupport()) {
+        public LuaPluginInfo(string name, LuaTable plugin, bool isTrigger) : base(name, typeof(LuaEntity), null, LoennSupport.INSTANCE ?? new LoennSupport()) {
             this.plugin = plugin;
             this.name = name;
+            this.isTrigger = isTrigger;
 
             Dictionary<string, PluginOption> options = new();
             Dictionary<string, object> defaults = new();
@@ -147,7 +149,7 @@ namespace Snowberry {
 
 		public override T Instantiate<T>() {
 			if(typeof(T).IsAssignableFrom(typeof(LuaEntity))) {
-                return new LuaEntity(name, this, plugin) as T;
+                return new LuaEntity(name, this, plugin, isTrigger) as T;
 			}
             return null;
 		}

@@ -18,6 +18,10 @@ namespace Snowberry.Editor.Triggers {
         public override int MinWidth => 8;
         public override int MinHeight => 8;
 
+        public Plugin_Trigger() {
+            IsTrigger = true;
+        }
+
         public override void Initialize() {
             base.Initialize();
             Text = string.Join(" ", Regex.Split(char.ToUpper(Name[0]) + Name.Substring(1), @"(?=[A-Z])")).Trim();
