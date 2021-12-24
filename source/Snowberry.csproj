@@ -76,7 +76,7 @@
     <Compile Include="Editor\Stylegrounds\Plugin_Snow.cs" />
     <Compile Include="Editor\Stylegrounds\Plugin_Starfield.cs" />
     <Compile Include="Editor\UI\Menus\MainMenu\UILevelRibbon.cs" />
-    <Compile Include="Editor\UI\Menus\UIConfirmMessage.cs" />
+    <Compile Include="Editor\UI\Menus\UIMessage.cs" />
     <Compile Include="Editor\UI\Menus\MainMenu\UILevelSelector.cs" />
     <Compile Include="Editor\UI\Menus\MainMenu\UIMainMenuButtons.cs" />
     <Compile Include="Editor\UI\Menus\UIPluginOptionList.cs" />

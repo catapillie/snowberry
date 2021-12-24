@@ -116,7 +116,7 @@ namespace Snowberry.Editor {
 
         private RenderTarget2D uiBuffer;
         private readonly UIElement ui = new UIElement();
-        public static UIConfirmMessage Confirmation { get; private set; }
+        public static UIMessage Message { get; private set; }
 
         internal static Rectangle? Selection;
         internal static Room SelectedRoom;
@@ -265,7 +265,7 @@ namespace Snowberry.Editor {
             else
                 MappingUI();
 
-            ui.Add(Confirmation = new UIConfirmMessage() {
+            ui.Add(Message = new UIMessage() {
                 Width = ui.Width,
                 Height = ui.Height,
             });

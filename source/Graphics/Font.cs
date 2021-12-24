@@ -35,7 +35,7 @@ namespace Snowberry {
             if (justify != Vector2.Zero)
                 position -= Measure(str) * scale * justify;
 
-            position = Calc.Round(position);
+            position = Calc.Floor(position);
             float startX = position.X;
 
             for (int i = 0; i < str.Length; i++) {
@@ -60,7 +60,7 @@ namespace Snowberry {
             if (justify != Vector2.Zero)
               position -= Measure(str) * scale * justify;
 
-            position = Calc.Round(position);
+            position = Calc.Floor(position);
             float startX = position.X;
 
             for (int i = 0; i < str.Length; i++) {

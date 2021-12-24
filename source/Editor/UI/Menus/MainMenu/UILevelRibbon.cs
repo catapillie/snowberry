@@ -101,14 +101,14 @@ namespace Snowberry.Editor.UI.Menus {
 
             int mouseX = (int)Editor.Mouse.Screen.X;
             int mouseY = (int)Editor.Mouse.Screen.Y;
-            hover = !Editor.Confirmation.Shown && Visible &&
+            hover = !Editor.Message.Shown && Visible &&
                 new Rectangle((int)position.X + 16, (int)position.Y - 1, Width + w, Height + H + 2).Contains(mouseX, mouseY);
 
             lerp = Calc.Approach(lerp, (hover || pressing).Bit(), Engine.DeltaTime * 6f);
             listLerp = Calc.Approach(listLerp, (selector.LevelRibbonAnim < n).Bit(), Engine.DeltaTime * 4f);
 
             if (Visible) {
-                if (!Editor.Confirmation.Shown && MInput.Mouse.PressedLeftButton && hover) {
+                if (!Editor.Message.Shown && MInput.Mouse.PressedLeftButton && hover) {
                     if (dropdown) {
                         if (!HoveringChildren()) {
                             openLerp = open.Bit();
@@ -119,13 +119,20 @@ namespace Snowberry.Editor.UI.Menus {
                         pressing = true;
                     }
                 }
-                if (MInput.Mouse.ReleasedLeftButton && pressing || Editor.Confirmation.Shown) {
+                if (MInput.Mouse.ReleasedLeftButton && pressing || Editor.Message.Shown) {
                     pressing = false;
                     if (hover) {
                         if (MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down)
                             Editor.Open(mode.MapData);
-                        else
-                            Editor.Confirmation.Show(ConfirmLoadMessage(), () => Editor.Open(mode.MapData));
+                        else {
+                            Editor.Message.Clear();
+
+                            Editor.Message.AddElement(ConfirmLoadMessage(), 0.5f, 0.5f, 0.5f, -0.1f);
+                            var buttons = UIMessage.YesAndNoButtons(() => Editor.Open(mode.MapData), () => Editor.Message.Shown = false, 0, 4, 0.5f, 0f);
+                            Editor.Message.AddElement(buttons, 0.5f, 0.5f, 0.5f, 1.1f);
+
+                            Editor.Message.Shown = true;
+                        }
                     }
                 }
             }
@@ -178,7 +185,15 @@ namespace Snowberry.Editor.UI.Menus {
             };
             tip.Position = new Vector2(-tip.Width / 2, warn.Position.Y + warn.Height);
 
-            return Regroup(ribbon, msg, warn, tip);
+            var element = Regroup(ribbon, msg, warn, tip);
+
+            Vector2 offset = new Vector2(element.Width / 2f, element.Height);
+            ribbon.Position -= offset;
+            msg.Position -= offset;
+            warn.Position -= offset;
+            tip.Position -= offset;
+
+            return element;
         }
     }
 }
