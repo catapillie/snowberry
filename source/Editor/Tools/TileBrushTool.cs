@@ -233,8 +233,8 @@ namespace Snowberry.Editor.Tools {
                 var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8 - Editor.SelectedRoom.Position.X), (float)Math.Floor(Editor.Mouse.World.Y / 8 - Editor.SelectedRoom.Position.Y));
                 int x = (int)tilePos.X; int y = (int)tilePos.Y;
                 if (Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
-                    var lastPress = (Editor.Instance.worldClick / 8).Ceiling();
-                    var roomLastPress = (Editor.Instance.worldClick / 8).Ceiling() - Editor.SelectedRoom.Position;
+                    var lastPress = (Editor.Instance.worldClick / 8).Floor();
+                    var roomLastPress = (Editor.Instance.worldClick / 8).Floor() - Editor.SelectedRoom.Position;
                     int ax = (int)Math.Min(x, roomLastPress.X);
                     int ay = (int)Math.Min(y, roomLastPress.Y);
                     int bx = (int)Math.Max(x, roomLastPress.X);
