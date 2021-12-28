@@ -291,7 +291,7 @@ namespace Snowberry.Editor {
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
-            Mouse.World = Calc.Round(Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse));
+            Mouse.World = Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse).Floor();
 
             MouseClicked = false;
             ui.Update();
