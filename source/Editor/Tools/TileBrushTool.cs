@@ -234,7 +234,7 @@ namespace Snowberry.Editor.Tools {
                 int x = (int)tilePos.X; int y = (int)tilePos.Y;
                 if (Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
                     var lastPress = (Editor.Instance.worldClick / 8).Floor();
-                    var roomLastPress = (Editor.Instance.worldClick / 8).Floor() - Editor.SelectedRoom.Position;
+                    var roomLastPress = lastPress - Editor.SelectedRoom.Position;
                     int ax = (int)Math.Min(x, roomLastPress.X);
                     int ay = (int)Math.Min(y, roomLastPress.Y);
                     int bx = (int)Math.Max(x, roomLastPress.X);
@@ -319,9 +319,11 @@ namespace Snowberry.Editor.Tools {
                             }
                             break;
                         case TileBrushMode.Circle:
+                            int radiusSquared = (rect.Width - 1) * (rect.Width - 1) + (rect.Height - 1) * (rect.Height - 1);
                             for (int x2 = 0; x2 < holoFgTileMap.Columns; x2++)
                                 for (int y2 = 0; y2 < holoFgTileMap.Rows; y2++) {
-                                    bool set = ((lastPress.X - x2) * (lastPress.X - x2) + (lastPress.Y - y2) * (lastPress.Y - y2)) < (rect.Width * rect.Width + rect.Height * rect.Height) / Math.Sqrt(2);
+                                    float deltaSquared = (roomLastPress.X - x2) * (roomLastPress.X - x2) + (roomLastPress.Y - y2) * (roomLastPress.Y - y2);
+                                    bool set = deltaSquared <= radiusSquared;
                                     SetHoloTile(fg, set ? tileset : 0, x2, y2, !set);
                                 }
                             break;
