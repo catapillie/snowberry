@@ -239,7 +239,7 @@ namespace Snowberry.Editor.Tools {
                     int ay = (int)Math.Min(y, roomLastPress.Y);
                     int bx = (int)Math.Max(x, roomLastPress.X);
                     int by = (int)Math.Max(y, roomLastPress.Y);
-                    var rect = new Rectangle(ax, ay, bx - ax, by - ay);
+                    var rect = new Rectangle(ax, ay, bx - ax + 1, by - ay + 1);
                     TileBrushMode mode = left ? LeftMode : RightMode;
                     switch (mode) {
                         case TileBrushMode.Brush:
