@@ -2,9 +2,9 @@
 using Microsoft.Xna.Framework;
 using Monocle;
 using Snowberry.Editor.UI;
+using Snowberry.Editor.UI.Menus;
 using System.Collections.Generic;
 using System.Linq;
-using static Snowberry.Editor.UI.UISelectionPanel;
 
 namespace Snowberry.Editor.Tools {
     public class StylegroundsTool : Tool {
@@ -140,11 +140,11 @@ namespace Snowberry.Editor.Tools {
         private void AddStylegroundInfo(UIElement panel) {
             panel.Clear();
             var styleground = Stylegrounds[SelectedButton()];
-            panel.Add(new UIOption("Only In", new UITextField(Fonts.Regular, 120, styleground.OnlyIn)));
-            panel.AddBelow(new UIOption("Not In", new UITextField(Fonts.Regular, 120, styleground.ExcludeFrom)));
-            panel.AddBelow(new UIOption("Flag", new UITextField(Fonts.Regular, 120, styleground.Flag)));
-            panel.AddBelow(new UIOption("Not Flag", new UITextField(Fonts.Regular, 120, styleground.NotFlag)));
-            panel.AddBelow(new UIOption("Force Flag", new UITextField(Fonts.Regular, 120, styleground.ForceFlag)));
+            panel.Add(UIPluginOptionList.StringOption("Only In", styleground.OnlyIn, onChange: null));
+            panel.AddBelow(UIPluginOptionList.StringOption("Not In", styleground.ExcludeFrom, onChange: null));
+            panel.AddBelow(UIPluginOptionList.StringOption("Flag", styleground.Flag, onChange: null));
+            panel.AddBelow(UIPluginOptionList.StringOption("Not Flag", styleground.NotFlag, onChange: null));
+            panel.AddBelow(UIPluginOptionList.StringOption("Force Flag", styleground.ForceFlag, onChange: null));
         }
 
         private void MoveStyleground(int by) {

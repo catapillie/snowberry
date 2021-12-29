@@ -69,7 +69,7 @@ namespace Snowberry.Editor.UI.Menus {
 
         public static UIOption StringOption(string name, string value, Action<string> onChange) {
             var checkbox = new UITextField(Fonts.Regular, 80, value) {
-                OnInputChange = str => onChange(str),
+                OnInputChange = str => onChange?.Invoke(str),
             };
             return new UIOption(name, checkbox);
         }
@@ -83,7 +83,7 @@ namespace Snowberry.Editor.UI.Menus {
 
         public static UIOption LiteralValueOption<T>(string name, string value, Action<T> onChange) {
             var checkbox = new UIValueTextField<T>(Fonts.Regular, 80, value) {
-                OnValidInputChange = v => onChange(v),
+                OnValidInputChange = v => onChange?.Invoke(v),
             };
             return new UIOption(name, checkbox);
         }
@@ -97,7 +97,7 @@ namespace Snowberry.Editor.UI.Menus {
 
         public static UIOption BoolOption(string name, bool value, Action<bool> onChange) {
             var checkbox = new UICheckBox(-1, value) {
-                OnPress = b => onChange(b),
+                OnPress = b => onChange?.Invoke(b),
             };
             return new UIOption(name, checkbox);
         }
@@ -111,7 +111,7 @@ namespace Snowberry.Editor.UI.Menus {
 
         public static UIOption ColorOption(string name, Color value, Action<Color> onChange) {
             var colorpicker = new UIColorPicker(100, 80, 16, 12, value) {
-                OnColorChange = color => onChange(color),
+                OnColorChange = color => onChange?.Invoke(color),
             };
             return new UIOption(name, colorpicker);
         }

@@ -7,8 +7,6 @@ using Monocle;
 using Snowberry.Editor.UI;
 using System;
 using System.Collections.Generic;
-using System.Collections;
-using Snowberry.Editor.UI;
 using Snowberry.Editor.UI.Menus;
 
 namespace Snowberry.Editor {
