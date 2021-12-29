@@ -14,6 +14,7 @@ namespace Snowberry.Editor {
             private bool changedView = true;
 
             private Vector2 pos;
+
             public Vector2 Position {
                 get => pos;
                 set {
@@ -21,10 +22,12 @@ namespace Snowberry.Editor {
                     changedView = true;
                 }
             }
+
             public int X => (int)Position.X;
             public int Y => (int)Position.Y;
 
             private float scale = 1f;
+
             public float Zoom {
                 get => scale;
                 set {
@@ -35,11 +38,13 @@ namespace Snowberry.Editor {
                         Vector2 size = new Vector2(Engine.Width, Engine.Height) / scale;
                         Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, (int)size.X + (Engine.Width % scale == 0 ? 0 : 1), (int)size.Y + (Engine.Height % scale == 0 ? 0 : 1));
                     }
+
                     changedView = true;
                 }
             }
 
             private Matrix matrix, inverse, screenview;
+
             public Matrix Matrix {
                 get {
                     if (changedView)
@@ -47,6 +52,7 @@ namespace Snowberry.Editor {
                     return matrix;
                 }
             }
+
             public Matrix Inverse {
                 get {
                     if (changedView)
@@ -54,6 +60,7 @@ namespace Snowberry.Editor {
                     return inverse;
                 }
             }
+
             public Matrix ScreenView {
                 get {
                     if (changedView)
@@ -84,6 +91,7 @@ namespace Snowberry.Editor {
                     ViewRect = new Rectangle((int)Position.X - w / 2, (int)Position.Y - h / 2, w, h);
                     screenview = m;
                 }
+
                 inverse = Matrix.Invert(matrix = m);
 
                 changedView = false;
@@ -270,6 +278,7 @@ namespace Snowberry.Editor {
                 else if (wheel < 0)
                     scale = scale > 1 ? scale - 1 : scale / 2f;
             }
+
             scale = Calc.Clamp(scale, 0.0625f, 24f);
             if (scale != Camera.Zoom)
                 Camera.Zoom = scale;
@@ -280,9 +289,9 @@ namespace Snowberry.Editor {
             // controls
             bool canClick = ui.CanClickThrough();
 
-			// panning
-			bool middlePan = Snowberry.Settings.MiddleClickPan;
-			if ((middlePan && MInput.Mouse.CheckMiddleButton || !middlePan && MInput.Mouse.CheckRightButton) && canClick) {
+            // panning
+            bool middlePan = Snowberry.Settings.MiddleClickPan;
+            if ((middlePan && MInput.Mouse.CheckMiddleButton || !middlePan && MInput.Mouse.CheckRightButton) && canClick) {
                 Vector2 move = lastMousePos - mousePos;
                 if (move != Vector2.Zero)
                     Camera.Position += move / (Camera.Buffer == null ? Camera.Zoom : 1f);
@@ -350,12 +359,12 @@ namespace Snowberry.Editor {
 
             // Tooltip rendering
             var tooltip = ui.HoveredTooltip();
-			if(tooltip != null) {
+            if (tooltip != null) {
                 var tooltipArea = Fonts.Regular.Measure(tooltip);
                 var at = Mouse.Screen.Round() - new Vector2(0, tooltipArea.Y + 6);
                 Draw.Rect(at, tooltipArea.X + 8, tooltipArea.Y + 6, Color.Black * 0.4f);
                 Fonts.Regular.Draw(tooltip, at + new Vector2(4, 3), Vector2.One, Color.White);
-			}
+            }
 
             Draw.SpriteBatch.End();
 

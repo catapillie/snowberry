@@ -41,10 +41,12 @@ namespace Snowberry {
                         continue;
                     }
                 }
+
                 esc = false;
 
                 characters.Add(Tuple.Create<char?, Color>(c, colors.Count == 0 ? Color.White : colors.Peek()));
             }
+
             this.characters = characters.ToArray();
         }
 

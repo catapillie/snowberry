@@ -48,6 +48,7 @@ namespace Snowberry.Editor {
                     break;
                 }
             }
+
             if (i < 0)
                 Entity.SetPosition(position);
             else
@@ -61,6 +62,7 @@ namespace Snowberry.Editor {
                     break;
                 }
             }
+
             Entity.SetWidth(width);
         }
 
@@ -71,6 +73,7 @@ namespace Snowberry.Editor {
                     break;
                 }
             }
+
             Entity.SetHeight(height);
         }
 

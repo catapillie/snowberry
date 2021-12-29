@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace Snowberry.Editor {
-
     public class Placements {
-
         public class Placement {
-
             public string Name, EntityName;
 
             public Dictionary<string, object> Defaults;
@@ -27,7 +24,6 @@ namespace Snowberry.Editor {
         public static List<Placement> All = new List<Placement>();
 
         public static void Create(string placementName, string entityName, Dictionary<string, object> defaults = null) {
-
             All.Add(new Placement(placementName, entityName, defaults ?? new Dictionary<string, object>()));
         }
     }

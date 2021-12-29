@@ -3,7 +3,6 @@ using Snowberry.Editor;
 
 namespace Snowberry {
     public class CelesteEverest : SnowberryModule {
-
         public static SnowberryModule INSTANCE { get; private set; }
 
         public CelesteEverest()

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Monocle;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +30,7 @@ namespace Snowberry.Editor.UI {
         public virtual void Update(Vector2 position = default) {
             canModify = false;
             // The last child is rendered last, on top of everything else, and should be the first to consume mouse clicks.
-            for(int i = Children.Count - 1; i >= 0; i--) {
+            for (int i = Children.Count - 1; i >= 0; i--) {
                 UIElement element = Children[i];
                 element.Update(position + element.Position);
             }
@@ -46,13 +44,14 @@ namespace Snowberry.Editor.UI {
         }
 
         public virtual void Render(Vector2 position = default) {
-            if(Background.HasValue) {
+            if (Background.HasValue) {
                 Rectangle rect = new Rectangle((int)position.X, (int)position.Y, Width, Height);
                 Draw.Rect(rect, Background.Value);
             }
-            if(RenderChildren)
-                foreach(UIElement element in Children)
-                    if(element.Visible)
+
+            if (RenderChildren)
+                foreach (UIElement element in Children)
+                    if (element.Visible)
                         element.Render(position + element.Position);
         }
 
@@ -65,14 +64,14 @@ namespace Snowberry.Editor.UI {
         public virtual Vector2 BoundsOffset() => Vector2.Zero;
 
         public void Destroy() {
-            foreach(UIElement element in Children)
+            foreach (UIElement element in Children)
                 element?.Destroy();
             OnDestroy();
         }
 
         public void Add(UIElement element) {
-            if(canModify) {
-                if(element.Parent == null) {
+            if (canModify) {
+                if (element.Parent == null) {
                     Children.Add(element);
                     element.Parent = this;
                     element.Initialize();
@@ -88,8 +87,9 @@ namespace Snowberry.Editor.UI {
 
         public void AddBelow(UIElement element) {
             UIElement low = null;
-            foreach(var item in Children)
-                if(low == null || item.Position.Y > low.Position.Y) low = item;
+            foreach (var item in Children)
+                if (low == null || item.Position.Y > low.Position.Y)
+                    low = item;
             Add(element);
             element.Position += new Vector2(0, (low?.Position.Y + low?.Height) ?? 0);
         }
@@ -101,14 +101,15 @@ namespace Snowberry.Editor.UI {
 
         public void AddRight(UIElement element) {
             UIElement right = null;
-            foreach(var item in Children)
-                if(right == null || item.Position.X > right.Position.X) right = item;
+            foreach (var item in Children)
+                if (right == null || item.Position.X > right.Position.X)
+                    right = item;
             Add(element);
             element.Position += new Vector2((right?.Position.X + right?.Width) ?? 0, 0);
         }
 
         public void Clear() {
-            foreach(UIElement element in Children)
+            foreach (UIElement element in Children)
                 element?.Destroy();
             Children.Clear();
         }
@@ -122,22 +123,24 @@ namespace Snowberry.Editor.UI {
         }
 
         public void RemoveAll(ICollection<UIElement> elems) {
-            foreach(var item in elems)
+            foreach (var item in elems)
                 Remove(item);
         }
 
-        public T HoveredChildProperty<T>(Func<UIElement, T> getter, T ignore = default){
-			if(!Equals(getter(this), ignore)) {
+        public T HoveredChildProperty<T>(Func<UIElement, T> getter, T ignore = default) {
+            if (!Equals(getter(this), ignore)) {
                 return getter(this);
-			}
-			foreach(var child in Children) {
-				if(child.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y)) {
+            }
+
+            foreach (var child in Children) {
+                if (child.Bounds.Contains((int)Editor.Mouse.Screen.X, (int)Editor.Mouse.Screen.Y)) {
                     var p = child.HoveredChildProperty(getter, ignore);
-					if(!Equals(p, ignore)) {
+                    if (!Equals(p, ignore)) {
                         return p;
-					}
-				}
-			}
+                    }
+                }
+            }
+
             return ignore;
         }
 
@@ -154,25 +157,28 @@ namespace Snowberry.Editor.UI {
         }
 
         private bool ConsumeClick() {
-            if(!Editor.MouseClicked) {
+            if (!Editor.MouseClicked) {
                 Editor.MouseClicked = true;
                 return true;
             }
+
             return false;
         }
 
         protected bool ConsumeLeftClick(bool pressed = true, bool held = false, bool released = false) {
-			if((!pressed || MInput.Mouse.PressedLeftButton) && (!held || MInput.Mouse.CheckLeftButton) && (!released || MInput.Mouse.ReleasedLeftButton)) {
+            if ((!pressed || MInput.Mouse.PressedLeftButton) && (!held || MInput.Mouse.CheckLeftButton) && (!released || MInput.Mouse.ReleasedLeftButton)) {
                 return ConsumeClick();
             }
+
             return false;
         }
 
         protected bool ConsumeAltClick(bool pressed = true, bool held = false, bool released = false) {
-            if(Snowberry.Settings.MiddleClickPan) {
-                if((!pressed || MInput.Mouse.PressedRightButton) && (!held || MInput.Mouse.CheckRightButton) && (!released || MInput.Mouse.ReleasedRightButton)) {
+            if (Snowberry.Settings.MiddleClickPan) {
+                if ((!pressed || MInput.Mouse.PressedRightButton) && (!held || MInput.Mouse.CheckRightButton) && (!released || MInput.Mouse.ReleasedRightButton)) {
                     return ConsumeClick();
-				}
+                }
+
                 return false;
             } else {
                 return (MInput.Keyboard.Check(Keys.LeftAlt) || MInput.Keyboard.Check(Keys.RightAlt)) && ConsumeLeftClick(pressed, held, released);
@@ -185,14 +191,14 @@ namespace Snowberry.Editor.UI {
 
         public T NestedChildWithTag<T>(string tag) where T : UIElement {
             var immediate = ChildWithTag<T>(tag);
-            if(immediate != null)
+            if (immediate != null)
                 return immediate;
 
-			foreach(var child in Children) {
+            foreach (var child in Children) {
                 var ret = child.NestedChildWithTag<T>(tag);
-                if(ret != null)
+                if (ret != null)
                     return ret;
-			}
+            }
 
             return null;
         }

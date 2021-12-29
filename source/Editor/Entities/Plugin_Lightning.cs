@@ -5,7 +5,6 @@ using System.Collections.Generic;
 namespace Snowberry.Editor.Entities {
     [Plugin("lightning")]
     public class Plugin_Lightning : Entity {
-
         [Option("moveTime")] public float MoveTime = 1;
 
         private List<bool> upperEdges;
@@ -13,7 +12,7 @@ namespace Snowberry.Editor.Entities {
         private List<bool> leftEdges;
         private List<bool> rightEdges;
 
-        public static Color[] ElectricityColors = new Color[2]{
+        public static Color[] ElectricityColors = new Color[2] {
             Calc.HexToColor("8cf7e2"),
             Calc.HexToColor("fcf579")
         };
@@ -50,6 +49,7 @@ namespace Snowberry.Editor.Entities {
                         upperEdges.Add(false);
                         lowerEdges.Add(false);
                     }
+
                     bool drawUp = dirty ? upperEdges[j] = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y - 4) : upperEdges[j];
                     bool drawDown = dirty ? lowerEdges[j] = !IsLightningAt(Position.X + j * slice * 2 + 2, Position.Y + 4 + Height) : lowerEdges[j];
                     for (int k = 0; k < 2; k++) {
@@ -59,18 +59,24 @@ namespace Snowberry.Editor.Entities {
                             Draw.Line(Position + new Vector2(i * slice, prev0), Position + new Vector2(i * slice + slice, prev0 = (last ? 0 : Calc.Random.Next(-2, 3))), ElectricityColors[0]);
                             Draw.Line(Position + new Vector2(i * slice, prev1), Position + new Vector2(i * slice + slice, prev1 = (last ? 0 : Calc.Random.Next(-2, 3))), ElectricityColors[1]);
                         }
+
                         if (drawDown) {
                             Draw.Line(Position + new Vector2(i * slice, Height + prev3), Position + new Vector2(i * slice + slice, Height + (prev3 = (last ? 0 : Calc.Random.Next(-2, 3)))), ElectricityColors[0]);
                             Draw.Line(Position + new Vector2(i * slice, Height + prev4), Position + new Vector2(i * slice + slice, Height + (prev4 = (last ? 0 : Calc.Random.Next(-2, 3)))), ElectricityColors[1]);
                         }
                     }
                 }
-                prev0 = 0; prev1 = 0; prev3 = 0; prev4 = 0;
+
+                prev0 = 0;
+                prev1 = 0;
+                prev3 = 0;
+                prev4 = 0;
                 for (int j = 0; j < vertLimit; j++) {
                     if (leftEdges.Count <= j) {
                         leftEdges.Add(false);
                         rightEdges.Add(false);
                     }
+
                     bool drawLeft = dirty ? leftEdges[j] = !IsLightningAt(Position.X - 4, Position.Y + j * slice * 2 + 2) : leftEdges[j];
                     bool drawRight = dirty ? rightEdges[j] = !IsLightningAt(Position.X + 4 + Width, Position.Y + j * slice * 2 + 2) : rightEdges[j];
                     for (int k = 0; k < 2; k++) {
@@ -80,6 +86,7 @@ namespace Snowberry.Editor.Entities {
                             Draw.Line(Position + new Vector2(prev0, i * slice), Position + new Vector2(prev0 = (last ? 0 : Calc.Random.Next(-2, 3)), i * slice + slice), ElectricityColors[0]);
                             Draw.Line(Position + new Vector2(prev1, i * slice), Position + new Vector2(prev1 = (last ? 0 : Calc.Random.Next(-2, 3)), i * slice + slice), ElectricityColors[1]);
                         }
+
                         if (drawRight) {
                             Draw.Line(Position + new Vector2(Width + prev3, i * slice), Position + new Vector2(Width + (prev3 = (last ? 0 : Calc.Random.Next(-2, 3))), i * slice + slice), ElectricityColors[0]);
                             Draw.Line(Position + new Vector2(Width + prev4, i * slice), Position + new Vector2(Width + (prev4 = (last ? 0 : Calc.Random.Next(-2, 3))), i * slice + slice), ElectricityColors[1]);

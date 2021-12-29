@@ -4,10 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
 namespace Snowberry.Editor.Stylegrounds {
-
     [Plugin("parallax")]
     internal class Plugin_Parallax : Styleground {
-
         [Option("texture")] public string Texture = "";
         [Option("atlas")] public string Atlas = "game";
         [Option("blendmode")] public string BlendMode = "alphablend";
@@ -65,6 +63,7 @@ namespace Snowberry.Editor.Stylegrounds {
                         break;
                     drawPos.Y += mtex.Height;
                 } while (drawPos.Y < editor.Camera.ViewRect.Bottom);
+
                 if (!LoopX)
                     break;
                 drawPos.X += mtex.Width;

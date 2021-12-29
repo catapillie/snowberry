@@ -74,6 +74,7 @@ namespace Snowberry.Editor.UI {
                 widthAtIndex[i] = w;
                 w += (int)Font.Measure(Value[i]).X + 1;
             }
+
             widthAtIndex[widthAtIndex.Length - 1] = w;
             OnInputUpdate(Value);
         }
@@ -84,9 +85,11 @@ namespace Snowberry.Editor.UI {
 
         private void GetSelection(out int a, out int b) {
             if (charIndex < selection) {
-                a = charIndex; b = selection;
+                a = charIndex;
+                b = selection;
             } else if (selection < charIndex) {
-                a = selection; b = charIndex;
+                a = selection;
+                b = charIndex;
             } else {
                 a = b = charIndex;
             }
@@ -106,7 +109,8 @@ namespace Snowberry.Editor.UI {
             } else
                 next += step;
 
-            return Calc.Clamp(next, 0, Value.Length); ;
+            return Calc.Clamp(next, 0, Value.Length);
+            ;
         }
 
         public override void Update(Vector2 position = default) {
@@ -121,16 +125,16 @@ namespace Snowberry.Editor.UI {
 
                 if (click) {
                     // don't require consuming the click to deselect, but do require it to select
-                    if(inside) {
-                        if(ConsumeLeftClick()) {
+                    if (inside) {
+                        if (ConsumeLeftClick()) {
                             Selected = true;
                         }
                     } else {
                         Selected = false;
                     }
-				}
+                }
 
-				if (Selected) {
+                if (Selected) {
                     int i, d = mouseX - (int)position.X + 1;
 
                     for (i = 0; i < widthAtIndex.Length - 1; i++)
@@ -214,6 +218,7 @@ namespace Snowberry.Editor.UI {
                 if ((Engine.Scene.TimeActive - timeOffset) % 1f < 0.5f) {
                     Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, Font.LineHeight, FG);
                 }
+
                 if (selection != charIndex) {
                     int a = widthAtIndex[charIndex], b = widthAtIndex[selection];
                     if (a < b)

@@ -1,16 +1,11 @@
 ﻿using Celeste;
-
 using Microsoft.Xna.Framework;
-
 using Monocle;
-
 using Snowberry.Editor.UI;
-
 using System;
 
 namespace Snowberry.Editor.Tools {
-	public class RoomTool : Tool {
-
+    public class RoomTool : Tool {
         private Room lastSelected = null;
         private int lastFillerSelected = -1;
         public static bool ScheduledRefresh = false;
@@ -82,6 +77,7 @@ namespace Snowberry.Editor.Tools {
                             newWidth = (int)Math.Ceiling(world.X - Editor.SelectedRoom.Bounds.X);
                             Editor.SelectedRoom.Bounds.Width = Math.Max(newWidth, 1);
                         }
+
                         if (resizingY) {
                             newHeight = (int)Math.Ceiling(world.Y - Editor.SelectedRoom.Bounds.Y);
                             Editor.SelectedRoom.Bounds.Height = Math.Max(newHeight, 1);
@@ -93,6 +89,7 @@ namespace Snowberry.Editor.Tools {
                         oldRoomBounds = Editor.SelectedRoom.Bounds;
                         Editor.SelectedRoom.UpdateBounds();
                     }
+
                     resizingX = resizingY = false;
                     newWidth = newHeight = 0;
                 }

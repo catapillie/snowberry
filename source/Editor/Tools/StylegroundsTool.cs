@@ -1,19 +1,13 @@
 ﻿using Celeste;
-
 using Microsoft.Xna.Framework;
-
 using Monocle;
-
 using Snowberry.Editor.UI;
-
 using System.Collections.Generic;
 using System.Linq;
-
 using static Snowberry.Editor.UI.UISelectionPanel;
 
 namespace Snowberry.Editor.Tools {
-	public class StylegroundsTool : Tool {
-
+    public class StylegroundsTool : Tool {
         public List<UIButton> StylegroundButtons = new();
         public Dictionary<UIButton, Styleground> Stylegrounds = new();
         public int SelectedStyleground = 0;
@@ -38,11 +32,11 @@ namespace Snowberry.Editor.Tools {
                 Tag = "stylegrounds_list"
             };
 
-			var fgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_FOREGROUND")) {
-				FG = Color.DarkKhaki,
-				Underline = true
-			};
-			fgLabel.Position = new Vector2((stylegrounds.Width - fgLabel.Width) / 2, 10);
+            var fgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_FOREGROUND")) {
+                FG = Color.DarkKhaki,
+                Underline = true
+            };
+            fgLabel.Position = new Vector2((stylegrounds.Width - fgLabel.Width) / 2, 10);
             stylegrounds.Add(fgLabel);
 
             int i = 0;
@@ -58,14 +52,14 @@ namespace Snowberry.Editor.Tools {
                 i++;
             }
 
-			var bgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND")) {
-				FG = Color.DarkKhaki,
-				Underline = true
-			};
-			bgLabel.Position = new Vector2((stylegrounds.Width - bgLabel.Width) / 2, i * 20 + 40);
+            var bgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND")) {
+                FG = Color.DarkKhaki,
+                Underline = true
+            };
+            bgLabel.Position = new Vector2((stylegrounds.Width - bgLabel.Width) / 2, i * 20 + 40);
             stylegrounds.Add(bgLabel);
 
-            foreach(var styleground in Editor.Instance.Map.BGStylegrounds) {
+            foreach (var styleground in Editor.Instance.Map.BGStylegrounds) {
                 int copy = i;
                 UIButton element = new UIButton(styleground.Title(), Fonts.Regular, 4, 2) {
                     Position = new Vector2(10, i * 20 + 60),
@@ -80,9 +74,9 @@ namespace Snowberry.Editor.Tools {
                 i++;
             }
 
-			if(SelectedStyleground >= StylegroundButtons.Count) {
+            if (SelectedStyleground >= StylegroundButtons.Count) {
                 SelectedStyleground = 0;
-			}
+            }
 
             UIElement stylebg = UIElement.Regroup(stylegrounds);
             stylebg.Background = Color.White * 0.1f;
@@ -107,21 +101,21 @@ namespace Snowberry.Editor.Tools {
 
             optionsPanel.AddRight(Delete = new UIButton("-", Fonts.Regular, 4, 4) {
                 OnPress = () => {
-					UIButton selected = SelectedButton();
-					if(selected != null) { // if there are no stylegrounds
-						Bgs().Remove(Stylegrounds[selected]);
-						Fgs().Remove(Stylegrounds[selected]);
-						selected.RemoveSelf();
-						RefreshPanel();
+                    UIButton selected = SelectedButton();
+                    if (selected != null) { // if there are no stylegrounds
+                        Bgs().Remove(Stylegrounds[selected]);
+                        Fgs().Remove(Stylegrounds[selected]);
+                        selected.RemoveSelf();
+                        RefreshPanel();
                     }
                 }
-			}, new Vector2(4));
+            }, new Vector2(4));
 
             optionsPanel.AddRight(MoveUp = new UIButton("↑", Fonts.Regular, 4, 4) {
                 OnPress = () => {
-					MoveStyleground(-1);
-				}
-			}, new Vector2(4));
+                    MoveStyleground(-1);
+                }
+            }, new Vector2(4));
 
             optionsPanel.AddRight(MoveDown = new UIButton("↓", Fonts.Regular, 4, 4) {
                 OnPress = () => {
@@ -137,7 +131,7 @@ namespace Snowberry.Editor.Tools {
                 Width = 175,
                 Position = new Vector2(5, 0)
             };
-            
+
             panel.AddBelow(stylegroundInfo);
             AddStylegroundInfo(stylegroundInfo);
             return panel;
@@ -153,55 +147,58 @@ namespace Snowberry.Editor.Tools {
             panel.AddBelow(new UIOption("Force Flag", new UITextField(Fonts.Regular, 120, styleground.ForceFlag)));
         }
 
-		private void MoveStyleground(int by) {
-			UIButton selected = SelectedButton();
-			if(selected != null) {
-				var style = Stylegrounds[selected];
-				if(IsFg(style)) {
-					int indx = Fgs().IndexOf(style);
-					if(indx + by < 0 || indx + by >= Fgs().Count)
-						return;
-					Fgs().Remove(style);
-					Fgs().Insert(indx + by, style);
-				} else {
-					int indx = Bgs().IndexOf(style);
-					if(indx + by < 0 || indx + by >= Bgs().Count)
-						return;
-					Bgs().Remove(style);
-					Bgs().Insert(indx + by, style);
-				}
-				SelectedStyleground += by;
-				RefreshPanel();
-			}
-		}
+        private void MoveStyleground(int by) {
+            UIButton selected = SelectedButton();
+            if (selected != null) {
+                var style = Stylegrounds[selected];
+                if (IsFg(style)) {
+                    int indx = Fgs().IndexOf(style);
+                    if (indx + by < 0 || indx + by >= Fgs().Count)
+                        return;
+                    Fgs().Remove(style);
+                    Fgs().Insert(indx + by, style);
+                } else {
+                    int indx = Bgs().IndexOf(style);
+                    if (indx + by < 0 || indx + by >= Bgs().Count)
+                        return;
+                    Bgs().Remove(style);
+                    Bgs().Insert(indx + by, style);
+                }
 
-		private UIButton SelectedButton() {
-			return StylegroundButtons.Count > SelectedStyleground ? StylegroundButtons[SelectedStyleground] : null;
-		}
+                SelectedStyleground += by;
+                RefreshPanel();
+            }
+        }
 
-		public override string GetName() {
+        private UIButton SelectedButton() {
+            return StylegroundButtons.Count > SelectedStyleground ? StylegroundButtons[SelectedStyleground] : null;
+        }
+
+        public override string GetName() {
             return Dialog.Clean("SNOWBERRY_EDITOR_TOOL_STYLEGROUNDS");
         }
 
         public override void Update(bool canClick) {
             for (int i = 0; i < StylegroundButtons.Count; i++) {
                 UIButton item = StylegroundButtons[i];
-                if(i == SelectedStyleground) {
+                if (i == SelectedStyleground) {
                     item.BG = item.HoveredBG = item.PressedBG = LeftSelectedBtnBg;
-				} else if(Stylegrounds[item].IsVisible(Editor.SelectedRoom)) {
+                } else if (Stylegrounds[item].IsVisible(Editor.SelectedRoom)) {
                     item.BG = item.HoveredBG = item.PressedBG = Color.Lerp(BothSelectedBtnBg, Color.Black, 0.5f);
                 } else {
                     item.ResetBgColors();
                 }
             }
-            if(SelectedButton() != null) {
+
+            if (SelectedButton() != null) {
                 var styleground = Stylegrounds[SelectedButton()];
-                if(IsFg(styleground) ? Fgs().IndexOf(styleground) > 0 : Bgs().IndexOf(styleground) > 0) {
+                if (IsFg(styleground) ? Fgs().IndexOf(styleground) > 0 : Bgs().IndexOf(styleground) > 0) {
                     MoveUp.ResetFgColors();
                 } else {
                     MoveUp.FG = MoveUp.HoveredFG = MoveUp.PressedFG = Color.DarkSlateGray;
                 }
-                if(IsFg(styleground) ? Fgs().IndexOf(styleground) < Fgs().Count - 1 : Bgs().IndexOf(styleground) < Bgs().Count - 1) {
+
+                if (IsFg(styleground) ? Fgs().IndexOf(styleground) < Fgs().Count - 1 : Bgs().IndexOf(styleground) < Bgs().Count - 1) {
                     MoveDown.ResetFgColors();
                 } else {
                     MoveDown.FG = MoveDown.HoveredFG = MoveDown.PressedFG = Color.DarkSlateGray;

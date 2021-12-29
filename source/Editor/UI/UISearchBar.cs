@@ -14,6 +14,7 @@ namespace Snowberry.Editor.UI {
         public Func<int, string> SearchInfo;
 
         public delegate bool TermMatcher(T entry, string term);
+
         private readonly TermMatcher termMatcher;
         private readonly Dictionary<char, Tuple<TermMatcher, Color, Regex>> specialChars = new();
 
@@ -92,9 +93,7 @@ namespace Snowberry.Editor.UI {
                     // try 'AND' seq. of terms 
                     bool m = true;
                     foreach (var term in terms) {
-                        bool check = term.Item1 == null ?
-                            termMatcher(entry, term.Item2) :
-                            specialChars[term.Item1.Value].Item1(entry, term.Item2);
+                        bool check = term.Item1 == null ? termMatcher(entry, term.Item2) : specialChars[term.Item1.Value].Item1(entry, term.Item2);
                         if (!check) {
                             m = false;
                             break;
@@ -110,6 +109,7 @@ namespace Snowberry.Editor.UI {
                 if (matched)
                     found.Add(entry); // the search matched this entry
             }
+
             Found = found.ToArray();
             searchInfo = SearchInfo?.Invoke(Found.Length);
 

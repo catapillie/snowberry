@@ -1,17 +1,11 @@
-﻿
-using Microsoft.Xna.Framework;
-
+﻿using Microsoft.Xna.Framework;
 using Monocle;
-
 using Snowberry.Editor.Tools;
 using Snowberry.Editor.UI;
-
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
-
-	public abstract class Tool {
-
+    public abstract class Tool {
         public static IList<Tool> Tools = new List<Tool>() { new SelectionTool(), new DecalSelectionTool(), new TileBrushTool(), new RoomTool(), new PlacementTool(), new StylegroundsTool() };
 
         public static readonly Color LeftSelectedBtnBg = Calc.HexToColor("274292");

@@ -5,11 +5,9 @@ using System.IO;
 using System.Linq;
 
 namespace Snowberry {
-
     using Element = Celeste.BinaryPacker.Element;
 
     class BinaryExporter {
-
         public static void ExportMap(Map map) {
             Export(map.Export(), "snowberry_map");
         }
@@ -24,7 +22,8 @@ namespace Snowberry {
             if (!values.ContainsKey("unnamed"))
                 values.Add("unnamed", (short)values.Count);
 
-            using var file = File.OpenWrite(output); var writer = new BinaryWriter(file);
+            using var file = File.OpenWrite(output);
+            var writer = new BinaryWriter(file);
 
             writer.Write("CELESTE MAP");
             writer.Write(filename);
@@ -39,7 +38,11 @@ namespace Snowberry {
         }
 
         public static void CreateLookupTable(Element element, Dictionary<string, short> table) {
-            void AddValue(string val) { if (val != null && !val.Equals("_eid") && !table.ContainsKey(val)) table.Add(val, (short)table.Count); };
+            void AddValue(string val) {
+                if (val != null && !val.Equals("_eid") && !table.ContainsKey(val)) table.Add(val, (short)table.Count);
+            }
+
+            ;
             AddValue(element.Name);
             if (element.Attributes != null)
                 foreach (var item in element.Attributes) {
@@ -47,6 +50,7 @@ namespace Snowberry {
                     if (item.Value is string)
                         AddValue((string)item.Value);
                 }
+
             if (element.Children != null)
                 foreach (var item in element.Children)
                     CreateLookupTable(item, table);
@@ -123,6 +127,7 @@ namespace Snowberry {
                     }
                 }
             }
+
             return true;
         }
     }

@@ -6,7 +6,6 @@ using System.IO;
 
 namespace Snowberry.Editor {
     public class Decal {
-
         private MTexture texture;
         public Vector2 Position;
         public Vector2 Scale;

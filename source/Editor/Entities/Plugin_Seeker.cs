@@ -5,7 +5,6 @@ using Monocle;
 namespace Snowberry.Editor.Entities {
     [Plugin("seeker")]
     public class Plugin_Seeker : Entity {
-
         public override int MaxNodes => -1;
 
         public override void Render() {

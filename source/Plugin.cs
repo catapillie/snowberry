@@ -49,6 +49,7 @@ namespace Snowberry {
             if (targetType == typeof(Color)) {
                 return Monocle.Calc.HexToColor(raw);
             }
+
             if (targetType.IsEnum) {
                 try {
                     return Enum.Parse(targetType, raw);
@@ -56,9 +57,11 @@ namespace Snowberry {
                     return null;
                 }
             }
+
             if (targetType == typeof(char)) {
                 return raw[0];
             }
+
             return raw;
         }
 

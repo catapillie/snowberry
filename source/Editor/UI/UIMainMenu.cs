@@ -119,7 +119,7 @@ namespace Snowberry.Editor.UI {
                     int mouseX = (int)Editor.Mouse.Screen.X;
                     int mouseY = (int)Editor.Mouse.Screen.Y;
                     hover = !Instance.confirm.Shown && Visible &&
-                        new Rectangle((int)position.X + 16, (int)position.Y - 1, Width + w, Height + H + 2).Contains(mouseX, mouseY);
+                            new Rectangle((int)position.X + 16, (int)position.Y - 1, Width + w, Height + H + 2).Contains(mouseX, mouseY);
 
                     lerp = Calc.Approach(lerp, (hover || pressing).Bit(), Engine.DeltaTime * 6f);
 
@@ -137,6 +137,7 @@ namespace Snowberry.Editor.UI {
                                 pressing = true;
                             }
                         }
+
                         if (pressing && ConsumeLeftClick(pressed: false, released: true) || Instance.confirm.Shown) {
                             pressing = false;
                             if (hover) {
@@ -238,6 +239,7 @@ namespace Snowberry.Editor.UI {
 
                     levels[i] = lvl;
                 }
+
                 Add(levelScrollPane);
                 levelScrollPane.Width = Width;
 
@@ -375,6 +377,7 @@ namespace Snowberry.Editor.UI {
         public enum States {
             Start, Create, Load, Exiting, Settings
         }
+
         private States state = States.Start;
         private readonly float[] stateLerp = new float[] { 1f, 0f, 0f, 0f, 0f };
 
@@ -488,8 +491,10 @@ namespace Snowberry.Editor.UI {
                             SaveData.InitializeDebugMode();
                             SaveData.Instance.CurrentSession_Safe = new Session(AreaKey.Default);
                         }
+
                         Engine.Scene = new OverworldLoader(Overworld.StartMode.MainMenu);
                     }
+
                     break;
 
                 default:

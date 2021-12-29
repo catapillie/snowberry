@@ -1,19 +1,14 @@
 ﻿using Celeste;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Monocle;
-
 using Snowberry.Editor.UI;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Snowberry.Editor.Tools {
-	public class PlacementTool : Tool {
-
+    public class PlacementTool : Tool {
         Placements.Placement curLeftSelection = null, curRightSelection = null;
         Dictionary<Placements.Placement, UIButton> placementButtons = new Dictionary<Placements.Placement, UIButton>();
         Entity preview = null;
@@ -33,6 +28,7 @@ namespace Snowberry.Editor.Tools {
                 });
                 placementButtons[item] = b;
             }
+
             return ret;
         }
 
@@ -64,6 +60,7 @@ namespace Snowberry.Editor.Tools {
                     if (item.EntityID > highestID)
                         highestID = item.EntityID;
                 }
+
                 if (toAdd.Name != "player")
                     toAdd.EntityID = highestID + 1;
                 Editor.SelectedRoom.AddEntity(toAdd);
@@ -98,7 +95,7 @@ namespace Snowberry.Editor.Tools {
         private void RefreshPreview(bool changedPlacement) {
             bool middlePan = Snowberry.Settings.MiddleClickPan;
 
-            Placements.Placement selection = (middlePan && (MInput.Mouse.CheckRightButton ||  MInput.Mouse.ReleasedRightButton) || !middlePan && MInput.Keyboard.Check(Keys.LeftAlt)) ? curRightSelection : curLeftSelection;
+            Placements.Placement selection = (middlePan && (MInput.Mouse.CheckRightButton || MInput.Mouse.ReleasedRightButton) || !middlePan && MInput.Keyboard.Check(Keys.LeftAlt)) ? curRightSelection : curLeftSelection;
             if ((preview == null || changedPlacement) && selection != null) {
                 preview = selection.Build(Editor.SelectedRoom);
             } else if (selection == null)

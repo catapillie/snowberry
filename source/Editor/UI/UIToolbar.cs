@@ -3,9 +3,7 @@ using Monocle;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor.UI {
-
     public class UIToolbar : UIElement {
-
         public Color BG = Calc.HexToColor("202929");
 
         private static readonly Color BtnFG = Calc.HexToColor("70a9c2");
@@ -51,8 +49,12 @@ namespace Snowberry.Editor.UI {
                     button.FG = button.PressedFG = button.HoveredFG = BtnSelectedFG;
                     button.BG = button.PressedBG = button.HoveredBG = BtnSelectedBG;
                 } else {
-                    button.FG = BtnFG; button.PressedFG = BtnPressedFG; button.HoveredFG = BtnHoveredFG;
-                    button.BG = BtnBG; button.PressedBG = BtnPressedBG; button.HoveredBG = BtnHoveredBG;
+                    button.FG = BtnFG;
+                    button.PressedFG = BtnPressedFG;
+                    button.HoveredFG = BtnHoveredFG;
+                    button.BG = BtnBG;
+                    button.PressedBG = BtnPressedBG;
+                    button.HoveredBG = BtnHoveredBG;
                 }
             }
         }

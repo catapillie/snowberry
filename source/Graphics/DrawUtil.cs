@@ -15,7 +15,7 @@ namespace Snowberry {
                 if (!Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable)
                     Engine.Instance.GraphicsDevice.RasterizerState = new RasterizerState() { ScissorTestEnable = true, CullMode = CullMode.None };
                 Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = rect;
-                
+
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, additive ? BlendState.Additive : BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Engine.Instance.GraphicsDevice.RasterizerState, null, matrix ?? Matrix.Identity);
                 action();
                 Draw.SpriteBatch.End();

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 
 namespace Snowberry.Editor.Entities {
-
     [Plugin("cloud")]
     public class Plugin_Cloud : Entity {
-
         [Option("fragile")] public bool Fragile = false;
 
         public override void Render() {

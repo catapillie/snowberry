@@ -1,23 +1,16 @@
 ﻿using Celeste;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Monocle;
-
 using MonoMod.Utils;
-
 using Snowberry.Editor.UI;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Snowberry.Editor.Tools {
-	public class TileBrushTool : Tool {
-
+    public class TileBrushTool : Tool {
         public class TilesetData {
-
             public char Key;
 
             public string Name;
@@ -27,7 +20,9 @@ namespace Snowberry.Editor.Tools {
             public TileGrid Tile, Square;
 
             public TilesetData(char key, string name, bool bg) {
-                Key = key; Name = name; Bg = bg;
+                Key = key;
+                Name = name;
+                Bg = bg;
                 Autotiler autotiler = Bg ? GFX.BGAutotiler : GFX.FGAutotiler;
                 Tile = autotiler.GenerateBox(Key, 1, 1).TileGrid;
                 Square = autotiler.GenerateBox(Key, 3, 3).TileGrid;
@@ -44,6 +39,7 @@ namespace Snowberry.Editor.Tools {
         public static bool RightFg = true;
 
         public static TileBrushMode LeftMode, RightMode;
+
         // tile, hasTile
         private static VirtualMap<char> holoFgTileMap;
         private static VirtualMap<char> holoBgTileMap;
@@ -83,14 +79,16 @@ namespace Snowberry.Editor.Tools {
                 paths.Add(path);
                 i++;
             }
-			List<TilesetData> ret = new List<TilesetData> {
-				// not a "real" tileset
-				new TilesetData('0', "air", bg)
-			};
-			for (int i1 = 0; i1 < chars.Count; i1++) {
+
+            List<TilesetData> ret = new List<TilesetData> {
+                // not a "real" tileset
+                new TilesetData('0', "air", bg)
+            };
+            for (int i1 = 0; i1 < chars.Count; i1++) {
                 char item = chars[i1];
                 ret.Add(new TilesetData(item, paths[i1], bg));
             }
+
             return ret;
         }
 
@@ -142,6 +140,7 @@ namespace Snowberry.Editor.Tools {
                 i++;
                 fgTilesetButtons.Add(button);
             }
+
             var bgLabel = new UILabel(Dialog.Clean("SNOWBERRY_EDITOR_UTIL_BACKGROUND"));
             bgLabel.Position = new Vector2((tilesetsPanel.Width - bgLabel.Width) / 2, (int)Math.Ceiling(FgTilesets.Count / 2f) * (8 * 3 + 30) + fgLabel.Height + 40);
             bgLabel.FG = Color.DarkKhaki;
@@ -172,6 +171,7 @@ namespace Snowberry.Editor.Tools {
                 i++;
                 bgTilesetButtons.Add(button);
             }
+
             UIElement brushTypes = new UIElement() {
                 Width = 30
             };
@@ -184,6 +184,7 @@ namespace Snowberry.Editor.Tools {
                 brushTypes.AddBelow(button, Vector2.One * 5);
                 modeButtons.Add(button);
             }
+
             panel.Add(brushTypes);
             tilesetsPanel.Position.X = brushTypes.Width + 5;
             tilesetsPanel.Background = null;
@@ -218,9 +219,9 @@ namespace Snowberry.Editor.Tools {
                             if (fg) {
                                 if (holoSetTiles[x, y])
                                     retile |= Editor.SelectedRoom.SetFgTile(x, y, holoFgTileMap[x, y]);
-                            } else
-                                if (holoSetTiles[x, y])
+                            } else if (holoSetTiles[x, y])
                                 retile |= Editor.SelectedRoom.SetBgTile(x, y, holoBgTileMap[x, y]);
+
                 if (retile) {
                     Editor.SelectedRoom.Autotile();
                 }
@@ -231,7 +232,8 @@ namespace Snowberry.Editor.Tools {
                 holoGrid = null;
             } else if ((MInput.Mouse.CheckLeftButton || (middlePan && MInput.Mouse.CheckRightButton)) && Editor.SelectedRoom != null) {
                 var tilePos = new Vector2((float)Math.Floor(Editor.Mouse.World.X / 8 - Editor.SelectedRoom.Position.X), (float)Math.Floor(Editor.Mouse.World.Y / 8 - Editor.SelectedRoom.Position.Y));
-                int x = (int)tilePos.X; int y = (int)tilePos.Y;
+                int x = (int)tilePos.X;
+                int y = (int)tilePos.Y;
                 if (Editor.SelectedRoom.Bounds.Contains((int)(x + Editor.SelectedRoom.Position.X), (int)(y + Editor.SelectedRoom.Position.Y))) {
                     var lastPress = (Editor.Instance.worldClick / 8).Floor();
                     var roomLastPress = lastPress - Editor.SelectedRoom.Position;
@@ -253,8 +255,10 @@ namespace Snowberry.Editor.Tools {
                                     if (mode == TileBrushMode.HollowRect) {
                                         set &= !new Rectangle(rect.X + 1, rect.Y + 1, rect.Width - 2, rect.Height - 2).Contains(x2, y2);
                                     }
+
                                     SetHoloTile(fg, set ? tileset : 0, x2, y2, !set);
                                 }
+
                             break;
                         case TileBrushMode.Fill:
                             // start at x,y
@@ -263,11 +267,13 @@ namespace Snowberry.Editor.Tools {
                             //     check their neighbors
                             if (!holoSetTiles[x, y]) {
                                 char origTile = Editor.SelectedRoom.GetTile(fg, new Vector2((x + Editor.SelectedRoom.X) * 8, (y + Editor.SelectedRoom.Y) * 8));
+
                                 bool inside(int cx, int cy) {
                                     return (cx >= 0 && cy >= 0 && cx < Editor.SelectedRoom.Width && cy < Editor.SelectedRoom.Height) && Editor.SelectedRoom.GetTile(fg, new Vector2((cx + Editor.SelectedRoom.X) * 8, (cy + Editor.SelectedRoom.Y) * 8)) == origTile;
                                 }
 
                                 Queue<Point> toCheck = new Queue<Point>();
+
                                 void scan(int lx, int rx, int y) {
                                     bool added = false;
                                     for (int i = lx; i <= rx; i++) {
@@ -279,6 +285,7 @@ namespace Snowberry.Editor.Tools {
                                         }
                                     }
                                 }
+
                                 toCheck.Enqueue(new Point(x, y));
                                 while (toCheck.Count > 0) {
                                     Point checking = toCheck.Dequeue();
@@ -288,10 +295,12 @@ namespace Snowberry.Editor.Tools {
                                         SetHoloTile(fg, tileset, lx - 1, y2);
                                         lx--;
                                     }
+
                                     while (inside(x2, y2)) {
                                         SetHoloTile(fg, tileset, x2, y2);
                                         x2++;
                                     }
+
                                     scan(lx, x2 - 1, y2 + 1);
                                     scan(lx, x2 - 1, y2 - 1);
                                 }
@@ -317,6 +326,7 @@ namespace Snowberry.Editor.Tools {
                                     SetHoloTile(fg, tileset, (int)(sign * p * grad + roomLastPress.X), (int)(sign * p + roomLastPress.Y));
                                 }
                             }
+
                             break;
                         case TileBrushMode.Circle:
                             int radiusSquared = (rect.Width - 1) * (rect.Width - 1) + (rect.Height - 1) * (rect.Height - 1);
@@ -326,10 +336,12 @@ namespace Snowberry.Editor.Tools {
                                     bool set = deltaSquared <= radiusSquared;
                                     SetHoloTile(fg, set ? tileset : 0, x2, y2, !set);
                                 }
+
                             break;
                         default:
                             break;
                     }
+
                     if (holoRetile) {
                         holoRetile = false;
                         holoGrid = (fg ? GFX.FGAutotiler : GFX.BGAutotiler).GenerateMap(fg ? holoFgTileMap : holoBgTileMap, new Autotiler.Behaviour() { EdgesExtend = true }).TileGrid;
@@ -350,6 +362,7 @@ namespace Snowberry.Editor.Tools {
                     button.ResetBgColors();
                 }
             }
+
             for (int i = 0; i < bgTilesetButtons.Count; i++) {
                 UIButton button = bgTilesetButtons[i];
                 if (!LeftFg && !RightFg && CurLeftTileset == CurRightTileset && CurLeftTileset == i)
@@ -360,8 +373,9 @@ namespace Snowberry.Editor.Tools {
                     button.BG = button.PressedBG = button.HoveredBG = RightSelectedBtnBg;
                 else {
                     button.ResetBgColors();
-				}
+                }
             }
+
             for (int i = 0; i < modeButtons.Count; i++) {
                 UIButton button = modeButtons[i];
                 if (LeftMode == RightMode && RightMode == (TileBrushMode)i)
