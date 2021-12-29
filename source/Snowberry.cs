@@ -23,10 +23,10 @@ namespace Snowberry {
             Instance = this;
         }
 
-		public override Type SettingsType => typeof(SnowberrySettings);
+        public override Type SettingsType => typeof(SnowberrySettings);
         public static SnowberrySettings Settings => (SnowberrySettings)Instance._Settings;
 
-		public override void Load() {
+        public override void Load() {
             hook_MapData_orig_Load = new Hook(
                 typeof(MapData).GetMethod("orig_Load", BindingFlags.Instance | BindingFlags.NonPublic),
                 typeof(Editor.Editor).GetMethod("CreatePlaytestMapDataHook", BindingFlags.Static | BindingFlags.NonPublic)
@@ -94,6 +94,7 @@ namespace Snowberry {
                 foreach (LevelData level in Editor.Editor.PlaytestMapData.Levels) {
                     templates.Add(new Celeste.Editor.LevelTemplate(level));
                 }
+
                 foreach (Microsoft.Xna.Framework.Rectangle item in Editor.Editor.PlaytestMapData.Filler) {
                     templates.Add(new Celeste.Editor.LevelTemplate(item.X, item.Y, item.Width, item.Height));
                 }

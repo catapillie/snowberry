@@ -14,14 +14,12 @@ namespace Snowberry.Editor.Entities {
         public override int MinHeight => 8;
         public override int MaxNodes => 1;
 
-        public MTexture[] ParticleTextures = new MTexture[4]
-            {
-                GFX.Game["objects/dreamblock/particles"].GetSubtexture(14, 0, 7, 7),
-                GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7),
-                GFX.Game["objects/dreamblock/particles"].GetSubtexture(0, 0, 7, 7),
-                GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7)
-
-            };
+        public MTexture[] ParticleTextures = new MTexture[4] {
+            GFX.Game["objects/dreamblock/particles"].GetSubtexture(14, 0, 7, 7),
+            GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7),
+            GFX.Game["objects/dreamblock/particles"].GetSubtexture(0, 0, 7, 7),
+            GFX.Game["objects/dreamblock/particles"].GetSubtexture(7, 0, 7, 7)
+        };
 
         public override void Render() {
             base.Render();
@@ -47,15 +45,15 @@ namespace Snowberry.Editor.Entities {
                     int animTimer = 0; // todo: animated entities?
                     switch (layer) {
                         case 0: {
-                                int num2 = (int)((timeOffset * 4f + animTimer) % 4f);
-                                mTexture = ParticleTextures[3 - num2];
-                                break;
-                            }
+                            int num2 = (int)((timeOffset * 4f + animTimer) % 4f);
+                            mTexture = ParticleTextures[3 - num2];
+                            break;
+                        }
                         case 1: {
-                                int num = (int)((timeOffset * 2f + animTimer) % 2f);
-                                mTexture = ParticleTextures[1 + num];
-                                break;
-                            }
+                            int num = (int)((timeOffset * 2f + animTimer) % 2f);
+                            mTexture = ParticleTextures[1 + num];
+                            break;
+                        }
                         default:
                             mTexture = ParticleTextures[2];
                             break;
@@ -65,6 +63,7 @@ namespace Snowberry.Editor.Entities {
                         mTexture.DrawCentered(pos, colour);
                     }
                 }
+
                 WobbleLine(Position, new Vector2(X + Width, Y), 0f);
                 WobbleLine(new Vector2(X + Width, Y), new Vector2(X + Width, Y + Height), 0.7f);
                 WobbleLine(new Vector2(X + Width, Y + Height), new Vector2(X, Y + Height), 1.5f);

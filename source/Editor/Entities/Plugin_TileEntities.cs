@@ -47,6 +47,7 @@ namespace Snowberry.Editor.Entities {
                     for (int y = 0; y < Tiles.Rows; y++)
                         Tiles[x, y]?.Draw(Nodes[0] + new Vector2(x, y) * 8, Vector2.Zero, c);
             }
+
             DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2, Color.White, 8, 4);
         }
 

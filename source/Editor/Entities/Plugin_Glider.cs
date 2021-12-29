@@ -5,7 +5,6 @@ using System;
 namespace Snowberry.Editor.Entities {
     [Plugin("glider")]
     public class Plugin_Glider : Entity {
-
         [Option("bubble")] public bool Bubble = false;
         [Option("tutorial")] public bool Tutorial = false;
 

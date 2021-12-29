@@ -34,6 +34,7 @@ namespace Snowberry {
                         options.Add(option.Name, f);
                 }
             }
+
             Options = new ReadOnlyDictionary<string, FieldInfo>(options);
         }
 
@@ -90,8 +91,7 @@ namespace Snowberry {
         }
     }
 
-	internal class UnkownPluginInfo : PluginInfo {
-
-		public UnkownPluginInfo(string name) : base(name, typeof(Plugin), null, CelesteEverest.INSTANCE) {}
-	}
+    internal class UnkownPluginInfo : PluginInfo {
+        public UnkownPluginInfo(string name) : base(name, typeof(Plugin), null, CelesteEverest.INSTANCE) { }
+    }
 }

@@ -6,7 +6,6 @@ using System;
 namespace Snowberry.Editor.Entities {
     [Plugin("crumbleBlock")]
     public class Plugin_CrumblePlatform : Entity {
-
         [Option("texture")] public string Texture = null;
 
         public override int MinWidth => 8;

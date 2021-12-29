@@ -1,17 +1,12 @@
 ﻿using Celeste;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Monocle;
-
 using Snowberry.Editor.UI;
-
 using System;
 
 namespace Snowberry.Editor.Tools {
-	public class SelectionTool : Tool {
-
+    public class SelectionTool : Tool {
         static bool canSelect;
 
         public override string GetName() {
@@ -67,6 +62,7 @@ namespace Snowberry.Editor.Tools {
                     entitiesRemoved = true;
                     item.Entity.Room.RemoveEntity(item.Entity);
                 }
+
                 Editor.SelectedEntities.Clear();
             }
 

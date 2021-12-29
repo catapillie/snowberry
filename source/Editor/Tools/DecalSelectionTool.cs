@@ -1,18 +1,13 @@
 ﻿using Celeste;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Monocle;
-
 using Snowberry.Editor.UI;
-
 using System;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor.Tools {
-	public class DecalSelectionTool : Tool {
-
+    public class DecalSelectionTool : Tool {
         static List<Decal> SelectedDecals = new List<Decal>();
         static bool fg = false;
         static bool bg = true;
@@ -83,6 +78,7 @@ namespace Snowberry.Editor.Tools {
                     item.Room.FgDecals.Remove(item);
                     item.Room.BgDecals.Remove(item);
                 }
+
                 SelectedDecals.Clear();
             }
         }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 namespace Snowberry.Editor.Entities {
     [Plugin("seekerBarrier")]
     public class Plugin_SeekerBarrier : Entity {
-
         [Option("moveTime")] public float MoveTime = 1;
 
         private List<bool> upperEdges;
@@ -45,6 +44,7 @@ namespace Snowberry.Editor.Entities {
                         upperEdges.Add(false);
                         lowerEdges.Add(false);
                     }
+
                     bool drawUp = dirty ? upperEdges[j] = !IsBarrierAt(Position.X + j * slice * 2 + 2, Position.Y - 4) : upperEdges[j];
                     bool drawDown = dirty ? lowerEdges[j] = !IsBarrierAt(Position.X + j * slice * 2 + 2, Position.Y + 4 + Height) : lowerEdges[j];
                     for (int k = 0; k < 2; k++) {
@@ -56,6 +56,7 @@ namespace Snowberry.Editor.Entities {
                                 Draw.Line(loc, loc + Vector2.UnitY * ((float)Math.Sin(loc.X / 3f) - 1.5f) * 1.5f, c);
                             }
                         }
+
                         if (drawDown) {
                             Vector2 sliceStart = Position + new Vector2(i * slice, Height);
                             for (int across = 0; (float)across < slice; across++) {
@@ -71,6 +72,7 @@ namespace Snowberry.Editor.Entities {
                         leftEdges.Add(false);
                         rightEdges.Add(false);
                     }
+
                     bool drawLeft = dirty ? leftEdges[j] = !IsBarrierAt(Position.X - 4, Position.Y + j * slice * 2 + 2) : leftEdges[j];
                     bool drawRight = dirty ? rightEdges[j] = !IsBarrierAt(Position.X + 4 + Width, Position.Y + j * slice * 2 + 2) : rightEdges[j];
                     for (int k = 0; k < 2; k++) {
@@ -82,6 +84,7 @@ namespace Snowberry.Editor.Entities {
                                 Draw.Line(loc, loc + Vector2.UnitX * ((float)Math.Sin(loc.Y / 3f) - 1.5f) * 1.5f, c);
                             }
                         }
+
                         if (drawRight) {
                             Vector2 sliceStart = Position + new Vector2(Width, i * slice);
                             for (int across = 0; (float)across < slice; across++) {

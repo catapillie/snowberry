@@ -4,7 +4,6 @@ using Monocle;
 namespace Snowberry.Editor.Entities {
     [Plugin("cassette")]
     public class Plugin_Cassette : Entity {
-
         public override int MinNodes => 2;
         public override int MaxNodes => 2;
 

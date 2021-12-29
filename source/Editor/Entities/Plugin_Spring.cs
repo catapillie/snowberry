@@ -3,12 +3,10 @@ using Microsoft.Xna.Framework;
 using System;
 
 namespace Snowberry.Editor.Entities {
-
     [Plugin("spring")]
     [Plugin("wallSpringLeft")]
     [Plugin("wallSpringRight")]
     public class Plugin_Spring : Entity {
-
         public Spring.Orientations Dir = Spring.Orientations.Floor;
 
         public override void Initialize() {

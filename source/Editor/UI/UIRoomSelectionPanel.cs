@@ -1,17 +1,13 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
-
 using Snowberry.Editor.Tools;
-
 using System;
 using System.Text.RegularExpressions;
 using static Snowberry.Editor.UI.UISelectionPanel;
 
 namespace Snowberry.Editor.UI {
-
     class UIRoomSelectionPanel : UIElement {
-
         public Color BG = Calc.HexToColor("202929");
 
         public UIRoomSelectionPanel() {
@@ -54,6 +50,7 @@ namespace Snowberry.Editor.UI {
                         });
                         label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
                     }
+
                     return;
                 } else {
                     Add(label = new UILabel("Create room") {
@@ -220,7 +217,6 @@ namespace Snowberry.Editor.UI {
 
         public override void Update(Vector2 position = default) {
             base.Update(position);
-
         }
     }
 }

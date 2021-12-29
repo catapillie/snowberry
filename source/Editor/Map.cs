@@ -1,13 +1,10 @@
 ﻿using Celeste;
 using Celeste.Mod;
 using Celeste.Mod.Meta;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
-
 using Snowberry.Editor.Stylegrounds;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,11 +13,9 @@ using System.Linq;
 using System.Xml;
 
 namespace Snowberry.Editor {
-
     using Element = BinaryPacker.Element;
 
     public class Map {
-
         public readonly string Name;
         public readonly AreaKey From;
 
@@ -41,7 +36,6 @@ namespace Snowberry.Editor {
 
         internal Map(MapData data)
             : this(data.Filename) {
-
             var playtestData = AreaData.Get("Snowberry/Playtest");
             var targetData = AreaData.Get(data.Area);
             AreaKey playtestKey = playtestData.ToKey();
@@ -54,7 +48,7 @@ namespace Snowberry.Editor {
                 Rooms.Add(new Room(roomData, this));
             foreach (Rectangle filler in data.Filler)
                 Fillers.Add(filler);
-            
+
             // load stylegrounds
             if (data.Foreground != null && data.Foreground.Children != null) {
                 foreach (var item in data.Foreground.Children) {
@@ -143,6 +137,7 @@ namespace Snowberry.Editor {
                 Rectangle rect = new Rectangle(filler.X * 8, filler.Y * 8, filler.Width * 8, filler.Height * 8);
                 Draw.Rect(rect, Color.White * (Editor.SelectedFillerIndex == i ? 0.14f : 0.1f));
             }
+
             Draw.SpriteBatch.End();
         }
 
@@ -220,65 +215,66 @@ namespace Snowberry.Editor {
         }
 
         public Element Export() {
-			Element map = new Element {
-				Children = new List<Element>()
-			};
+            Element map = new Element {
+                Children = new List<Element>()
+            };
 
-			// children:
-			//   levels w/ levels as children
-			Element levels = new Element {
-				Name = "levels",
-				Children = new List<Element>()
-			};
-			foreach(var room in Rooms)
-				levels.Children.Add(room.CreateLevelData());
-			map.Children.Add(levels);
+            // children:
+            //   levels w/ levels as children
+            Element levels = new Element {
+                Name = "levels",
+                Children = new List<Element>()
+            };
+            foreach (var room in Rooms)
+                levels.Children.Add(room.CreateLevelData());
+            map.Children.Add(levels);
 
-			//   Filler w/ children w/ x,y,w,h
-			Element fillers = new Element {
-				Name = "Filler",
-				Children = new List<Element>()
-			};
-			foreach(var filler in Fillers) {
-				Element fill = new Element {
-					Attributes = new Dictionary<string, object>() {
-						["x"] = filler.X,
-						["y"] = filler.Y,
-						["w"] = filler.Width,
-						["h"] = filler.Height,
-					}
-				};
-				fillers.Children.Add(fill);
-			}
-			map.Children.Add(fillers);
+            //   Filler w/ children w/ x,y,w,h
+            Element fillers = new Element {
+                Name = "Filler",
+                Children = new List<Element>()
+            };
+            foreach (var filler in Fillers) {
+                Element fill = new Element {
+                    Attributes = new Dictionary<string, object>() {
+                        ["x"] = filler.X,
+                        ["y"] = filler.Y,
+                        ["w"] = filler.Width,
+                        ["h"] = filler.Height,
+                    }
+                };
+                fillers.Children.Add(fill);
+            }
 
-			//   style: w/ optional color, Backgrounds child & Foregrounds child
-			Element style = new Element {
-				Name = "Style",
-				Attributes = new(),
-				Children = new()
-			};
+            map.Children.Add(fillers);
 
-			Element fgStyles = GenerateStylegroundsElement(false);
-			Element bgStyles = GenerateStylegroundsElement(true);
+            //   style: w/ optional color, Backgrounds child & Foregrounds child
+            Element style = new Element {
+                Name = "Style",
+                Attributes = new(),
+                Children = new()
+            };
 
-			style.Children.Add(fgStyles);
-			style.Children.Add(bgStyles);
-			map.Children.Add(style);
+            Element fgStyles = GenerateStylegroundsElement(false);
+            Element bgStyles = GenerateStylegroundsElement(true);
 
-			return map;
-		}
+            style.Children.Add(fgStyles);
+            style.Children.Add(bgStyles);
+            map.Children.Add(style);
 
-		private Element GenerateStylegroundsElement(bool bg) {
-			Element styles = new Element {
-				Name = bg ? "Backgrounds" : "Foregrounds",
-				Children = new()
-			};
+            return map;
+        }
 
-			foreach(var styleground in bg ? BGStylegrounds : FGStylegrounds) {
-				Element elem = new Element() {
-					Name = styleground.Name,
-					Attributes = new() {
+        private Element GenerateStylegroundsElement(bool bg) {
+            Element styles = new Element {
+                Name = bg ? "Backgrounds" : "Foregrounds",
+                Children = new()
+            };
+
+            foreach (var styleground in bg ? BGStylegrounds : FGStylegrounds) {
+                Element elem = new Element() {
+                    Name = styleground.Name,
+                    Attributes = new() {
                         ["tag"] = styleground.Tags.Aggregate("", (x, y) => x + ";" + y),
                         ["x"] = styleground.Position.X,
                         ["y"] = styleground.Position.Y,
@@ -302,69 +298,69 @@ namespace Snowberry.Editor {
                         ["instantOut"] = styleground.InstantOut,
                         //["fadex"] = fg.FadeX,
                     }
-				};
-                
-				if(styleground.DreamingOnly.HasValue)
-                    elem.Attributes["dreaming"] = styleground.DreamingOnly.Value;
-				
-				foreach(var opt in styleground.Info.Options.Keys) {
-					var val = styleground.Get(opt);
-					if(val != null)
-						elem.Attributes[opt] = val;
-				}
+                };
 
-				if(styleground is Plugin_Other placeholder)
-					foreach(string opt in placeholder.Attrs.Keys)
+                if (styleground.DreamingOnly.HasValue)
+                    elem.Attributes["dreaming"] = styleground.DreamingOnly.Value;
+
+                foreach (var opt in styleground.Info.Options.Keys) {
+                    var val = styleground.Get(opt);
+                    if (val != null)
+                        elem.Attributes[opt] = val;
+                }
+
+                if (styleground is Plugin_Other placeholder)
+                    foreach (string opt in placeholder.Attrs.Keys)
                         elem.Attributes[opt] = placeholder.Attrs[opt];
 
-				styles.Children.Add(elem);
-			}
+                styles.Children.Add(elem);
+            }
 
-			return styles;
-		}
+            return styles;
+        }
 
-		// Setup autotilers, animated tiles, and the Graphics atlas, based on LevelLoader
-		private void SetupGraphics(MapMeta meta) {
+        // Setup autotilers, animated tiles, and the Graphics atlas, based on LevelLoader
+        private void SetupGraphics(MapMeta meta) {
             string text = meta?.BackgroundTiles;
-            if(string.IsNullOrEmpty(text)) {
+            if (string.IsNullOrEmpty(text)) {
                 text = Path.Combine("Graphics", "BackgroundTiles.xml");
             }
 
             GFX.BGAutotiler = new Autotiler(text);
             text = meta?.ForegroundTiles;
-            if(string.IsNullOrEmpty(text)) {
+            if (string.IsNullOrEmpty(text)) {
                 text = Path.Combine("Graphics", "ForegroundTiles.xml");
             }
 
             GFX.FGAutotiler = new Autotiler(text);
             text = meta?.AnimatedTiles;
-            if(string.IsNullOrEmpty(text)) {
+            if (string.IsNullOrEmpty(text)) {
                 text = Path.Combine("Graphics", "AnimatedTiles.xml");
             }
 
             GFX.AnimatedTilesBank = new AnimatedTilesBank();
-            foreach(XmlElement item in Calc.LoadContentXML(text)["Data"]) {
-                if(item != null) {
+            foreach (XmlElement item in Calc.LoadContentXML(text)["Data"]) {
+                if (item != null) {
                     GFX.AnimatedTilesBank.Add(item.Attr("name"), item.AttrFloat("delay", 0f), item.AttrVector2("posX", "posY", Vector2.Zero), item.AttrVector2("origX", "origY", Vector2.Zero), GFX.Game.GetAtlasSubtextures(item.Attr("path")));
                 }
             }
 
             GFX.SpriteBank = new SpriteBank(GFX.Game, Path.Combine("Graphics", "Sprites.xml"));
             text = meta?.Sprites;
-            if(!string.IsNullOrEmpty(text)) {
+            if (!string.IsNullOrEmpty(text)) {
                 SpriteBank spriteBank = GFX.SpriteBank;
-                foreach(KeyValuePair<string, SpriteData> spriteDatum in new SpriteBank(GFX.Game, getModdedSpritesXml(text)).SpriteData) {
+                foreach (KeyValuePair<string, SpriteData> spriteDatum in new SpriteBank(GFX.Game, getModdedSpritesXml(text)).SpriteData) {
                     string key = spriteDatum.Key;
                     SpriteData value = spriteDatum.Value;
-                    if(spriteBank.SpriteData.TryGetValue(key, out SpriteData value2)) {
+                    if (spriteBank.SpriteData.TryGetValue(key, out SpriteData value2)) {
                         IDictionary animations = value2.Sprite.GetAnimations();
-                        foreach(DictionaryEntry item2 in (IDictionary)value.Sprite.GetAnimations()) {
+                        foreach (DictionaryEntry item2 in (IDictionary)value.Sprite.GetAnimations()) {
                             animations[item2.Key] = item2.Value;
                         }
 
                         value2.Sources.AddRange(value.Sources);
                         value2.Sprite.Stop();
-                        if(value.Sprite.CurrentAnimationID != "") {
+                        if (value.Sprite.CurrentAnimationID != "") {
                             value2.Sprite.Play(value.Sprite.CurrentAnimationID);
                         }
                     } else {

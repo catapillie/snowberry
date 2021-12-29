@@ -4,7 +4,6 @@ using System;
 
 namespace Snowberry.Editor.UI {
     class UILabel : UIElement {
-
         public Func<string> Value { get; private set; }
         private readonly Font font;
         public Color FG = Calc.HexToColor("f0f0f0");

@@ -25,6 +25,7 @@ namespace Snowberry {
             for (int i = 0; i < characters.Count; i++) {
                 glyphs.Add(characters[i], new Glyph(bounds[i], offsets[i]));
             }
+
             LineHeight = lineHeight;
         }
 
@@ -52,6 +53,7 @@ namespace Snowberry {
                             Monocle.Draw.SpriteBatch.Draw(texture, position, g.Bounds, color, 0f, g.Offset, scale, SpriteEffects.None, 0f);
                             position.X += (g.Bounds.Width + 1) * scale.X;
                         }
+
                         break;
                 }
             }
@@ -77,6 +79,7 @@ namespace Snowberry {
                             Monocle.Draw.SpriteBatch.Draw(texture, position, g.Bounds, colorByChar[Math.Min(i, colorByChar.Length - 1)], 0f, g.Offset, scale, SpriteEffects.None, 0f);
                             position.X += (g.Bounds.Width + 1) * scale.X;
                         }
+
                         break;
                 }
             }
@@ -114,6 +117,7 @@ namespace Snowberry {
                         break;
                 }
             }
+
             return size - Vector2.UnitX;
         }
     }
