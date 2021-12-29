@@ -12,12 +12,12 @@ namespace Snowberry.Editor.Entities {
 
         [Option("theme")] public Themes Theme = Themes.Normal;
 
-		public override int MinWidth => 16;
-		public override int MinHeight => 16;
-		public override int MinNodes => 1;
-		public override int MaxNodes => 1;
+        public override int MinWidth => 16;
+        public override int MinHeight => 16;
+        public override int MinNodes => 1;
+        public override int MaxNodes => 1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             MTexture block, light, cog;
@@ -68,27 +68,27 @@ namespace Snowberry.Editor.Entities {
             int fg = 1;
             float rotation = 0;
             MTexture temp = new MTexture();
-            for(int y = 4; y <= Height - 4f; y += 8) {
+            for (int y = 4; y <= Height - 4f; y += 8) {
                 int odd = fg;
-                for(int x = 4; x <= Width - 4f; x += 8) {
+                for (int x = 4; x <= Width - 4f; x += 8) {
                     int index = (int)((rotation / ((float)Math.PI / 2f) % 1f) * innerCogs.Count);
                     MTexture iCog = innerCogs[index];
                     Rectangle bounds = new Rectangle(0, 0, iCog.Width, iCog.Height);
                     Vector2 innerbounds = Vector2.Zero;
-                    if(x <= 4) {
+                    if (x <= 4) {
                         innerbounds.X = 2f;
                         bounds.X = 2;
                         bounds.Width -= 2;
-                    } else if(x >= Width - 4f) {
+                    } else if (x >= Width - 4f) {
                         innerbounds.X = -2f;
                         bounds.Width -= 2;
                     }
 
-                    if(y <= 4) {
+                    if (y <= 4) {
                         innerbounds.Y = 2f;
                         bounds.Y = 2;
                         bounds.Height -= 2;
-                    } else if(y >= Height - 4f) {
+                    } else if (y >= Height - 4f) {
                         innerbounds.Y = -2f;
                         bounds.Height -= 2;
                     }
@@ -99,19 +99,19 @@ namespace Snowberry.Editor.Entities {
                     rotation += (float)Math.PI / 3f;
                 }
 
-                if(odd == fg) {
+                if (odd == fg) {
                     fg = -fg;
                 }
             }
-            
+
             // Draw box
             int w = Width / 8;
             int h = Height / 8;
-            for(int x = 0; x < w; x++) {
-                for(int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                for (int y = 0; y < h; y++) {
                     int tx = x == 0 ? 0 : (x == w - 1 ? 16 : 8);
                     int ty = y == 0 ? 0 : (y == h - 1 ? 16 : 8);
-                    if(tx != 8 || ty != 8)
+                    if (tx != 8 || ty != 8)
                         block.GetSubtexture(tx, ty, 8, 8).Draw(Position + new Vector2(x * 8, y * 8));
                 }
             }

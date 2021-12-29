@@ -18,7 +18,7 @@ namespace Snowberry.Editor.Entities {
         public override int MinWidth => (!initialized || dir == Directions.Left || dir == Directions.Right) ? -1 : 8;
         public override int MinHeight => (!initialized || dir == Directions.Up || dir == Directions.Down) ? -1 : 8;
 
-		public override void Initialize() {
+        public override void Initialize() {
             base.Initialize();
 
             dir = Name switch {
@@ -32,7 +32,7 @@ namespace Snowberry.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            
+
             if (Type == "tentacles") {
                 // TODO: this part
             } else {
@@ -66,8 +66,8 @@ namespace Snowberry.Editor.Entities {
         public static void AddPlacements() {
             string[] directions = new string[] { "Up", "Down", "Left", "Right" };
             string[] types = new string[] { "Default", "Outline", "Cliffside", "Reflection" };
-			foreach(var type in types) 
-				foreach(var dir in directions) 
+            foreach (var type in types)
+                foreach (var dir in directions)
                     Placements.Create($"Spikes ({dir}, {type})", "spikes" + dir, new Dictionary<string, object>() { { "type", type.ToLower() } });
         }
     }

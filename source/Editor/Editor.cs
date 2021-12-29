@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Monocle;
+using Snowberry.Editor.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -16,6 +17,7 @@ namespace Snowberry.Editor {
             private bool changedView = true;
 
             private Vector2 pos;
+
             public Vector2 Position {
                 get => pos;
                 set {
@@ -23,39 +25,45 @@ namespace Snowberry.Editor {
                     changedView = true;
                 }
             }
+
             public int X => (int)Position.X;
             public int Y => (int)Position.Y;
 
             private float scale = 1f;
+
             public float Zoom {
                 get => scale;
                 set {
                     scale = value;
-                    if(scale < 1f)
+                    if (scale < 1f)
                         Buffer = null;
                     else {
                         Vector2 size = new Vector2(Engine.Width, Engine.Height) / scale;
                         Buffer = new RenderTarget2D(Engine.Instance.GraphicsDevice, (int)size.X + (Engine.Width % scale == 0 ? 0 : 1), (int)size.Y + (Engine.Height % scale == 0 ? 0 : 1));
                     }
+
                     changedView = true;
                 }
             }
 
             private Matrix matrix, inverse, screenview;
+
             public Matrix Matrix {
                 get {
-                    if(changedView)
+                    if (changedView)
                         UpdateMatrices();
                     return matrix;
                 }
             }
+
             public Matrix Inverse {
                 get {
-                    if(changedView)
+                    if (changedView)
                         UpdateMatrices();
                     return inverse;
                 }
             }
+
             public Matrix ScreenView {
                 get {
                     if (changedView)
@@ -86,6 +94,7 @@ namespace Snowberry.Editor {
                     ViewRect = new Rectangle((int)Position.X - w / 2, (int)Position.Y - h / 2, w, h);
                     screenview = m;
                 }
+
                 inverse = Matrix.Invert(matrix = m);
 
                 changedView = false;
@@ -111,6 +120,7 @@ namespace Snowberry.Editor {
 
         public Vector2 mousePos, lastMousePos;
         public Vector2 worldClick;
+        public static bool MouseClicked = false;
 
         public Map Map { get; private set; }
 
@@ -148,7 +158,7 @@ namespace Snowberry.Editor {
             Audio.Stop(Audio.CurrentMusicEventInstance);
 
             Map map = null;
-            if(data != null) {
+            if (data != null) {
                 Snowberry.Log(LogLevel.Info, $"Opening level editor using map {data.Area.GetSID()}");
                 // Also copies the target's metadata into Playtest's metadata.
                 From = data.Area;
@@ -215,11 +225,13 @@ namespace Snowberry.Editor {
             string editorplaytest = Dialog.Clean("SNOWBERRY_EDITOR_PLAYTEST");
             string editorexport = Dialog.Clean("SNOWBERRY_EDITOR_EXPORT");
 
-            if(From.HasValue) {
+            if (From.HasValue) {
                 UIButton rtm = new UIButton(editorreturn, Fonts.Regular, 6, 6) {
                     OnPress = () => {
                         Audio.SetMusic(null);
                         Audio.SetAmbience(null);
+
+                        SaveData.InitializeDebugMode();
 
                         LevelEnter.Go(new Session(From.Value), true);
                     }
@@ -231,6 +243,8 @@ namespace Snowberry.Editor {
                 OnPress = () => {
                     Audio.SetMusic(null);
                     Audio.SetAmbience(null);
+
+                    SaveData.InitializeDebugMode();
 
                     generatePlaytestMapData = true;
                     PlaytestMapData = new MapData(Map.From);
@@ -260,7 +274,7 @@ namespace Snowberry.Editor {
             ui.Width = uiBuffer.Width;
             ui.Height = uiBuffer.Height;
 
-            if(Map == null)
+            if (Map == null)
                 MenuUI();
             else
                 MappingUI();
@@ -291,40 +305,43 @@ namespace Snowberry.Editor {
             bool canZoom = ui.CanScrollThrough();
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
             float scale = Camera.Zoom;
-            if(canZoom) {
-                if(wheel > 0)
+            if (canZoom) {
+                if (wheel > 0)
                     scale = scale >= 1 ? scale + 1 : scale * 2f;
-                else if(wheel < 0)
+                else if (wheel < 0)
                     scale = scale > 1 ? scale - 1 : scale / 2f;
             }
+
             scale = Calc.Clamp(scale, 0.0625f, 24f);
-            if(scale != Camera.Zoom)
+            if (scale != Camera.Zoom)
                 Camera.Zoom = scale;
 
-            if(Camera.Buffer != null)
+            if (Camera.Buffer != null)
                 mousePos /= Camera.Zoom;
 
             // controls
             bool canClick = ui.CanClickThrough();
 
             // panning
-            if(MInput.Mouse.CheckRightButton && canClick) {
+            bool middlePan = Snowberry.Settings.MiddleClickPan;
+            if ((middlePan && MInput.Mouse.CheckMiddleButton || !middlePan && MInput.Mouse.CheckRightButton) && canClick) {
                 Vector2 move = lastMousePos - mousePos;
-                if(move != Vector2.Zero)
+                if (move != Vector2.Zero)
                     Camera.Position += move / (Camera.Buffer == null ? Camera.Zoom : 1f);
             }
 
             MouseState m = Microsoft.Xna.Framework.Input.Mouse.GetState();
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
-            Mouse.World = Calc.Round(Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse));
+            Mouse.World = Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse).Floor();
 
+            MouseClicked = false;
             ui.Update();
 
             // room & filler select
-            if(Map != null) {
-                if((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
-                    if(MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
+            if (Map != null) {
+                if ((MInput.Mouse.CheckLeftButton || MInput.Mouse.CheckRightButton) && canClick) {
+                    if (MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) {
                         Point mouse = new Point((int)Mouse.World.X, (int)Mouse.World.Y);
 
                         worldClick = Mouse.World;
@@ -332,7 +349,7 @@ namespace Snowberry.Editor {
                         SelectedRoom = Map.GetRoomAt(mouse);
                         SelectedFillerIndex = Map.GetFillerIndexAt(mouse);
                         // don't let tools click when clicking onto new rooms
-                        if(SelectedRoom != before)
+                        if (SelectedRoom != before)
                             canClick = false;
                     }
                 }
@@ -342,7 +359,7 @@ namespace Snowberry.Editor {
                 tool.Update(canClick);
 
                 // keybinds
-                if(MInput.Keyboard.Pressed(Keys.F)) {
+                if (MInput.Keyboard.Pressed(Keys.F)) {
                     FancyRender = !FancyRender;
                 }
             }
@@ -373,13 +390,22 @@ namespace Snowberry.Editor {
 
             ui.Render();
 
+            // Tooltip rendering
+            var tooltip = ui.HoveredTooltip();
+            if (tooltip != null) {
+                var tooltipArea = Fonts.Regular.Measure(tooltip);
+                var at = Mouse.Screen.Round() - new Vector2(0, tooltipArea.Y + 6);
+                Draw.Rect(at, tooltipArea.X + 8, tooltipArea.Y + 6, Color.Black * 0.4f);
+                Fonts.Regular.Draw(tooltip, at + new Vector2(4, 3), Vector2.One, Color.White);
+            }
+
             Draw.SpriteBatch.End();
 
             #endregion
 
             #region Tool Rendering
 
-            if(Map != null) {
+            if (Map != null) {
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
                 tool.RenderScreenSpace();
                 Draw.SpriteBatch.End();
@@ -389,7 +415,7 @@ namespace Snowberry.Editor {
 
             #region Map Rendering
 
-            if(Camera.Buffer != null)
+            if (Camera.Buffer != null)
                 Engine.Instance.GraphicsDevice.SetRenderTarget(Camera.Buffer);
             else
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
@@ -404,9 +430,9 @@ namespace Snowberry.Editor {
 
             #endregion
 
-			#region Displaying on Backbuffer + HQRender
+            #region Displaying on Backbuffer + HQRender
 
-			if(Camera.Buffer != null) {
+            if (Camera.Buffer != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
                 Engine.Instance.GraphicsDevice.Clear(bg);
 
@@ -427,17 +453,17 @@ namespace Snowberry.Editor {
         }
 
         private static void CreatePlaytestMapDataHook(Action<MapData> orig_Load, MapData self) {
-            if(!generatePlaytestMapData)
+            if (!generatePlaytestMapData)
                 orig_Load(self);
             else {
-                if(Engine.Scene is Editor editor) {
+                if (Engine.Scene is Editor editor) {
                     editor.Map.GenerateMapData(self);
                 } else orig_Load(self);
             }
         }
 
         private static MapData HookSessionGetAreaData(Func<Session, MapData> orig, Session self) {
-            if(self.Area.SID == "Snowberry/Playtest") {
+            if (self.Area.SID == "Snowberry/Playtest") {
                 return PlaytestMapData;
             }
 
@@ -474,7 +500,7 @@ namespace Snowberry.Editor {
             to.WoodPlatform = from.WoodPlatform;
 
             // hold onto info about vanilla's hardcoded stuff
-            VanillaLevelID =  from.IsOfficialLevelSet() ? from.ID : -1;
+            VanillaLevelID = from.IsOfficialLevelSet() ? from.ID : -1;
         }
 
         internal static void EmptyMapMeta(AreaData of) {

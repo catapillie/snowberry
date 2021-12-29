@@ -6,7 +6,6 @@ using System.IO;
 
 namespace Snowberry.Editor {
     public class Decal {
-
         private MTexture texture;
         public Vector2 Position;
         public Vector2 Scale;
@@ -17,13 +16,13 @@ namespace Snowberry.Editor {
         public Rectangle Bounds => new Rectangle((int)(Position.X - Math.Abs(texture.Width * Scale.X) / 2 + Room.X * 8), (int)(Position.Y - Math.Abs(texture.Height * Scale.Y) / 2 + Room.Y * 8), (int)Math.Abs(texture.Width * Scale.X), (int)Math.Abs(texture.Height * Scale.Y));
 
         internal Decal(Room room, string texture) {
-            this.Room = room;
+            Room = room;
             this.texture = GFX.Game[texture];
             //this.Texture = texture;
         }
 
         internal Decal(Room room, DecalData data) {
-            this.Room = room;
+            Room = room;
 
             // messy, see Celeste.Decal.orig_ctor
             var ext = Path.GetExtension(data.Texture);

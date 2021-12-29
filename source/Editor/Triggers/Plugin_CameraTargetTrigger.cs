@@ -9,10 +9,10 @@ namespace Snowberry.Editor.Triggers {
         [Option("xOnly")] public bool XOnly = false;
         [Option("yOnly")] public bool YOnly = false;
 
-		public override int MinNodes => 1;
-		public override int MaxNodes => 1;
+        public override int MinNodes => 1;
+        public override int MaxNodes => 1;
 
-		public static new void AddPlacements() {
+        public static new void AddPlacements() {
             Placements.Create("Camera Target Trigger", "cameraTargetTrigger");
         }
     }

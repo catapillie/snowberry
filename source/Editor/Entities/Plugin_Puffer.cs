@@ -9,7 +9,7 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            GFX.Game[$"objects/puffer/idle00"].DrawOutlineCentered(Position, Color.White, new Vector2(Right ? 1 : -1, 1));
+            FromSprite("pufferFish", "idle")?.DrawOutlineCentered(Position, Color.White, new Vector2(Right ? 1 : -1, 1));
         }
 
         public static void AddPlacements() {

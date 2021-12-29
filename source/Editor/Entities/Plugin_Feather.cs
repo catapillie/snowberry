@@ -11,7 +11,7 @@ namespace Snowberry.Editor.Entities {
 
         public override void Render() {
             base.Render();
-            GFX.Game["objects/flyFeather/idle00"].DrawCentered(Position);
+            FromSprite("flyFeather", "loop")?.DrawCentered(Position);
             if (Shielded)
                 Draw.Circle(Position, 12f, Color.White, 5);
         }

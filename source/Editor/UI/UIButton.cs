@@ -1,7 +1,7 @@
-﻿using Celeste;
+﻿using System;
+using Celeste;
 using Microsoft.Xna.Framework;
 using Monocle;
-using System;
 
 namespace Snowberry.Editor.UI {
     public class UIButton : UIElement {
@@ -28,14 +28,17 @@ namespace Snowberry.Editor.UI {
         private bool pressed, hovering;
 
         private readonly MTexture
-            top, bottom,
-            topFill, bottomFill,
+            top,
+            bottom,
+            topFill,
+            bottomFill,
             mid;
         public bool active = true; //Whether or not the Button is able to be pressed. Currently implemented poorly.
         public Action OnPress, OnRightPress;
+        public bool Underline = false, Strikethrough = false;
 
         private UIButton(int spaceX, int spaceY, int minWidth, int minHeight) {
-            MTexture full = GFX.Gui["editor/button"];
+            MTexture full = GFX.Gui["Snowberry/button"];
             top = full.GetSubtexture(0, 0, 3, 4);
             topFill = full.GetSubtexture(2, 0, 1, 4);
             bottom = full.GetSubtexture(0, 5, 3, 3);
@@ -58,7 +61,7 @@ namespace Snowberry.Editor.UI {
             SetText(text, font);
         }
 
-        public UIButton(MTexture icon, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8) 
+        public UIButton(MTexture icon, int spaceX = 0, int spaceY = 0, int minWidth = 6, int minHeight = 8)
             : this(spaceX, spaceY, minWidth, minHeight) {
             SetIcon(icon);
             FG = PressedFG = HoveredFG = Color.White;
@@ -97,31 +100,40 @@ namespace Snowberry.Editor.UI {
             SetSize(icoWidth + 6, icoHeight + 3);
         }
 
+        public void ResetBgColors() {
+            BG = DefaultBG;
+            HoveredBG = DefaultHoveredBG;
+            PressedBG = DefaultPressedBG;
+        }
+
+        public void ResetFgColors() {
+            FG = DefaultFG;
+            HoveredFG = DefaultHoveredFG;
+            PressedFG = DefaultPressedFG;
+        }
+
         public override void Update(Vector2 position = default) {
             base.Update();
 
             int mouseX = (int)Editor.Mouse.Screen.X;
             int mouseY = (int)Editor.Mouse.Screen.Y;
-            if (active)
-            {
+            if (active) {
                 hovering = new Rectangle((int)position.X + 1, (int)position.Y + 1, Width - 2, Height - 2).Contains(mouseX, mouseY);
 
-                if ((MInput.Mouse.PressedLeftButton || MInput.Mouse.PressedRightButton) && hovering)
+                if (hovering && (ConsumeLeftClick() || ConsumeAltClick()))
                     pressed = true;
-                else if (MInput.Mouse.ReleasedLeftButton || MInput.Mouse.ReleasedRightButton)
-                {
-                    if (hovering && pressed)
-                    {
-                        if (MInput.Mouse.ReleasedLeftButton)
-                            Pressed();
-                        else
-                            OnRightPress?.Invoke();
+                else if (hovering && pressed) {
+                    if (ConsumeAltClick(pressed: false, released: true)) {
+                        OnRightPress?.Invoke();
+                        pressed = false;
+                    } else if (ConsumeLeftClick(pressed: false, released: true)) {
+                        Pressed();
+                        pressed = false;
                     }
-
-                    pressed = false;
                 }
+
+                lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
             }
-            lerp = Calc.Approach(lerp, pressed ? 1f : 0f, Engine.DeltaTime * 20f);
         }
 
         protected virtual void Pressed() {
@@ -152,9 +164,14 @@ namespace Snowberry.Editor.UI {
 
             Vector2 at = position + new Vector2(3 + space.X, press + space.Y);
             Color fg = Color.Lerp(hovering ? HoveredFG : FG, PressedFG, lerp);
-            if (text != null && font != null)
+            if (text != null && font != null) {
                 font.Draw(text, at, Vector2.One, fg);
-            else icon?.Invoke(at, fg);
-		}
+                Vector2 textArea = font.Measure(this.text);
+                if (Underline)
+                    Draw.Rect(at + new Vector2(-2, textArea.Y), textArea.X + 4, 1, FG);
+                if (Strikethrough)
+                    Draw.Rect(at + new Vector2(-2, textArea.Y / 2 + 1), textArea.X + 4, 1, Color.Lerp(FG, Color.Black, 0.25f));
+            } else icon?.Invoke(at, fg);
+        }
     }
 }

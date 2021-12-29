@@ -9,8 +9,8 @@ namespace Snowberry.Editor.Entities {
             base.Render();
 
             int id = Room.Map.From.ID;
-			string text = !string.IsNullOrWhiteSpace(Background) ? "objects/checkpoint/bg/" + Background : "objects/checkpoint/bg/" + id;
-			if(GFX.Game.Has(text)) {
+            string text = !string.IsNullOrWhiteSpace(Background) ? "objects/checkpoint/bg/" + Background : "objects/checkpoint/bg/" + id;
+            if (GFX.Game.Has(text)) {
                 GFX.Game[text].DrawJustified(Position, new Microsoft.Xna.Framework.Vector2(0.5f, 1));
             }
         }

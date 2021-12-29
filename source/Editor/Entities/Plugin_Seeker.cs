@@ -5,18 +5,17 @@ using Monocle;
 namespace Snowberry.Editor.Entities {
     [Plugin("seeker")]
     public class Plugin_Seeker : Entity {
+        public override int MaxNodes => -1;
 
-		public override int MaxNodes => -1;
-
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
-            MTexture seeker = GFX.Game["characters/monsters/predator73"];
-            seeker.DrawCentered(Position);
+            MTexture seeker = FromSprite("seeker", "idle");
+            seeker?.DrawCentered(Position);
 
             Vector2 prev = Position;
             foreach (Vector2 node in Nodes) {
-                seeker.DrawCentered(node);
+                seeker?.DrawCentered(node);
                 Draw.Line(prev, node, Color.White * 0.5f);
                 prev = node;
             }

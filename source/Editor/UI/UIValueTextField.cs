@@ -45,7 +45,7 @@ namespace Snowberry.Editor.UI {
         protected override void OnInputUpdate(string input) {
             base.OnInputUpdate(input);
             try {
-                Value = (T) Convert.ChangeType(input, typeof(T));
+                Value = (T)Convert.ChangeType(input, typeof(T));
                 OnValidInputChange?.Invoke(Value);
                 Error = false;
             } catch {

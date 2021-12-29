@@ -48,6 +48,7 @@ namespace Snowberry.Editor {
                     break;
                 }
             }
+
             if (i < 0)
                 Entity.SetPosition(position);
             else
@@ -61,6 +62,7 @@ namespace Snowberry.Editor {
                     break;
                 }
             }
+
             Entity.SetWidth(width);
         }
 
@@ -71,11 +73,12 @@ namespace Snowberry.Editor {
                     break;
                 }
             }
+
             Entity.SetHeight(height);
         }
 
-		public override bool Equals(object obj) {
-			return obj != null && obj is EntitySelection s && s.Entity.Equals(Entity) && s.Selections.All(it => Selections.Any(x => x.Index == it.Index));
-		}
-	}
+        public override bool Equals(object obj) {
+            return obj != null && obj is EntitySelection s && s.Entity.Equals(Entity) && s.Selections.All(it => Selections.Any(x => x.Index == it.Index));
+        }
+    }
 }

@@ -7,10 +7,10 @@ namespace Snowberry.Editor.Entities {
         protected virtual float Alpha => 1.0f;
         protected VirtualMap<MTexture> Tiles;
 
-		public override int MinWidth => 8;
-		public override int MinHeight => 8;
+        public override int MinWidth => 8;
+        public override int MinHeight => 8;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             if (Tiles != null) {
@@ -29,16 +29,16 @@ namespace Snowberry.Editor.Entities {
             base.Initialize();
             Tiles = GFX.FGAutotiler.GenerateBox(TileType, Width / 8, Height / 8).TileGrid.Tiles;
         }
-	}
+    }
 
     [Plugin("introCrusher")]
     public class Plugin_IntroCrusher : Plugin_TileEntity {
         [Option("flags")] public string Flags = "1,0b";
 
-		public override int MinNodes => 1;
-		public override int MaxNodes => 1;
+        public override int MinNodes => 1;
+        public override int MaxNodes => 1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             if (Tiles != null && Nodes.Length > 0) {
@@ -47,6 +47,7 @@ namespace Snowberry.Editor.Entities {
                     for (int y = 0; y < Tiles.Rows; y++)
                         Tiles[x, y]?.Draw(Nodes[0] + new Vector2(x, y) * 8, Vector2.Zero, c);
             }
+
             DrawUtil.DottedLine(Center, Nodes[0] + new Vector2(Width, Height) / 2, Color.White, 8, 4);
         }
 
@@ -79,7 +80,7 @@ namespace Snowberry.Editor.Entities {
     }
 
     [Plugin("fakeBlock")]
-    [Plugin("exitBlock")] 
+    [Plugin("exitBlock")]
     public class Plugin_FakeBlock : Plugin_FakeWall {
         [Option("playTransitionReveal")] public bool PlayTransitionReveal = false;
 

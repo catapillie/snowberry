@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20FB55F7-2C76-4023-9363-FA9CB8EAEDDA}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		everest.yaml = everest.yaml
 	EndProjectSection
 EndProject
 Global

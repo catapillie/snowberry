@@ -22,10 +22,10 @@ namespace Snowberry.Editor.Entities {
         private static readonly Color fill = Color.Magenta * 0.2f;
         private static readonly Color border = new Color(0.4f, 0.0f, 0.4f);
 
-		public override int MinWidth => 8;
-		public override int MinHeight => 8;
+        public override int MinWidth => 8;
+        public override int MinHeight => 8;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
             Draw.Rect(Position, Width, Height, fill);
             Draw.HollowRect(Position, Width, Height, border);

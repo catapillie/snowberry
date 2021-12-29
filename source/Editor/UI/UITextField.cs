@@ -62,8 +62,9 @@ namespace Snowberry.Editor.UI {
             }
         }
 
-        private void InsertString(int from, int to, string str = null)
-            => UpdateInput(Value.Substring(0, from) + str + Value.Substring(to));
+        private void InsertString(int from, int to, string str = null) {
+            UpdateInput(Value.Substring(0, from) + str + Value.Substring(to));
+        }
 
         public void UpdateInput(string str) {
             Value = str;
@@ -73,6 +74,7 @@ namespace Snowberry.Editor.UI {
                 widthAtIndex[i] = w;
                 w += (int)Font.Measure(Value[i]).X + 1;
             }
+
             widthAtIndex[widthAtIndex.Length - 1] = w;
             OnInputUpdate(Value);
         }
@@ -83,16 +85,19 @@ namespace Snowberry.Editor.UI {
 
         private void GetSelection(out int a, out int b) {
             if (charIndex < selection) {
-                a = charIndex; b = selection;
+                a = charIndex;
+                b = selection;
             } else if (selection < charIndex) {
-                a = selection; b = charIndex;
+                a = selection;
+                b = charIndex;
             } else {
                 a = b = charIndex;
             }
         }
 
-        private static bool MustSeparate(char at, char previous)
-            => char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
+        private static bool MustSeparate(char at, char previous) {
+            return char.GetUnicodeCategory(char.ToLower(at)) != char.GetUnicodeCategory(char.ToLower(previous));
+        }
 
         private int MoveIndex(int step, bool stepByWord) {
             int next = charIndex;
@@ -104,7 +109,8 @@ namespace Snowberry.Editor.UI {
             } else
                 next += step;
 
-            return Calc.Clamp(next, 0, Value.Length); ;
+            return Calc.Clamp(next, 0, Value.Length);
+            ;
         }
 
         public override void Update(Vector2 position = default) {
@@ -117,8 +123,16 @@ namespace Snowberry.Editor.UI {
             if (MInput.Mouse.CheckLeftButton) {
                 bool click = MInput.Mouse.PressedLeftButton;
 
-                if (click)
-                    Selected = inside;
+                if (click) {
+                    // don't require consuming the click to deselect, but do require it to select
+                    if (inside) {
+                        if (ConsumeLeftClick()) {
+                            Selected = true;
+                        }
+                    } else {
+                        Selected = false;
+                    }
+                }
 
                 if (Selected) {
                     int i, d = mouseX - (int)position.X + 1;
@@ -139,7 +153,7 @@ namespace Snowberry.Editor.UI {
             if (Selected) {
                 bool shift = MInput.Keyboard.CurrentState[Keys.LeftShift] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightShift] == KeyState.Down;
                 bool ctrl = MInput.Keyboard.CurrentState[Keys.LeftControl] == KeyState.Down || MInput.Keyboard.CurrentState[Keys.RightControl] == KeyState.Down;
-                
+
                 if (MInput.Keyboard.Pressed(Keys.Escape)) {
                     Selected = false;
                 } else {
@@ -162,7 +176,7 @@ namespace Snowberry.Editor.UI {
                         charIndex = Value.Length;
                         selection = 0;
                     }
-                    
+
                     if (selection != charIndex && (copy || cut)) {
                         GetSelection(out int a, out int b);
                         clipboard = Value.Substring(a, b - a);
@@ -183,15 +197,16 @@ namespace Snowberry.Editor.UI {
             hovering = inside;
         }
 
-        protected virtual void DrawText(Vector2 position)
-            => Font.Draw(Value, position, Vector2.One, FG);
+        protected virtual void DrawText(Vector2 position) {
+            Font.Draw(Value, position, Vector2.One, FG);
+        }
 
         public override void Render(Vector2 position = default) {
             base.Render(position);
 
             Draw.Rect(position, Width, Height, Color.Lerp(BG, BGSelected, hovering && !Selected ? 0.25f : lerp));
             DrawText(position);
-            
+
             Draw.Rect(position + Vector2.UnitY * Height, Width, 1, Line);
             if (lerp != 0f) {
                 float ease = Ease.ExpoOut(lerp);
@@ -203,6 +218,7 @@ namespace Snowberry.Editor.UI {
                 if ((Engine.Scene.TimeActive - timeOffset) % 1f < 0.5f) {
                     Draw.Rect(position + Vector2.UnitX * widthAtIndex[charIndex], 1, Font.LineHeight, FG);
                 }
+
                 if (selection != charIndex) {
                     int a = widthAtIndex[charIndex], b = widthAtIndex[selection];
                     if (a < b)

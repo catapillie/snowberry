@@ -26,7 +26,8 @@ namespace Snowberry {
         public PluginInfo Info { get; internal set; }
         public string Name { get; internal set; }
 
-        public void Set(string option, object value) {
+        // overriden by generic plugins
+        public virtual void Set(string option, object value) {
             if (Info.Options.TryGetValue(option, out FieldInfo f)) {
                 object v = value is string str ? RawToObject(f.FieldType, str) : value;
                 try {
@@ -38,16 +39,17 @@ namespace Snowberry {
             }
         }
 
-        public object Get(string option) {
+        public virtual object Get(string option) {
             if (Info.Options.TryGetValue(option, out FieldInfo f))
                 return ObjectToRaw(f.GetValue(this));
             return null;
         }
 
-        private static object RawToObject(Type targetType, string raw) {
+        protected static object RawToObject(Type targetType, string raw) {
             if (targetType == typeof(Color)) {
                 return Monocle.Calc.HexToColor(raw);
             }
+
             if (targetType.IsEnum) {
                 try {
                     return Enum.Parse(targetType, raw);
@@ -55,13 +57,15 @@ namespace Snowberry {
                     return null;
                 }
             }
+
             if (targetType == typeof(char)) {
                 return raw[0];
             }
+
             return raw;
         }
 
-        private static object ObjectToRaw(object obj) {
+        protected static object ObjectToRaw(object obj) {
             return obj switch {
                 Color color => BitConverter.ToString(new byte[] { color.R, color.G, color.B }).Replace("-", string.Empty),
                 Enum => obj.ToString(),

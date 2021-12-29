@@ -1,9 +1,9 @@
 ﻿using Celeste;
 using Microsoft.Xna.Framework;
+using Monocle;
 using System.Collections.Generic;
 
 namespace Snowberry.Editor {
-
     public abstract class Entity : Plugin {
         public Room Room { get; private set; }
 
@@ -32,24 +32,28 @@ namespace Snowberry.Editor {
         private bool nodesChanged;
         private readonly List<Vector2> nodes = new List<Vector2>();
         private Vector2[] nodeArray;
+
         public Vector2[] Nodes {
             get {
                 if (nodeArray == null || nodesChanged) {
                     nodeArray = nodes.ToArray();
                     nodesChanged = false;
                 }
+
                 return nodeArray;
             }
         }
 
         private bool updateSelection = true;
         private Rectangle[] selectionRectangles;
+
         internal Rectangle[] SelectionRectangles {
             get {
                 if (updateSelection) {
                     selectionRectangles = Select();
                     updateSelection = false;
                 }
+
                 return selectionRectangles;
             }
         }
@@ -72,6 +76,7 @@ namespace Snowberry.Editor {
                 Nodes[i] = position;
                 updateSelection = true;
             }
+
             Room.MarkTrackedEntityDirty(this);
         }
 
@@ -80,6 +85,7 @@ namespace Snowberry.Editor {
                 nodes[i] += amount;
                 updateSelection = nodesChanged = true;
             }
+
             Room.MarkTrackedEntityDirty(this);
         }
 
@@ -107,25 +113,39 @@ namespace Snowberry.Editor {
             Room.MarkTrackedEntityDirty(this);
         }
 
-        public virtual void ChangeDefault() {}
-        public virtual void Initialize() => ChangeDefault();
-        public virtual void InitializeAfter() { }
-		protected virtual Rectangle[] Select() {
-            List<Rectangle> ret = new List<Rectangle>();
-			ret.Add(new Rectangle(Width < 6 ? X - 3 : X, Height < 6 ? Y - 3 : Y, Width < 6 ? 6 : Width, Height < 6 ? 6 : Height));
-			foreach(var node in nodes) {
-                ret.Add(new Rectangle((int)node.X - 3, (int)node.Y - 3, 6, 6));
-			}
-            return ret.ToArray();
-		}
+        public virtual void ChangeDefault() { }
 
-		public virtual void Render() { }
+        public virtual void Initialize() {
+            ChangeDefault();
+        }
+
+        public virtual void InitializeAfter() { }
+
+        protected virtual Rectangle[] Select() {
+            List<Rectangle> ret = new List<Rectangle>();
+            ret.Add(new Rectangle(Width < 6 ? X - 3 : X, Height < 6 ? Y - 3 : Y, Width < 6 ? 6 : Width, Height < 6 ? 6 : Height));
+            foreach (var node in nodes) {
+                ret.Add(new Rectangle((int)node.X - 3, (int)node.Y - 3, 6, 6));
+            }
+
+            return ret.ToArray();
+        }
+
+        public virtual void Render() { }
         public virtual void RenderBefore() { }
         public virtual void HQRender() { }
 
+        private static readonly Sprite carrier = new Sprite(GFX.SpriteBank.Atlas, "strawberry");
+
+        public static MTexture FromSprite(string spriteName, string animName) {
+            GFX.SpriteBank.CreateOn(carrier, spriteName);
+            carrier.Play(animName);
+            return carrier.Texture;
+        }
+
         #region Entity Instantiating
 
-        public virtual void ApplyDefaults() {}
+        public virtual void ApplyDefaults() { }
 
         private Entity InitializeData(EntityData entityData) {
             Vector2 offset = Room.Position * 8;

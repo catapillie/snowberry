@@ -2,9 +2,9 @@
 using Snowberry.Editor;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Collections.ObjectModel;
 
 namespace Snowberry {
     public class PluginInfo {
@@ -34,6 +34,7 @@ namespace Snowberry {
                         options.Add(option.Name, f);
                 }
             }
+
             Options = new ReadOnlyDictionary<string, FieldInfo>(options);
         }
 
@@ -64,9 +65,9 @@ namespace Snowberry {
 
                     PluginInfo info = new PluginInfo(pl.Name, t, ctor, module);
 
-                    if(isEntity)
+                    if (isEntity)
                         Entities.Add(pl.Name, info);
-                    else if(isStyleground)
+                    else if (isStyleground)
                         Stylegrounds.Add(pl.Name, info);
                     else
                         OtherPlugins.Add(pl.Name, info);
@@ -74,10 +75,10 @@ namespace Snowberry {
                     Snowberry.Log(LogLevel.Info, $"Successfully registered '{pl.Name}' plugin");
                 }
 
-                if(isEntity) {
+                if (isEntity) {
                     MethodInfo addPlacements = t.GetMethod("AddPlacements");
-                    if(addPlacements != null) {
-                        if(addPlacements.GetParameters().Length == 0) {
+                    if (addPlacements != null) {
+                        if (addPlacements.GetParameters().Length == 0) {
                             addPlacements.Invoke(null, new object[0]);
                         } else {
                             Snowberry.Log(LogLevel.Warn, $"Found entity plugin with invalid AddPlacements (has parameters)! skipping... (Type: {t})");
@@ -88,5 +89,9 @@ namespace Snowberry {
                 }
             }
         }
+    }
+
+    internal class UnkownPluginInfo : PluginInfo {
+        public UnkownPluginInfo(string name) : base(name, typeof(Plugin), null, CelesteEverest.INSTANCE) { }
     }
 }

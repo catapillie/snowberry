@@ -7,7 +7,7 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            GFX.Game["characters/player/sitDown00"].DrawCentered(Position - Vector2.UnitY * 16);
+            FromSprite("player", "sitDown")?.DrawCentered(Position - Vector2.UnitY * 16);
         }
 
         public static void AddPlacements() {

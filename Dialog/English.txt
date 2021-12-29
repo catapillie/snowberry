@@ -57,6 +57,11 @@ SNOWBERRY_SNOWBERRY={# d12626}Snowberry{#}
     SNOWBERRY_STYLEGROUNDS_STARDUST=            stardust
     SNOWBERRY_STYLEGROUNDS_PLANETS=             planets
 
-# Error Messages
+# *** Error Messages ***
     
     SNOWBERRY_PLAYTEST_MAP_POSTCARD=            This might be out of the way, but it's not a collectable!{n}{n}This map is used to implement some {+SNOWBERRY_SNOWBERRY} features, and has no real content.
+
+# *** Settings ***
+
+    SNOWBERRY_SETTINGS_MIDDLE_CLICK_PAN=        Middle Click to Pan
+    SNOWBERRY_SETTINGS_MIDDLE_CLICK_PAN_SUB=    Whether to use middle click to pan and right click for alternate placements,{n}or right click to pan and alt-left-click for alternate placements.

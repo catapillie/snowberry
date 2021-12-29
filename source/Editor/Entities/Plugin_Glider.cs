@@ -1,20 +1,18 @@
-﻿using Celeste;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Monocle;
 using System;
 
 namespace Snowberry.Editor.Entities {
     [Plugin("glider")]
     public class Plugin_Glider : Entity {
-
         [Option("bubble")] public bool Bubble = false;
         [Option("tutorial")] public bool Tutorial = false;
 
         public override void Render() {
             base.Render();
-            GFX.Game["objects/glider/idle0"].DrawOutlineCentered(Position);
-            if(Bubble) {
-                for(int i = 0; i < 24; i++) {
+            FromSprite("glider", "idle")?.DrawOutlineCentered(Position);
+            if (Bubble) {
+                for (int i = 0; i < 24; i++) {
                     Draw.Point(Position + PlatformAdd(i), PlatformColor(i));
                 }
             }
@@ -25,7 +23,7 @@ namespace Snowberry.Editor.Entities {
         }
 
         private Color PlatformColor(int num) {
-            if(num <= 1 || num >= 22) {
+            if (num <= 1 || num >= 22) {
                 return Color.White * 0.4f;
             }
 

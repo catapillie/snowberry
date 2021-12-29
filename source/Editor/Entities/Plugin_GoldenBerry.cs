@@ -9,9 +9,9 @@ namespace Snowberry.Editor.Entities {
 
         private bool noDash;
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Initialize() {
+        public override void Initialize() {
             base.Initialize();
             noDash = Name == "memorialTextController";
         }
@@ -21,12 +21,12 @@ namespace Snowberry.Editor.Entities {
 
             bool seeded = Nodes.Length != 0;
             string dir = seeded && !noDash ? "ghostgoldberry" : "goldberry";
-            string anim = Winged || noDash ? "wings01" : "idle00";
-            GFX.Game[$"collectables/{dir}/{anim}"].DrawCentered(Position);
+            string anim = Winged || noDash ? "flap" : "idle";
+            FromSprite(dir, anim)?.DrawCentered(Position);
 
             if (seeded)
                 foreach (Vector2 node in Nodes)
-                    GFX.Game["collectables/strawberry/seed00"].DrawCentered(node);
+                    FromSprite("strawberrySeed", "idle")?.DrawCentered(node);
         }
 
         public static void AddPlacements() {

@@ -2,33 +2,32 @@
 using Microsoft.Xna.Framework;
 using Monocle;
 using Snowberry.Editor.UI.Menus;
+using Snowberry.Editor.Tools;
 using System;
 using System.Text.RegularExpressions;
 using static Snowberry.Editor.UI.UIEntitySelection;
 
 namespace Snowberry.Editor.UI {
+    class UIRoomSelectionPanel : UIElement {
+        public Color BG = Calc.HexToColor("202929");
 
-	class UIRoomSelectionPanel : UIElement {
+        public UIRoomSelectionPanel() {
+            BG.A = 127;
+            GrabsClick = true;
+        }
 
-		public Color BG = Calc.HexToColor("202929");
+        public override void Render(Vector2 position = default) {
+            Draw.Rect(Bounds, BG);
+            base.Render(position);
+        }
 
-		public UIRoomSelectionPanel() {
-			BG.A = 127;
-			GrabsClick = true;
-		}
-
-		public override void Render(Vector2 position = default) {
-			Draw.Rect(Bounds, BG);
-			base.Render(position);
-		}
-
-		public void Refresh() {
+        public void Refresh() {
             Clear();
             UIElement label;
 
-            if(Editor.SelectedRoom == null) {
-                if(!RoomTool.PendingRoom.HasValue) {
-                    if(Editor.SelectedFillerIndex != -1) {
+            if (Editor.SelectedRoom == null) {
+                if (!RoomTool.PendingRoom.HasValue) {
+                    if (Editor.SelectedFillerIndex != -1) {
                         Add(label = new UILabel("Selected filler: " + Editor.SelectedFillerIndex) {
                             FG = Color.DarkKhaki,
                             Underline = true
@@ -52,6 +51,7 @@ namespace Snowberry.Editor.UI {
                         });
                         label.Position = Vector2.UnitX * (Width / 2 - label.Width / 2);
                     }
+
                     return;
                 } else {
                     Add(label = new UILabel("Create room") {
@@ -80,9 +80,9 @@ namespace Snowberry.Editor.UI {
                     newRoom.OnPress = () => {
                         newNameInvalid.FG = newNameTaken.FG = Color.Transparent;
                         // validate room name
-                        if(newName.Length <= 0 || Regex.Match(newName, "[0-9a-zA-Z\\-_ ]+").Length != newName.Length)
+                        if (newName.Length <= 0 || Regex.Match(newName, "[0-9a-zA-Z\\-_ ]+").Length != newName.Length)
                             newNameInvalid.FG = Color.Red;
-                        else if(Editor.Instance.Map.Rooms.Exists(it => it.Name.Equals(newName)))
+                        else if (Editor.Instance.Map.Rooms.Exists(it => it.Name.Equals(newName)))
                             newNameTaken.FG = Color.Red;
                         else {
                             // add room
@@ -111,9 +111,9 @@ namespace Snowberry.Editor.UI {
                 }
             }
 
-			int spacing = Fonts.Regular.LineHeight + 2;
+            int spacing = Fonts.Regular.LineHeight + 2;
             Room room = Editor.SelectedRoom;
-            
+
             Add(label = new UILabel("Selected room:") {
                 FG = Color.DarkKhaki,
                 Underline = true
@@ -140,9 +140,9 @@ namespace Snowberry.Editor.UI {
             updateName.OnPress = () => {
                 nameInvalid.FG = nameTaken.FG = Color.Transparent;
                 // validate room name
-                if(name.Length <= 0 || Regex.Match(name, "[0-9a-zA-Z\\-_ ]+").Length != name.Length)
+                if (name.Length <= 0 || Regex.Match(name, "[0-9a-zA-Z\\-_ ]+").Length != name.Length)
                     nameInvalid.FG = Color.Red;
-                else if(room.Map.Rooms.Exists(it => it.Name.Equals(name)))
+                else if (room.Map.Rooms.Exists(it => it.Name.Equals(name)))
                     nameTaken.FG = Color.Red;
                 else
                     room.Name = name;
@@ -191,9 +191,8 @@ namespace Snowberry.Editor.UI {
             }, new Vector2(4, 12));
         }
 
-		public override void Update(Vector2 position = default) {
-			base.Update(position);
-
-		}
-	}
+        public override void Update(Vector2 position = default) {
+            base.Update(position);
+        }
+    }
 }

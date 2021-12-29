@@ -10,24 +10,24 @@ namespace Snowberry.Editor.Entities {
         [Option("order")] public int Order = -1;
         [Option("checkpointID")] public int CheckpointID = -1;
 
-		public override int MaxNodes => -1;
+        public override int MaxNodes => -1;
 
-		public override void Render() {
+        public override void Render() {
             base.Render();
 
             bool seeded = Nodes.Length != 0;
             if (Moon) {
-                string anim = seeded || Winged ? "ghost" : "normal";
-                GFX.Game[$"collectables/moonBerry/{anim}00"].DrawCentered(Position);
+                string anim = seeded || Winged ? "moonghostberry" : "moonberry";
+                FromSprite(anim, "idle")?.DrawCentered(Position);
             } else {
                 string dir = seeded ? "ghostberry" : "strawberry";
-                string anim = Winged ? "wings01" : (seeded ? "idle00" : "normal00");
-                GFX.Game[$"collectables/{dir}/{anim}"].DrawCentered(Position);
+                string anim = Winged ? "flap" : "idle";
+                FromSprite(dir, anim)?.DrawCentered(Position);
             }
 
             if (seeded)
                 foreach (Vector2 node in Nodes)
-                    GFX.Game["collectables/strawberry/seed00"].DrawCentered(node);
+                    FromSprite("strawberrySeed", "idle")?.DrawCentered(node);
         }
 
         public static void AddPlacements() {

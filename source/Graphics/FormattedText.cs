@@ -41,10 +41,12 @@ namespace Snowberry {
                         continue;
                     }
                 }
+
                 esc = false;
 
                 characters.Add(Tuple.Create<char?, Color>(c, colors.Count == 0 ? Color.White : colors.Peek()));
             }
+
             this.characters = characters.ToArray();
         }
 
@@ -70,7 +72,8 @@ namespace Snowberry {
             return formatted;
         }
 
-        public static FormattedText Parse(string expression)
-            => new FormattedText((string)expression.Clone());
+        public static FormattedText Parse(string expression) {
+            return new FormattedText((string)expression.Clone());
+        }
     }
 }

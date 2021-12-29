@@ -1,5 +1,4 @@
-﻿using Celeste;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Snowberry.Editor.Entities {
@@ -14,11 +13,11 @@ namespace Snowberry.Editor.Entities {
         public override void Render() {
             base.Render();
 
-            MTexture orb = GFX.Game["objects/badelineboost/idle00"];
-            orb.DrawCentered(Position);
+            MTexture orb = FromSprite("badelineBoost", "idle");
+            orb?.DrawCentered(Position);
 
             foreach (Vector2 node in Nodes)
-                orb.DrawCentered(node);
+                orb?.DrawCentered(node);
         }
 
         public override void HQRender() {

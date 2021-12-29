@@ -1,4 +1,5 @@
-﻿using Celeste.Mod;
+﻿using Celeste;
+using Celeste.Mod;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
@@ -18,10 +19,9 @@ namespace Snowberry {
         }
 
         private static Font LoadFont(string name) {
-            ModAsset font = Everest.Content.Get($"Snowberry:/Content/font/{name}");
-            ModAsset data = Everest.Content.Get($"Snowberry:/Content/font/{name}Data");
+            ModAsset data = Everest.Content.Get($"Snowberry:/Content/fonts/{name}Data");
 
-            Texture2D texture = Texture2D.FromStream(Engine.Instance.GraphicsDevice, font.Stream);
+            Texture2D texture = GFX.Gui[$"Snowberry/fonts/{name}"].Texture.Texture_Safe;
 
             XmlDocument xml = new XmlDocument();
             xml.Load(data.Stream);

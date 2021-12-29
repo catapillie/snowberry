@@ -11,7 +11,7 @@ namespace Snowberry.Editor.Entities {
     public class Plugin_ClutterBlock : Entity {
         private List<MTexture> blocks;
 
-		public override int MinWidth => 8;
+        public override int MinWidth => 8;
         public override int MinHeight => 8;
 
         public override void Initialize() {
@@ -56,7 +56,7 @@ namespace Snowberry.Editor.Entities {
         private bool CheckAndFill(VirtualMap<bool> map, int x, int y, int sx, int sy) {
             for (int i = x; i < sx; i++)
                 for (int j = y; j < sy; j++)
-                    if (map[i, j]) 
+                    if (map[i, j])
                         return false;
             for (int i = x; i < sx; i++)
                 for (int j = y; j < sy; j++)
