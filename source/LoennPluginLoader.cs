@@ -64,8 +64,10 @@ namespace Snowberry {
 					if(ex.Contains("error in error handling")) {
 						Snowberry.Log(LogLevel.Error, $"Could not load Loenn plugin at \"{asset.PathVirtual}\" because of internal Lua errors. No more Lua entities will be loaded. Try restarting the game.");
 						break;
-					} else
-						Snowberry.Log(LogLevel.Warn, $"Failed to load Loenn plugin at \"{asset.PathVirtual}\": {ex}");
+					} else {
+						Snowberry.Log(LogLevel.Warn, $"Failed to load Loenn plugin at \"{asset.PathVirtual}\"");
+						Snowberry.Log(LogLevel.Verbose, $"Reason: {ex}");
+					}
 				}
 			}
 
@@ -147,16 +149,20 @@ namespace Snowberry {
 				LuaFunction h = Everest.LuaLoader.Context.DoString("return function() return require(\"Loenn/" + name.Replace(".", "/") + "\") end").FirstOrDefault() as LuaFunction;
 				if(h.Call().FirstOrDefault() is not null) return h;
 			} catch(LuaScriptException e) {
-				if(!e.ToString().Contains("not found:")) 
-					Snowberry.Log(LogLevel.Warn, $"Failed to load at {name}: {e}");
+				if(!e.ToString().Contains("not found:")) {
+					Snowberry.Log(LogLevel.Warn, $"Failed to load at {name}");
+					Snowberry.Log(LogLevel.Verbose, $"Reason: {e}");
+				}
 			}
 
 			try {
 				LuaFunction h = Everest.LuaLoader.Context.DoString("return function() return require(\"LoennHelpers/" + name.Replace(".", "/") + "\") end").FirstOrDefault() as LuaFunction;
 				if(h.Call().FirstOrDefault() is not null) return h;
 			} catch(LuaScriptException e) {
-				if(!e.ToString().Contains("not found:"))
-					Snowberry.Log(LogLevel.Warn, $"Failed to load at {name}: {e}");
+				if(!e.ToString().Contains("not found:")) {
+					Snowberry.Log(LogLevel.Warn, $"Failed to load at {name}");
+					Snowberry.Log(LogLevel.Verbose, $"Reason: {e}");
+				}
 			}
 
 			return "\n\tCould not find Loenn library: " + name;
