@@ -50,6 +50,9 @@ namespace Snowberry.Editor.Entities {
 			if(plugin["justification"] is LuaTable justification) {
 				justify = new Vector2(Float(justification, 1, 0.5f), Float(justification, 2, 0.5f));
 			}
+
+			if(isTrigger)
+				text = Name; // Entities that are loaded do not get UpdatePostPlacement called
 		}
 
 		public override void UpdatePostPlacement(Placements.Placement placement) {
