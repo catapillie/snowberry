@@ -28,13 +28,15 @@ namespace Snowberry.Editor.UI.Menus {
         private float lerp;
         public bool Shown;
 
-        new public void Clear() {
+        public new void Clear() {
             base.Clear(); msgs.Clear();
         }
 
         public void AddElement(UIElement element, float justifyX, float justifyY, float hiddenJustifyX, float hiddenJustifyY) {
             Add(element);
-            msgs.Add(new Msg(element, new Vector2(justifyX, justifyY), new Vector2(hiddenJustifyX, hiddenJustifyY)));
+            var msg = new Msg(element, new Vector2(justifyX, justifyY), new Vector2(hiddenJustifyX, hiddenJustifyY));
+            msgs.Add(msg);
+            msg.UpdateElement(Width, Height, Ease.ExpoOut(lerp));
         }
 
         public override void Update(Vector2 position = default) {
