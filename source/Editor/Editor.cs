@@ -302,17 +302,19 @@ namespace Snowberry.Editor {
             // zooming
             bool canZoom = ui.CanScrollThrough();
             int wheel = Math.Sign(MInput.Mouse.WheelDelta);
-            float scale = Camera.Zoom;
-            if (canZoom) {
-                if (wheel > 0)
-                    scale = scale >= 1 ? scale + 1 : scale * 2f;
-                else if (wheel < 0)
-                    scale = scale > 1 ? scale - 1 : scale / 2f;
-            }
+            if (wheel != 0) {
+                float scale = Camera.Zoom;
+                if (canZoom) {
+                    if (wheel > 0)
+                        scale = scale >= 1 ? scale + 1 : scale * 2f;
+                    else if (wheel < 0)
+                        scale = scale > 1 ? scale - 1 : scale / 2f;
+                }
 
-            scale = Calc.Clamp(scale, 0.0625f, 24f);
-            if (scale != Camera.Zoom)
-                Camera.Zoom = scale;
+                scale = Calc.Clamp(scale, 0.0625f, 24f);
+                if (scale != Camera.Zoom)
+                    Camera.Zoom = scale;
+            }
 
             if (Camera.Buffer != null)
                 mousePos /= Camera.Zoom;
@@ -332,6 +334,12 @@ namespace Snowberry.Editor {
             Vector2 mouseVec = new Vector2(m.X, m.Y);
             Mouse.Screen = mouseVec / 2;
             Mouse.World = Vector2.Transform(Camera.Buffer == null ? mouseVec : mousePos, Camera.Inverse).Floor();
+
+            if (wheel != 0) {
+                Vector2 offset = Mouse.WorldLast - Mouse.World;
+                Camera.Position += offset;
+                Mouse.World += offset;
+            }
 
             MouseClicked = false;
             ui.Update();
