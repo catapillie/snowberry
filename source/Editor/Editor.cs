@@ -386,6 +386,8 @@ namespace Snowberry.Editor {
         }
 
         public override void Render() {
+            Draw.SpriteBatch.GraphicsDevice.Clear(bg);
+
             var tool = Map == null ? null : Tool.Tools[Toolbar.CurrentTool];
 
             #region UI Rendering
