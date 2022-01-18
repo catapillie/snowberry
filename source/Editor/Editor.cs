@@ -418,7 +418,7 @@ namespace Snowberry.Editor {
             else
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
 
-            Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
+            Engine.Instance.GraphicsDevice.Clear(bg);
             if (Map != null) {
                 Map.Render(Camera);
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Camera.Matrix);
@@ -432,7 +432,6 @@ namespace Snowberry.Editor {
 
             if (Camera.Buffer != null) {
                 Engine.Instance.GraphicsDevice.SetRenderTarget(null);
-                Engine.Instance.GraphicsDevice.Clear(bg);
 
                 Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, Engine.ScreenMatrix);
                 Draw.SpriteBatch.Draw(Camera.Buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, Camera.Zoom, SpriteEffects.None, 0f);
