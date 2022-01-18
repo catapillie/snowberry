@@ -144,21 +144,13 @@ namespace Snowberry.Editor {
         internal void HQRender(Editor.BufferCamera camera) {
             Rectangle viewRect = camera.ViewRect;
 
-            Rectangle scissor = Draw.SpriteBatch.GraphicsDevice.ScissorRectangle;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = true;
-
             foreach (Room room in Rooms) {
                 Rectangle rect = new Rectangle(room.Bounds.X * 8, room.Bounds.Y * 8, room.Bounds.Width * 8, room.Bounds.Height * 8);
                 if (!viewRect.Intersects(rect))
                     continue;
 
-                Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.ScreenView);
-                room.HQRender(camera.ScreenView);
-                Draw.SpriteBatch.End();
+                DrawUtil.WithinScissorRectangle(room.ScissorRect, () => room.HQRender(), camera.ScreenView, nested: false, false);
             }
-
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = scissor;
-            Engine.Instance.GraphicsDevice.RasterizerState.ScissorTestEnable = false;
         }
 
         public void GenerateMapData(MapData data) {

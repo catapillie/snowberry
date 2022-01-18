@@ -296,9 +296,7 @@ namespace Snowberry.Editor {
             DirtyTrackedEntities.Clear();
         }
 
-        internal void HQRender(Matrix m) {
-            Draw.SpriteBatch.GraphicsDevice.ScissorRectangle = ScissorRect;
-
+        internal void HQRender() {
             // Entities
             foreach (Entity entity in Entities)
                 entity.HQRender();
