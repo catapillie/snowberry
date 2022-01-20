@@ -51,7 +51,7 @@ namespace Snowberry.Editor {
         public virtual bool Additive => false;
 
         // Render on the Snowberry background
-        public virtual void Render() { }
+        public virtual void Render(Room room) { }
 
         public virtual string Title() {
             return Name;

@@ -18,8 +18,8 @@ namespace Snowberry.Editor.Stylegrounds {
             return $"{Dialog.Clean("SNOWBERRY_STYLEGROUNDS_IMAGE")}: \"{Texture}\" {(Atlas != "game" ? $"in {Atlas}" : "")}";
         }
 
-        public override void Render() {
-            base.Render();
+        public override void Render(Room room) {
+            base.Render(room);
 
             Editor editor = Editor.Instance;
             if (editor == null)
@@ -41,17 +41,22 @@ namespace Snowberry.Editor.Stylegrounds {
                 flip = SpriteEffects.FlipVertically;
             }
 
+            int left = room.Bounds.Left * 8;
+            int right = room.Bounds.Right * 8;
+            int top = room.Bounds.Top * 8;
+            int bottom = room.Bounds.Bottom * 8;
+
             if (LoopX) {
-                while (pos.X < editor.Camera.ViewRect.X)
+                while (pos.X < left)
                     pos.X += mtex.Width;
-                while (pos.X > editor.Camera.ViewRect.X)
+                while (pos.X > left)
                     pos.X -= mtex.Width;
             }
 
             if (LoopY) {
-                while (pos.Y < editor.Camera.ViewRect.Y)
+                while (pos.Y < top)
                     pos.Y += mtex.Height;
-                while (pos.Y > editor.Camera.ViewRect.Y)
+                while (pos.Y > top)
                     pos.Y -= mtex.Height;
             }
 
@@ -62,13 +67,13 @@ namespace Snowberry.Editor.Stylegrounds {
                     if (!LoopY)
                         break;
                     drawPos.Y += mtex.Height;
-                } while (drawPos.Y < editor.Camera.ViewRect.Bottom);
+                } while (drawPos.Y < bottom);
 
                 if (!LoopX)
                     break;
                 drawPos.X += mtex.Width;
                 drawPos.Y = pos.Y;
-            } while (drawPos.X < editor.Camera.ViewRect.Right);
+            } while (drawPos.X < right);
         }
     }
 }

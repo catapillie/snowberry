@@ -121,7 +121,7 @@ namespace Snowberry.Editor {
             foreach (var styleground in BGStylegrounds)
                 foreach (Room room in visibleRooms)
                     if (styleground.IsVisible(room))
-                        DrawUtil.WithinScissorRectangle(room.ScissorRect, styleground.Render, camera.Matrix, nested: false, styleground.Additive);
+                        DrawUtil.WithinScissorRectangle(room.ScissorRect, () => styleground.Render(room), camera.Matrix, nested: false, styleground.Additive);
 
             foreach (Room room in visibleRooms)
                 DrawUtil.WithinScissorRectangle(room.ScissorRect, () => room.Render(viewRect), camera.Matrix, nested: false);
@@ -129,7 +129,7 @@ namespace Snowberry.Editor {
             foreach (var styleground in FGStylegrounds)
                 foreach (Room room in visibleRooms)
                     if (styleground.IsVisible(room))
-                        DrawUtil.WithinScissorRectangle(room.ScissorRect, styleground.Render, camera.Matrix, nested: false, styleground.Additive);
+                        DrawUtil.WithinScissorRectangle(room.ScissorRect, () => styleground.Render(room), camera.Matrix, nested: false, styleground.Additive);
 
             Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
             for (int i = 0; i < Fillers.Count; i++) {
@@ -149,7 +149,7 @@ namespace Snowberry.Editor {
                 if (!viewRect.Intersects(rect))
                     continue;
 
-                DrawUtil.WithinScissorRectangle(room.ScissorRect, () => room.HQRender(), camera.ScreenView, nested: false, false);
+                DrawUtil.WithinScissorRectangle(room.ScissorRect, room.HQRender, camera.ScreenView, nested: false, false);
             }
         }
 
